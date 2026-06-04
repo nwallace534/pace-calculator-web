@@ -1,0 +1,147 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+:root {
+  --accent: #009688;
+}
+[data-bs-theme="dark"] {
+  --accent: #d2fe3d;
+}
+
+.flow-container {
+  max-width: 704px;
+}
+
+@media (max-width: 767.98px) {
+  .flow-container {
+    max-width: 340px;
+  }
+}
+
+.form-control-huge {
+  padding: 0.1rem 0.4rem !important;
+  font-size: 1.75rem !important;
+}
+
+.numeric-input-md {
+  width: 3.2rem !important;
+}
+
+.numeric-input-lg {
+  min-width: 3.2rem !important;
+  max-width: 4rem !important;
+}
+
+.numeric-input-xl {
+  min-width: 3.2rem !important;
+  max-width: 5.2rem !important;
+}
+
+.text-small {
+  font-size: 0.75rem !important;
+}
+
+.text-smallish {
+  font-size: 0.9rem !important;
+}
+
+.text-big {
+  font-size: 1.5rem !important;
+}
+
+.text-huge {
+  font-size: 1.75rem !important;
+}
+
+.text-ginormous {
+  font-size: 2rem !important;
+}
+
+.output {
+  font-weight: 200;
+  font-family: var(--bs-font-monospace);
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.rotatable-icon {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
+.calculator-form label {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.spinner-btn {
+  border-color: transparent;
+  position: relative;
+}
+
+.spinner-btn::before {
+  content: "";
+  position: absolute;
+  inset: -1.25rem;
+}
+
+.spinner-btn.spinner-btn-down::before {
+  inset-inline-end: 0;
+}
+.spinner-btn.spinner-btn-up::before {
+  inset-inline-start: 0;
+}
+
+.btn.spinner-btn:focus,
+.btn.spinner-btn:active,
+.btn.spinner-btn:disabled {
+  outline: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.spinner-btn svg {
+  transform: scale(1);
+  transition: transform 0.08s ease-out;
+}
+
+/* Press feedback is purely CSS. The animation runs from press toward scale(1.2)
+   and `forwards` holds it there for the full hold duration. On release, the
+   `:active` selector stops matching, the animation is dropped, and the base
+   transition above smoothly returns the icon to scale(1). */
+.spinner-btn:not(:disabled):active svg {
+  animation: spinner-press 0.13s ease-out forwards;
+}
+
+@keyframes spinner-press {
+  to {
+    transform: scale(1.2);
+  }
+}
+
+.spinner-hint {
+  position: absolute;
+  z-index: 1060;
+  max-width: 16rem;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+.spinner-hint.spinner-hint-show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.calculator-form :is(input, select) {
+  background-color: var(--bs-tertiary-bg);
+}

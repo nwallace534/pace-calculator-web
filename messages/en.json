@@ -1,0 +1,288 @@
+{
+  "theme": {
+    "controlLabel": "Dark mode",
+    "toggleAriaLabel": "Toggle dark mode",
+    "logoAlt": "Pacerly logo"
+  },
+  "calculator": {
+    "distanceApproximation": "{{from}} is approximately {{to}}",
+    "runDuration": "Run duration",
+    "holdHint": "Tip: press and hold to change faster",
+    "increaseTimeAriaLabel": "Increase time",
+    "decreaseTimeAriaLabel": "Decrease time",
+    "selectedRunDistance": "Selected run distance",
+    "customDistance": "Custom (road)",
+    "customTrackDistance": "Custom (track)",
+    "timeUnit": {
+      "hours": "hours",
+      "minutes": "minutes",
+      "seconds": "seconds",
+      "hundredths": "hundredths"
+    },
+    "eventGroup": {
+      "mostPopular": "Most popular",
+      "middleDistance": "Middle distance",
+      "sprints": "Sprints"
+    },
+    "result": {
+      "needsDistance": "Enter a distance to see your pace.",
+      "needsTime": "Enter a time to see your pace.",
+      "fasterThanRecordPace": "Faster than world record pace.",
+      "pacePerKm": "Pace per km",
+      "pacePerMile": "Pace per mile",
+      "speedKph": "Speed kph",
+      "speedMph": "Speed mph",
+      "timesForPace": "Times for pace",
+      "splits": "Splits",
+      "splitsInUnit": "Show in {{unit}}",
+      "trackSummary": "First {{opening}}m in {{openingTime}} · {{lap}}m laps in {{lapTime}}",
+      "eventGuideTitle": "{{event}} goals and records",
+      "columnDistance": "Distance",
+      "columnTime": "Time"
+    },
+    "unit": {
+      "perKm": "/km",
+      "perMile": "/mile",
+      "kph": "km/h",
+      "mph": "mph"
+    }
+  },
+  "events": {
+    "event": {
+      "oneHundredMeters": {
+        "label": "100m",
+        "guide": {
+          "description": "<em>THE</em> sprint event, made legendary by Usain Bolt. Casual runners take <strong>14–18 seconds</strong>, while the fastest hit top speeds over <strong>27 mph</strong>."
+        },
+        "sub15": {
+          "label": "Sub 15 secs ⚡"
+        },
+        "sub12": {
+          "label": "Sub 12 secs 🔥"
+        },
+        "fWR": {
+          "label": "10.49 Flo-Jo '88 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "9.58 Bolt '09 (M WR) 🏆"
+        }
+      },
+      "twoHundredMeters": {
+        "label": "200m",
+        "guide": {
+          "description": "Half a lap of the track — its second 100m, from a running start, is the fastest 100m in athletics. Elites go <strong>sub-22</strong>."
+        },
+        "sub30": {
+          "label": "Sub 30 secs ⚡"
+        },
+        "sub25": {
+          "label": "Sub 25 secs 🔥"
+        },
+        "fWR": {
+          "label": "21.34 Flo-Jo '88 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "19.19 Bolt '09 (M WR) 🏆"
+        }
+      },
+      "fourHundredMeters": {
+        "label": "400m",
+        "guide": {
+          "description": "One lap of the track, appearing in many forms: sprint, hurdles and relays. Elites target <strong>sub-44 seconds</strong> for men and <strong>sub-49</strong> for women."
+        },
+        "sub60": {
+          "label": "Sub 60 secs ⚡"
+        },
+        "sub50": {
+          "label": "Sub 50 secs 🔥"
+        },
+        "fWR": {
+          "label": "47.60 Koch '85 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "43.03 Van Niekerk '16 (M WR) 🏆"
+        }
+      },
+      "eightHundredMeters": {
+        "label": "800m",
+        "guide": {
+          "description": "Two laps of the track where the first lap is often the fastest. Local times start around <strong>2:30</strong>, while elites are under <strong>2 minutes</strong>."
+        },
+        "twoThirty": {
+          "label": "2:30 ⏱️"
+        },
+        "subTwo": {
+          "label": "Sub 2 mins ⚡"
+        },
+        "mWR": {
+          "label": "1:40.91 Rudisha '12 (M WR) 🏆"
+        },
+        "fWR": {
+          "label": "1:53.28 Kratochvílová '83 (F WR) 🏆"
+        }
+      },
+      "fifteenHundredMeters": {
+        "label": "1500m",
+        "guide": {
+          "description": "Known as the 'metric mile,' it's a tactical event that often comes down to finishing speed on the last lap. Elite runners are under <strong>4 minutes</strong>."
+        },
+        "fiveThirty": {
+          "label": "5:30 ⏱️"
+        },
+        "sub5": {
+          "label": "Sub 5 mins ⚡"
+        },
+        "sub430": {
+          "label": "Sub 4:30 🔥"
+        },
+        "fWR": {
+          "label": "3:49.04 Kipyegon '24 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "3:26.00 El Guerrouj '98 (M WR) 🏆"
+        }
+      },
+      "mile": {
+        "label": "1 mile",
+        "guide": {
+          "description": "The mile (<strong>1609m</strong>) is iconic in athletics. Club times start around <strong>6 minutes</strong>; Roger Bannister became the first to break <strong>4 minutes</strong> in 1954."
+        },
+        "sub7": {
+          "label": "Sub 7 mins ⚡"
+        },
+        "sub6": {
+          "label": "Sub 6 mins ⚡"
+        },
+        "sub5": {
+          "label": "Sub 5 mins 🔥"
+        },
+        "fWR": {
+          "label": "4:07.64 Kipyegon '23 (F WR) 🏆"
+        },
+        "bannister": {
+          "label": "3:59.4 Bannister '54 (first sub-4) 🏛️"
+        },
+        "mWR": {
+          "label": "3:43.13 El Guerrouj '99 (M WR) 🏆"
+        }
+      },
+      "threeThousandMeters": {
+        "label": "3000m",
+        "guide": {
+          "description": "Best known as the <strong>steeplechase distance</strong>, the flat 3K isn't in the Olympics. Local times start around <strong>10 minutes</strong>, with elites under <strong>8:30</strong>."
+        },
+        "sub10": {
+          "label": "Sub 10 mins ⚡"
+        },
+        "mWR": {
+          "label": "7:20.67 Komen '96 (M flat WR) 🏆"
+        },
+        "fWR": {
+          "label": "8:06.11 Wang '93 (F flat WR) 🏆"
+        },
+        "mWRSteeple": {
+          "label": "7:52.11 Girma '23 (M steeple WR) 🏆"
+        },
+        "fWRSteeple": {
+          "label": "8:44.32 Chepkoech '18 (F steeple WR) 🏆"
+        }
+      },
+      "oneK": {
+        "label": "1K",
+        "guide": {
+          "description": "1K times range from under <strong>2 minutes 30 seconds</strong> for elite runners to over <strong>7 minutes</strong> for beginners."
+        },
+        "avg": {
+          "label": "Avg 5m 30s ⏱️"
+        }
+      },
+      "fiveK": {
+        "label": "5K",
+        "guide": {
+          "description": "The 5K is the world's most-run race distance thanks to <strong>parkrun</strong>. A typical finish is <strong>33 mins</strong>. See <strong>5K goals and records</strong> below for more."
+        },
+        "avg": {
+          "label": "Avg 33 mins ⏱️"
+        },
+        "sub30": {
+          "label": "Sub 30 mins ⚡"
+        },
+        "sub20": {
+          "label": "Sub 20 mins 🔥"
+        },
+        "sub15": {
+          "label": "Sub 15 mins 🚀"
+        },
+        "fWR": {
+          "label": "13:58.06 Chebet '25 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "12:35.36 Cheptegei '20 (M WR) 🏆"
+        }
+      },
+      "tenK": {
+        "label": "10K",
+        "guide": {
+          "description": "A popular step up from the 5K. Common targets are the round-number barriers: <strong>sub-60</strong>, <strong>sub-50</strong>, <strong>sub-40</strong>. Elites go under <strong>30</strong>."
+        },
+        "sub60": {
+          "label": "Sub 60 mins ⚡"
+        },
+        "sub50": {
+          "label": "Sub 50 mins ⚡"
+        },
+        "sub40": {
+          "label": "Sub 40 mins 🔥"
+        },
+        "fWR": {
+          "label": "28:54.14 Chebet '24 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "26:11.00 Cheptegei '20 (M WR) 🏆"
+        }
+      },
+      "halfMarathon": {
+        "label": "Half Marathon",
+        "guide": {
+          "description": "<strong>13.1 miles</strong> — a popular endurance challenge in its own right. <strong>Under 2 hours</strong> is a common goal while the world's best approach <strong>1 hour</strong>."
+        },
+        "avg": {
+          "label": "2h 15m ⏱️"
+        },
+        "sub2": {
+          "label": "Sub 2 hours ⚡"
+        },
+        "sub90": {
+          "label": "Sub 90 mins ⚡"
+        },
+        "fWR": {
+          "label": "1:02:52 Gidey '21 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "56:42 Kiplimo '25 (M WR) 🏆"
+        }
+      },
+      "marathon": {
+        "label": "Marathon",
+        "guide": {
+          "description": "<strong>26.2 miles</strong> — the classic endurance challenge, with most runners finishing between <strong>3.5 – 6 hours</strong> and the fastest now <strong>under 2 hours</strong>."
+        },
+        "avg": {
+          "label": "Avg 4.5 hours ⏱️"
+        },
+        "sub4": {
+          "label": "Sub 4 hours ⚡"
+        },
+        "sub3": {
+          "label": "Sub 3 hours 🔥"
+        },
+        "fWR": {
+          "label": "2:09:56 Chepng'etich '24 (F WR) 🏆"
+        },
+        "mWR": {
+          "label": "1:59:30 Sawe '26 (M WR) 🏆"
+        }
+      }
+    }
+  }
+}

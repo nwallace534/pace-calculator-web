@@ -1,0 +1,10 @@
+.custom-dropdown {
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+  pointer-events: none;
+}
+
+.custom-dropdown.show {
+  opacity: 1;
+  pointer-events: auto;
+}
