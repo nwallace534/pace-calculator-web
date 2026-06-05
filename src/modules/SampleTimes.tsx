@@ -16,7 +16,7 @@ const SampleTimes = () => {
       <Dropdown menu={<SampleTimesDropdown />}>
         <button
           type="button"
-          className="btn btn-secondary badge dropdown-toggle"
+          className="btn btn-accent btn-attract dropdown-toggle"
         >
           {eventGuide.title}
         </button>

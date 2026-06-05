@@ -110,6 +110,7 @@ function Distance() {
       <div className="col-md-6">
         <select
           className="form-select border-secondary shadow-sm"
+          style={{ cursor: "pointer" }}
           value={event}
           onChange={handleEventSelect}
           id="labelDistance"

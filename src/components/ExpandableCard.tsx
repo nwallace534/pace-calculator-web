@@ -26,8 +26,10 @@ export const ExpandableCard = ({
       }}
     >
       <div className={`card-header ${isExpanded ? "" : "border-0"}`}>
-        <div
-          className="d-flex justify-content-between align-items-center"
+        <button
+          type="button"
+          className="d-flex justify-content-between align-items-center w-100 p-0 border-0 bg-transparent text-start text-body"
+          aria-expanded={isExpanded}
           onClick={() => handleToggle(!isExpanded)}
         >
           <h5 className="mb-0">{title}</h5>
@@ -37,7 +39,7 @@ export const ExpandableCard = ({
             height="1.75rem"
             className={`rotatable-icon ${isExpanded ? "rotated" : ""}`}
           />
-        </div>
+        </button>
       </div>
 
       {isExpanded && <div className="px-3 py-2">{children}</div>}

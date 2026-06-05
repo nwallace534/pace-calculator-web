@@ -25,12 +25,10 @@ describe("Goals and records dropdown", () => {
       .getByText("10K")
       .closest("tr")!.textContent;
 
-    // Open the "5K goals and records" dropdown and pick the Sub-20 example.
+    // Open the "5K goals" dropdown and pick the Sub-20 example.
     // The sub20 entry in events.ts is 0h 19m 59s 00, so visible fields land
     // on 19 minutes / 59 seconds (hours is hidden for 5K).
-    await userEvent.click(
-      screen.getByRole("button", { name: /5K goals and records/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /5K goals/i }));
     await userEvent.click(screen.getByRole("button", { name: /Sub 20 mins/i }));
 
     expect(screen.getByLabelText("minutes")).toHaveValue("19");
@@ -67,7 +65,7 @@ describe("Goals and records dropdown", () => {
 
     // Sub-3 marathon example = 02h 59m 59s 00.
     await userEvent.click(
-      screen.getByRole("button", { name: /Marathon goals and records/i }),
+      screen.getByRole("button", { name: /Marathon goals/i }),
     );
     await userEvent.click(screen.getByRole("button", { name: /Sub 3 hours/i }));
 
@@ -98,9 +96,7 @@ describe("Goals and records dropdown", () => {
       .at(-1)!.textContent;
 
     // Flo-Jo's '88 women's WR = 0h 0m 10s 49 hundredths.
-    await userEvent.click(
-      screen.getByRole("button", { name: /100m goals and records/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /100m goals/i }));
     await userEvent.click(screen.getByRole("button", { name: /Flo-Jo/i }));
 
     expect(screen.getByLabelText("seconds")).toHaveValue("10");
@@ -120,9 +116,7 @@ describe("Goals and records dropdown", () => {
     // visible fields would leave a hidden 360ms driving a phantom pace.
     render(<App />);
 
-    await userEvent.click(
-      screen.getByRole("button", { name: /5K goals and records/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /5K goals/i }));
     await userEvent.click(
       screen.getByRole("button", { name: /Cheptegei '20 \(M WR\)/i }),
     );

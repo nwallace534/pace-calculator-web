@@ -40,7 +40,7 @@
       "splits": "Splits",
       "splitsInUnit": "Show in {{unit}}",
       "trackSummary": "First {{opening}}m in {{openingTime}} · {{lap}}m laps in {{lapTime}}",
-      "eventGuideTitle": "{{event}} goals and records",
+      "eventGuideTitle": "{{event}} goals",
       "columnDistance": "Distance",
       "columnTime": "Time"
     },
@@ -203,7 +203,7 @@
       "fiveK": {
         "label": "5K",
         "guide": {
-          "description": "The 5K is the world's most-run race distance thanks to <strong>parkrun</strong>. A typical finish is <strong>33 mins</strong>. See <strong>5K goals and records</strong> below for more."
+          "description": "The 5K is the world's most-run race distance thanks to parkrun. A typical finish is <strong>33 mins</strong>. You can type a time, tap <strong>+/−</strong>, or pick a goal."
         },
         "avg": {
           "label": "Avg 33 mins ⏱️"

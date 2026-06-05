@@ -13,8 +13,7 @@ type PostHog = Awaited<typeof import("posthog-js")>["default"];
 const KEY = import.meta.env.VITE_POSTHOG_KEY;
 const HOST = import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.com";
 
-// Personal opt-out: visit any URL with ?notrack to exclude that visit from
-// analytics. Bookmark pacerly.com/?notrack and use it everywhere.
+// Opt-out: visit any URL with ?notrack to exclude that visit from analytics.
 const OPTED_OUT = (() => {
   try {
     return new URLSearchParams(window.location.search).has("notrack");
