@@ -13,6 +13,16 @@ type PostHog = Awaited<typeof import("posthog-js")>["default"];
 const KEY = import.meta.env.VITE_POSTHOG_KEY;
 const HOST = import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.com";
 
+// Personal opt-out: visit any URL with ?notrack to exclude that visit from
+// analytics. Bookmark pacerly.com/?notrack and use it everywhere.
+const OPTED_OUT = (() => {
+  try {
+    return new URLSearchParams(window.location.search).has("notrack");
+  } catch {
+    return false;
+  }
+})();
+
 let ph: PostHog | null = null;
 let loadStarted = false;
 const queue: Array<(instance: PostHog) => void> = [];
@@ -33,7 +43,7 @@ const callOrQueue = (fn: (instance: PostHog) => void) => {
 };
 
 export const initAnalytics = () => {
-  if (loadStarted || !KEY) return;
+  if (loadStarted || !KEY || OPTED_OUT) return;
   loadStarted = true;
 
   import("posthog-js")
@@ -56,14 +66,14 @@ export const initAnalytics = () => {
 };
 
 export const track = (event: AnalyticsEventName, props?: Props) => {
-  if (!KEY) return;
+  if (!KEY || OPTED_OUT) return;
   callOrQueue((instance) => instance.capture(event, props));
 };
 
 // Fires only the first time per page lifetime — for "did the user ever touch
 // this feature" signals that would otherwise drown the dashboard.
 export const trackOnce = (event: AnalyticsEventName, props?: Props) => {
-  if (!KEY) return;
+  if (!KEY || OPTED_OUT) return;
   if (firedOnce.has(event)) return;
   firedOnce.add(event);
   callOrQueue((instance) => instance.capture(event, props));
