@@ -4,6 +4,10 @@
     "toggleAriaLabel": "Toggle dark mode",
     "logoAlt": "Pacerly logo"
   },
+  "footer": {
+    "builtBy": "Built by {{name}}",
+    "sourceOnGitHub": "Source on GitHub"
+  },
   "calculator": {
     "distanceApproximation": "{{from}} is approximately {{to}}",
     "runDuration": "Run duration",

@@ -6,6 +6,7 @@ i18n.use(initReactI18next).init({
   resources: {
     en: {
       theme: enMessages.theme,
+      footer: enMessages.footer,
       calculator: enMessages.calculator,
       events: enMessages.events,
     },

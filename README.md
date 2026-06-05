@@ -10,36 +10,34 @@ An open source running pace calculator that aims to solve issues I had with othe
 
 ### Immediately useable by anyone on first visit
 
-Starts with a default 5K with reasonable time and description and goals and record picker to help choosing a time. Advanced metrics are collapsed by default.
+Starts with a default 5K, a sensible time and description, plus a goal/record picker to help choose your own. Advanced metrics are collapsed by default.
 
 ### Easy editing
 
-- Any number entry is separate (e.g. separate hours and minutes) so you can jump to the unit you want.
-- Auto-skip through to the next field for quick text entry.
-- Spinner buttons that can be held to allow for fine tweaking of time, with immediate effect on other distances — e.g. expanding the Times for Pace.
+- Separate field for each number (hours, minutes, seconds) so you can jump straight to the one you want.
+- Auto-skip to the next field for quick text entry.
+- Spinner buttons you can hold for fine tweaking — every nudge updates splits, speeds, and the Times for Pace table.
 
 ### Avoid getting lost in calculations
 
-- Always show kilometers and miles so the user doesn't have to switch. This goes for paces, speeds, and splits where it makes sense.
-- Record and goal pickers to always get back to a sensible calculation.
-- Tool tip when going beyond world record pace and boundaries of times.
+- Kilometres and miles always shown together for paces, speeds, and splits — no toggle-and-back round trips.
+- Goal and record pickers to get back to a sensible calculation in one tap.
+- Tool tip when going beyond world record pace or the boundaries of times.
 
-### Advanced features
+### Track-aware advanced bits
 
-- Middle-distance and track events adjust their splits. E.g. 1500m shows the first 300m split and then the 400s after, with a quick summary: _"First 300m in 66 seconds · 400m laps in 88 seconds"_.
-- Separate custom modes for road and track, because the splits logic is different.
+- Middle-distance and track events adjust their splits. E.g. 1500m shows the first 300m and then 400m laps, with a quick summary: _"First 300m in 66 seconds · 400m laps in 88 seconds"_.
+- Separate Custom modes for road and track, because the splits logic is different.
 
-### Stand-out features
+### Things other calculators tend to skip
 
-- Lists of records per event for quick selection. Fun to pick a marathon record, expand the Times for Pace, and see how crazy the speeds are for even a 5K.
-- Spinner buttons mean you don't need to type at all if you want — just tweak.
-- Speeds (kph / mph) not commonly included by other calculators.
+- A full list of world records per event for quick selection. Fun to pick a marathon record and see how crazy the resulting splits look across every distance.
+- Drive the whole thing without ever typing — just hold a spinner.
+- Speeds (kph / mph) shown alongside paces.
 
 ## A note on AI
 
-This is v2. The first version was a React app written before the AI revolution, with a small set of features I had time to build. AI has let me ship many more — but the goal stays the same: the code is always human-readable, and you should be able to edit it without AI if you ever need to.
-
-My thoughts are there is still a place for a calculator like this. Asking an AI can give you a different answer every time. This one gives a consistent experience on every device, and lets you nudge a pace by a single second or even hundredth of second to watch the effect on a column of distances instantly — something that would take a bigger AI prompt.
+This is v2 — the first was a React app written before the AI revolution, with a small set of features I had time to build. AI has let me ship many more, but the code stays human-readable so you can edit it without AI if you ever need to. A calculator like this still has a place too: asking an AI gives you a different answer every time, this gives the same one on every device, and lets you nudge a pace by a single second or even hundredth to watch the effect on a column of distances instantly — something that would take a bigger AI prompt.
 
 ## Stack
 
@@ -47,13 +45,22 @@ Vite, React 19, Bootstrap 5, Zustand. Calculations come from the [`pace-calculat
 
 ## Development
 
+Clone the repo, install once, and you're ready to go:
+
 ```bash
 npm install
-npm run dev      # Vite dev server on :5273
-npm run lint     # ESLint
-npm test         # Vitest (browser tests via Playwright)
-npm run build    # Production build
+npm run dev          # Vite dev server on http://localhost:5273
+npm run lint         # ESLint
+npm run format       # Prettier — auto-fix every file
+npm test             # Full test suite (real browser, see below)
+npm run build        # Production build
 ```
+
+A `pre-commit` hook (husky + lint-staged) runs ESLint + Prettier on staged files, then `tsc --noEmit` and the full test suite, before any commit lands. It installs itself on `npm install`, so contributors don't have to think about it. Bypass with `git commit --no-verify` when truly needed.
+
+### Testing
+
+Tests run in a **real browser** (Vitest + Playwright), not jsdom. The app's behaviour relies on specific, hand-designed details — the spinner buttons' hold-and-repeat, the auto-skipping focus between time fields, real keyboard input, and how Bootstrap's CSS variables resolve under `data-bs-theme` — and jsdom approximations break in exactly those places. So tests run where the app actually runs.
 
 A fuller architecture overview lives in [`CLAUDE.md`](./CLAUDE.md).
 
