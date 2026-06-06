@@ -6,7 +6,8 @@
   },
   "footer": {
     "builtBy": "Built by {{name}}",
-    "sourceOnGitHub": "Source on GitHub"
+    "sourceOnGitHub": "Source on GitHub",
+    "previousVersion": "Looking for the previous version?"
   },
   "calculator": {
     "distanceApproximation": "{{from}} is approximately {{to}}",

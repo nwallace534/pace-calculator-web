@@ -5,6 +5,8 @@ import IconMail from "@/assets/icon-mail.svg?react";
 const GITHUB_URL = "https://github.com/nwallace534/pace-calculator-web";
 const CONTACT_EMAIL = "hello@pacerly.com";
 const AUTHOR_NAME = "Nicholas Wallace";
+const V1_URL = "https://v1.pacerly.com";
+const V1_LABEL = "v1.pacerly.com";
 
 const ICON_STYLE = { verticalAlign: "-2px" };
 
@@ -34,6 +36,12 @@ function Footer() {
             style={ICON_STYLE}
           />
           {CONTACT_EMAIL}
+        </a>
+      </div>
+      <div className="text-muted">
+        {t("previousVersion")}{" "}
+        <a href={V1_URL} target="_blank" rel="noopener noreferrer">
+          {V1_LABEL}
         </a>
       </div>
     </footer>
