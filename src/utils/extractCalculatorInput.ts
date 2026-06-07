@@ -16,6 +16,7 @@ export const extractCalculatorInput = (
   computeMode: state.computeMode,
   splitsUnit: state.splitsUnit,
   event: state.event,
+  savedDistances: state.savedDistances,
 });
 
 export const extractDistanceInput = (state: CalculatorStore) => ({

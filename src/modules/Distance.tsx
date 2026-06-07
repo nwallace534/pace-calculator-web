@@ -1,21 +1,15 @@
-import { ChangeEvent, ChangeEventHandler, useMemo } from "react";
-import React from "react";
+import { ChangeEventHandler, useMemo } from "react";
 
 import useCalculatorStore from "../state/useCalculatorStore";
 
-import NumericInput from "@/components/NumericInput";
-import ReactSelect, { SelectOption } from "@/components/ReactSelect";
+import DistanceValueInput from "@/components/DistanceValueInput";
 
-import { SingleValue } from "react-select";
 import { Events, EventTags } from "@/utils/events";
-import endsWithSkipChar from "@/utils/ends-with-skip-char";
 import { DistanceUnitOptions } from "@/utils/distances";
 import { DistanceMode } from "@/types/distance";
 import { DistanceUnit } from "pace-calculator";
 import { useTranslation } from "react-i18next";
 import useEventGuide from "@/hooks/useEventGuide";
-
-const distanceDecimalInput = React.createRef<HTMLInputElement>();
 
 function Distance() {
   const { t } = useTranslation(["events", "calculator"]);
@@ -64,28 +58,6 @@ function Distance() {
   const setDistanceUnit = useCalculatorStore((state) => state.setDistanceUnit);
   const setEvent = useCalculatorStore((state) => state.setEvent);
 
-  const handleDistanceChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let skip = true;
-    if (!endsWithSkipChar(event.target.value)) {
-      setDistanceWhole(event.target.value);
-      skip = false;
-    }
-
-    if (skip) {
-      if (distanceDecimalInput && distanceDecimalInput.current) {
-        distanceDecimalInput.current.focus();
-      }
-    }
-  };
-
-  const handleDistanceDecimalChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    if (!endsWithSkipChar(event.target.value)) {
-      setDistanceFractional(event.target.value);
-    }
-  };
-
   const handleEventSelect: ChangeEventHandler<HTMLSelectElement> = (option) => {
     const id = option.target.value as string;
 
@@ -94,10 +66,10 @@ function Distance() {
     }
   };
 
-  const handleDistanceUnitsSelect = (option: SingleValue<SelectOption>) => {
-    const selectDistanceUnit = option?.value || DistanceUnit.Kilometers;
-    const distanceUnit = selectDistanceUnit as DistanceUnit;
-    setDistanceUnit(distanceUnit);
+  const handleDistanceUnitsSelect: ChangeEventHandler<HTMLSelectElement> = (
+    e,
+  ) => {
+    setDistanceUnit(e.target.value as DistanceUnit);
   };
 
   return (
@@ -148,42 +120,34 @@ function Distance() {
         {(event === DistanceMode.Custom ||
           event === DistanceMode.CustomTrack) && (
           <div className="d-flex justify-content-center mt-2">
-            <div className="d-flex align-items-end">
-              <NumericInput
-                id="distance"
-                cssClasses="numeric-input-xl form-control-huge text-end"
-                onChange={handleDistanceChange}
-                placeholder="00"
-                value={distance}
+            <div className="d-flex align-items-center">
+              <DistanceValueInput
+                whole={distance}
+                fractional={distanceDecimal}
+                onWholeChange={setDistanceWhole}
+                onFractionalChange={setDistanceFractional}
               />
-              <div className="text-huge">.</div>
-              <NumericInput
-                id="distanceDecimal"
-                cssClasses="numeric-input-lg form-control-huge text-start"
-                onChange={handleDistanceDecimalChange}
-                placeholder="00"
-                value={distanceDecimal}
-                ref={distanceDecimalInput}
-              />
-              <div className="ms-2 align-self-center">
+              <div className="ms-2">
                 {event === DistanceMode.CustomTrack ? (
                   // Track mode is meters-only — render as static text so it
                   // doesn't look like a disabled-but-interactive dropdown.
                   <span className="fs-5">meters</span>
                 ) : (
                   <div className="distance-unit">
-                    <ReactSelect
-                      options={DistanceUnitOptions.filter(
-                        (option) => option.value !== DistanceUnit.Meters,
-                      )}
+                    <select
+                      id="labelDistanceUnit"
+                      className="form-select"
+                      value={distanceUnit}
                       onChange={handleDistanceUnitsSelect}
-                      value={
-                        DistanceUnitOptions.filter(
-                          (option) => option.value === distanceUnit,
-                        )[0]
-                      }
-                      inputId="labelDistanceUnit"
-                    />
+                    >
+                      {DistanceUnitOptions.filter(
+                        (option) => option.value !== DistanceUnit.Meters,
+                      ).map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
               </div>

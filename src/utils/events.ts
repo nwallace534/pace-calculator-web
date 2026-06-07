@@ -3,6 +3,7 @@ import { Distance, DistanceUnit, getDistanceInAllUnits } from "pace-calculator";
 import { getDecimalValue, getNumericValue, getValidatedInput } from "./input";
 import { CalculatorTime, timeStringsToMs } from "./time";
 import { Event, Events, EventTags, TimeExample } from "./events-data";
+import { SavedDistance } from "@/state/savedDistancesSlice";
 
 export { Events, EventTags };
 export type { Event };
@@ -19,16 +20,24 @@ const getEventsForPace = (events: Event[]) => {
   }, {});
 };
 
-const metricEvents = Events.filter(
-  (event) =>
-    event.distanceUnit === DistanceUnit.Kilometers ||
-    event.distanceUnit === DistanceUnit.Meters,
+// Opt-in via EventTags.TimesForPace: the mile is deliberately omitted because
+// the per-mile pace row above the table already restates it.
+const timesForPaceEvents = Events.filter((event) =>
+  event.eventTags.includes(EventTags.TimesForPace),
 );
 
-export const metricEventsForPace = getEventsForPace(metricEvents);
+export const metricEventsForPace = getEventsForPace(
+  timesForPaceEvents.filter(
+    (event) =>
+      event.distanceUnit === DistanceUnit.Kilometers ||
+      event.distanceUnit === DistanceUnit.Meters,
+  ),
+);
 
 export const imperialEventsForPace = getEventsForPace(
-  Events.filter((event) => event.distanceUnit === DistanceUnit.Miles),
+  timesForPaceEvents.filter(
+    (event) => event.distanceUnit === DistanceUnit.Miles,
+  ),
 );
 
 export const eventDistancesInMeters: Record<string, number> = Events.reduce<
@@ -43,6 +52,24 @@ export const eventDistancesInMeters: Record<string, number> = Events.reduce<
   acc[event.id] = getDistanceInAllUnits(distance).inMeters.distanceValue;
   return acc;
 }, {});
+
+// Resolves the per-meters distance for either a built-in event id or a saved
+// custom id (prefixed `saved:<uuid>`). Used by the Times-for-Pace sort step
+// so saved customs slot into the same sorted list as built-ins.
+export const getDistanceInMetersForId = (
+  id: string,
+  savedDistances: SavedDistance[],
+): number => {
+  if (id.startsWith("saved:")) {
+    const saved = savedDistances.find((s) => `saved:${s.id}` === id);
+    if (!saved) return 0;
+    return getDistanceInAllUnits({
+      distanceValue: saved.distanceValue,
+      distanceUnit: saved.distanceUnit,
+    }).inMeters.distanceValue;
+  }
+  return eventDistancesInMeters[id] ?? 0;
+};
 
 export const DEFAULT_EVENT_ID = "fiveK";
 

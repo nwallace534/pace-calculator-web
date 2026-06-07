@@ -16,6 +16,8 @@ export const AnalyticsEvent = {
   SpinnerHeld: "spinner_held",
   SpinnerHintShown: "spinner_hint_shown",
   CalculationCompleted: "calculation_completed",
+  SavedDistanceAdded: "saved_distance_added",
+  SavedDistanceRemoved: "saved_distance_removed",
 } as const;
 
 export type AnalyticsEventName =

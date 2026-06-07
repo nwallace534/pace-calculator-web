@@ -93,7 +93,20 @@
 
 .form-control-huge {
   padding: 0.1rem 0.4rem !important;
-  font-size: 1.75rem !important;
+  font-size: 1.5rem !important;
+}
+
+/* Match the neighbour form-control-huge input height. Font stays at 1rem so
+   iOS Safari doesn't auto-zoom on focus. */
+.distance-unit .form-select {
+  padding-block: 0.5rem;
+}
+
+/* btn-link in theme-aware gray instead of link blue. */
+.btn-link.btn-link-muted {
+  --bs-btn-color: var(--bs-secondary-color);
+  --bs-btn-hover-color: var(--bs-secondary-color);
+  --bs-btn-active-color: var(--bs-secondary-color);
 }
 
 .numeric-input-md {

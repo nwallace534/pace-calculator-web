@@ -16,6 +16,7 @@ beforeEach(() => {
   // Clear the per-test localStorage so a prior test's theme toggle (or any
   // other persisted preference) doesn't bleed into the next render.
   window.localStorage?.removeItem("theme");
+  window.localStorage?.removeItem("pace-calculator:saved-distances");
 
   // The Zustand store is a module-level singleton; without a full wipe, panel
   // toggles, per-event time memory, the splits-unit override and Custom
@@ -40,6 +41,7 @@ beforeEach(() => {
     paceMinutes: "",
     paceSeconds: "",
     paceHundredths: "",
+    savedDistances: [],
   });
   // Re-bootstrap the default event so distance/time/calculations repaint —
   // same path the store uses on first load.

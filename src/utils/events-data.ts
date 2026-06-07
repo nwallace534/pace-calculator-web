@@ -5,6 +5,10 @@ export enum EventTags {
   Standard = "Standard",
   Sprints = "Sprints",
   MiddleDistance = "MiddleDistance",
+  // Opt-in: events tagged TimesForPace appear in the Times-for-Pace results
+  // table. The mile is untagged — selectable as an event but omitted from
+  // that list because the per-mile pace row already restates it.
+  TimesForPace = "TimesForPace",
 }
 
 export type TimeExample = {
@@ -42,7 +46,7 @@ export type Event = {
 export const Events: Event[] = [
   {
     id: "oneHundredMeters",
-    eventTags: [EventTags.Sprints],
+    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
     distanceValue: "100",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -98,7 +102,7 @@ export const Events: Event[] = [
   },
   {
     id: "twoHundredMeters",
-    eventTags: [EventTags.Sprints],
+    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
     distanceValue: "200",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -154,7 +158,7 @@ export const Events: Event[] = [
   },
   {
     id: "fourHundredMeters",
-    eventTags: [EventTags.Sprints],
+    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
     distanceValue: "400",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -209,7 +213,7 @@ export const Events: Event[] = [
   },
   {
     id: "eightHundredMeters",
-    eventTags: [EventTags.MiddleDistance],
+    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
     distanceValue: "800",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -263,34 +267,8 @@ export const Events: Event[] = [
     },
   },
   {
-    id: "oneK",
-    eventTags: [],
-    distanceValue: "1",
-    distanceDecimal: "0",
-    distanceUnit: DistanceUnit.Kilometers,
-    defaultTime: {
-      timeHours: "0",
-      timeMinutes: "04",
-      timeSeconds: "30",
-      timeHundredths: "00",
-    },
-    eventGuide: {
-      timeExamples: [
-        {
-          id: "avg",
-          time: {
-            timeHours: "0",
-            timeMinutes: "05",
-            timeSeconds: "30",
-            timeHundredths: "00",
-          },
-        },
-      ],
-    },
-  },
-  {
     id: "fifteenHundredMeters",
-    eventTags: [EventTags.MiddleDistance],
+    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
     distanceValue: "1500",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -427,7 +405,7 @@ export const Events: Event[] = [
   },
   {
     id: "threeThousandMeters",
-    eventTags: [EventTags.MiddleDistance],
+    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
     distanceValue: "3",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -490,7 +468,7 @@ export const Events: Event[] = [
   },
   {
     id: "fiveK",
-    eventTags: [EventTags.Standard],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
     distanceValue: "5",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -561,7 +539,7 @@ export const Events: Event[] = [
   },
   {
     id: "tenK",
-    eventTags: [EventTags.Standard],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
     distanceValue: "10",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -624,7 +602,7 @@ export const Events: Event[] = [
   },
   {
     id: "halfMarathon",
-    eventTags: [EventTags.Standard],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
     distanceValue: "13",
     distanceDecimal: "109",
     distanceUnit: DistanceUnit.Miles,
@@ -687,7 +665,7 @@ export const Events: Event[] = [
   },
   {
     id: "marathon",
-    eventTags: [EventTags.Standard],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
     distanceValue: "26",
     distanceDecimal: "218",
     distanceUnit: DistanceUnit.Miles,

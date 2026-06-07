@@ -17,11 +17,6 @@ const customDistance = () =>
 const customDistanceDecimal = () =>
   document.getElementById("distanceDecimal") as HTMLInputElement;
 
-// ReactSelect renders the chosen option as plain text in its control div. The
-// dropdown opens on click and exposes <option>-like nodes for selection.
-const unitControl = () =>
-  document.getElementById("labelDistanceUnit")!.closest(".distance-unit")!;
-
 describe("Custom (road) — happy path", () => {
   it("starts blank on first selection (no inheritance from the prior event)", async () => {
     render(<App />);
@@ -80,12 +75,11 @@ describe("Custom (road) — happy path", () => {
     render(<App />);
     await selectEvent("Custom");
 
-    // Open the dropdown to enumerate its options.
-    await userEvent.click(unitControl());
-    const listbox = await screen.findByRole("listbox");
-    const optionLabels = within(listbox)
-      .getAllByRole("option")
-      .map((o) => o.textContent);
+    // Native select — read the rendered <option> children directly.
+    const select = document.getElementById(
+      "labelDistanceUnit",
+    ) as HTMLSelectElement;
+    const optionLabels = Array.from(select.options).map((o) => o.textContent);
     expect(optionLabels).toEqual(["K", "miles"]);
   });
 
@@ -127,7 +121,7 @@ describe("Custom (track) — happy path", () => {
     expect(customDistanceDecimal()).toHaveValue("");
     expect(screen.getByLabelText("seconds")).toHaveValue("00");
 
-    // Unit is fixed: rendered as plain "meters" text, no ReactSelect control.
+    // Unit is fixed: rendered as plain "meters" text, no select control.
     expect(screen.getByText("meters")).toBeInTheDocument();
     expect(document.getElementById("labelDistanceUnit")).toBeNull();
   });

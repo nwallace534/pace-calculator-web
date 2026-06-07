@@ -41,3 +41,8 @@ export const getDistanceUnitSingular = (distanceUnit: DistanceUnit) =>
 // whole numbers display without a decimal (e.g. 21.04 -> "21", 21.08 -> "21.1").
 export const formatDistanceValue = (value: number): string =>
   String(Number(value.toFixed(1)));
+
+// Absorbs float drift from unit conversion — not a fuzzy match for user-entered
+// "near" distances. Small enough that distinct hand-entered distances stay
+// distinct.
+export const DISTANCE_MATCH_TOLERANCE_METERS = 0.5;

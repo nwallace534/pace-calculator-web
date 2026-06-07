@@ -7,7 +7,7 @@
   "footer": {
     "builtBy": "Built by {{name}}",
     "sourceOnGitHub": "Source on GitHub",
-    "previousVersion": "Looking for the previous version?"
+    "pacerlyClassic": "Visit Pacerly Classic"
   },
   "calculator": {
     "distanceApproximation": "{{from}} is approximately {{to}}",
@@ -44,6 +44,24 @@
       "eventGuideTitle": "{{event}} goals",
       "columnDistance": "Distance",
       "columnTime": "Time"
+    },
+    "timesForPace": {
+      "addCustom": "+ Add custom distance",
+      "addCustomWithCount": "+ Add custom distance ({{count}}/{{cap}})",
+      "addCustomTitle": "Add custom distance",
+      "addCustomLimitReached": "Limit reached — remove one first",
+      "savedBadge": "Custom",
+      "removeAriaLabel": "Remove custom distance",
+      "closeAriaLabel": "Close",
+      "form": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "placeholderWhole": "00",
+        "placeholderFractional": "00",
+        "errorEmpty": "Enter a distance.",
+        "errorDuplicateBuiltIn": "{{label}} is already in the list.",
+        "errorDuplicateSaved": "That distance is already saved."
+      }
     },
     "unit": {
       "perKm": "/km",
@@ -190,15 +208,6 @@
         },
         "fWRSteeple": {
           "label": "8:44.32 Chepkoech '18 (F steeple WR) 🏆"
-        }
-      },
-      "oneK": {
-        "label": "1K",
-        "guide": {
-          "description": "1K times range from under <strong>2 minutes 30 seconds</strong> for elite runners to over <strong>7 minutes</strong> for beginners."
-        },
-        "avg": {
-          "label": "Avg 5m 30s ⏱️"
         }
       },
       "fiveK": {

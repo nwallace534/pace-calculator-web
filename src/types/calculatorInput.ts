@@ -1,5 +1,6 @@
 import { ComputeMode } from "@/utils/calculator";
 import { DistanceUnit } from "pace-calculator";
+import { SavedDistance } from "@/state/savedDistancesSlice";
 
 export interface CalculatorInputSubset {
   distanceWhole: string;
@@ -14,6 +15,7 @@ export interface CalculatorInputSubset {
   computeMode: ComputeMode;
   splitsUnit: DistanceUnit | null;
   event: string;
+  savedDistances: SavedDistance[];
 }
 
 export interface DistanceInputSubset {

@@ -2,6 +2,7 @@ import {
   calculatePace,
   calculateSplits,
   CalculateSplitsOutput,
+  Distance,
   DistanceInAllUnits,
   DistanceUnit,
   getDistanceInAllUnits,
@@ -11,7 +12,7 @@ import {
 } from "pace-calculator";
 import { hasTimeValue } from "./validator";
 import {
-  eventDistancesInMeters,
+  getDistanceInMetersForId,
   getEventLandmarks,
   getVisibleTimeFields,
   imperialEventsForPace,
@@ -155,22 +156,40 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
           unit: DistanceUnit.Miles,
         };
 
+        // Partition saved customs by pace unit. Kilometers and Meters both pace
+        // per-km; Miles paces per-mile.
+        const savedMetric: Record<string, Distance> = {};
+        const savedImperial: Record<string, Distance> = {};
+        for (const s of state.savedDistances) {
+          const distance: Distance = {
+            distanceValue: s.distanceValue,
+            distanceUnit: s.distanceUnit,
+          };
+          if (s.distanceUnit === DistanceUnit.Miles) {
+            savedImperial[`saved:${s.id}`] = distance;
+          } else {
+            savedMetric[`saved:${s.id}`] = distance;
+          }
+        }
+
         const kTimesForPace = getTimesForPace({
           pace: kPace,
-          distances: metricEventsForPace,
+          distances: { ...metricEventsForPace, ...savedMetric },
         });
 
         const mTimesForPace = getTimesForPace({
           pace: mPace,
-          distances: imperialEventsForPace,
+          distances: { ...imperialEventsForPace, ...savedImperial },
         });
 
-        // Sort by actual distance so the mile (1609m) sits between 1500m and
-        // 3K, instead of after 10K just because it was paced in miles.
+        // Sort by actual distance so saved customs (km or miles) slot in by
+        // their meters rather than being bucketed by pace unit.
         const merged = { ...kTimesForPace, ...mTimesForPace };
         timesForPace = Object.fromEntries(
           Object.entries(merged).sort(
-            ([a], [b]) => eventDistancesInMeters[a] - eventDistancesInMeters[b],
+            ([a], [b]) =>
+              getDistanceInMetersForId(a, state.savedDistances) -
+              getDistanceInMetersForId(b, state.savedDistances),
           ),
         );
       }
