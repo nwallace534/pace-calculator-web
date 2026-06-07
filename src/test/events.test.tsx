@@ -135,6 +135,17 @@ describe("5K (default event)", () => {
     expect(
       within(timesCard).getByText("10K").closest("tr")!.textContent,
     ).toMatch(/00:41:41/);
+
+    await userEvent.click(screen.getByText("Times & predictions"));
+    expect(within(timesCard).queryByRole("table")).toBeNull();
+
+    await userEvent.click(screen.getByText("Times & predictions"));
+    expect(
+      within(timesCard).getByRole("tab", { name: "Predictions" }),
+    ).toHaveAttribute("aria-selected", "true");
+    expect(
+      within(timesCard).getByRole("columnheader", { name: "Prediction" }),
+    ).toBeInTheDocument();
   });
 
   it("spinner up/down steps the time by 1 second and recalculates the pace", async () => {

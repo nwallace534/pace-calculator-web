@@ -35,17 +35,17 @@ Vite + React 19 single-page app. Entry point is `src/main.tsx`; root component i
 
 All UI state lives in a single Zustand store (`src/state/useCalculatorStore.ts`) composed from slices. Centralisation is deliberate — nearly every piece of the UI derives from the same calculator state, so a single store avoids synchronisation complexity between components.
 
-| Slice                  | Responsibility                                                  |
-| ---------------------- | --------------------------------------------------------------- |
-| `calculatorSlice`      | `computeMode`, theme, result-panel visibility, splits unit      |
-| `timeSlice`            | Time field strings for the time input                           |
-| `distanceSlice`        | Event selection, distance field strings, unit, per-event memory |
-| `paceSlice`            | Pace field strings + unit                                       |
-| `paceResultsSlice`     | Calculated pace, times by event/predictions source data, splits |
-| `distanceResultsSlice` | Calculated distance conversions                                 |
-| `spinnerHintSlice`     | Spinner hold/tap hint learning state                            |
-| `savedDistancesSlice`  | User-saved custom distances for Times & predictions             |
-| `savedDurationsSlice`  | User-saved custom durations for Distance covered                |
+| Slice                  | Responsibility                                                            |
+| ---------------------- | ------------------------------------------------------------------------- |
+| `calculatorSlice`      | `computeMode`, theme, result-panel visibility, selected tabs, splits unit |
+| `timeSlice`            | Time field strings for the time input                                     |
+| `distanceSlice`        | Event selection, distance field strings, unit, per-event memory           |
+| `paceSlice`            | Pace field strings + unit                                                 |
+| `paceResultsSlice`     | Calculated pace, times by event/predictions source data, splits           |
+| `distanceResultsSlice` | Calculated distance conversions                                           |
+| `spinnerHintSlice`     | Spinner hold/tap hint learning state                                      |
+| `savedDistancesSlice`  | User-saved custom distances for Times & predictions                       |
+| `savedDurationsSlice`  | User-saved custom durations for Distance covered                          |
 
 All time/distance/pace values in the store are **strings** (as typed by the user), not numbers. Conversion to numbers happens in `src/utils/input.ts` (`GetNumericValue`, `GetDecimalValue`).
 

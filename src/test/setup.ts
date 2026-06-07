@@ -27,6 +27,7 @@ beforeEach(() => {
   store.setState({
     showSplits: false,
     showTimesForPace: false,
+    timesForPaceTab: "times",
     splitsUnit: null,
     computeMode: ComputeMode.Pace,
     theme: "light",

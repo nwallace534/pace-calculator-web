@@ -7,6 +7,8 @@ import { AnalyticsEvent } from "@/utils/analytics-events";
 
 const THEME_STORAGE_KEY = "theme";
 
+export type TimesForPaceTab = "times" | "predictions";
+
 // Stored choice wins, then OS preference, then light. We don't subscribe to
 // live OS changes — mid-workout theme flips are unwelcome.
 const resolveInitialTheme = (): "light" | "dark" => {
@@ -27,6 +29,8 @@ export interface CalculatorSlice {
   setShowSplits: (showSplits: boolean) => void;
   showTimesForPace: boolean;
   setShowTimesForPace: (showTimesForPace: boolean) => void;
+  timesForPaceTab: TimesForPaceTab;
+  setTimesForPaceTab: (timesForPaceTab: TimesForPaceTab) => void;
   /** Unit for the splits table; `null` follows the entered distance unit. */
   splitsUnit: DistanceUnit | null;
   toggleSplitsUnit: () => void;
@@ -42,6 +46,7 @@ export const createCalculatorSlice: StateCreator<
   computeMode: ComputeMode.Pace,
   showSplits: false,
   showTimesForPace: false,
+  timesForPaceTab: "times",
   splitsUnit: null,
   setShowSplits: (showSplits) => {
     const calculationUpdate = getCalculationUpdate({
@@ -66,6 +71,10 @@ export const createCalculatorSlice: StateCreator<
     }
 
     set({ showTimesForPace, ...calculationUpdate });
+  },
+
+  setTimesForPaceTab: (timesForPaceTab) => {
+    set({ timesForPaceTab });
   },
 
   toggleSplitsUnit: () => {

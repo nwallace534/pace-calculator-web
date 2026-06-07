@@ -1,4 +1,3 @@
-import { useState } from "react";
 import useCalculatorStore from "@/state/useCalculatorStore";
 import { formatTime } from "@/utils/formatTime";
 import { useTranslation } from "react-i18next";
@@ -8,8 +7,6 @@ import {
   buildTimesForPaceRows,
   TimesForPaceRow,
 } from "@/modules/timesForPaceRows";
-
-type TimesForPaceTab = "times" | "predictions";
 
 const getRowTimeDisplay = ({
   row,
@@ -34,7 +31,8 @@ const getRowTimeDisplay = ({
 
 function TimesForPace({ results }: { results: Record<string, Time> | null }) {
   const { t } = useTranslation(["events", "calculator"]);
-  const [activeTab, setActiveTab] = useState<TimesForPaceTab>("times");
+  const activeTab = useCalculatorStore((state) => state.timesForPaceTab);
+  const setActiveTab = useCalculatorStore((state) => state.setTimesForPaceTab);
   const event = useCalculatorStore((state) => state.event);
   const distanceWhole = useCalculatorStore((state) => state.distanceWhole);
   const distanceFractional = useCalculatorStore(
