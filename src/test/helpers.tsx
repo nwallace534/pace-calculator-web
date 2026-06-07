@@ -8,6 +8,7 @@ export const paceCellText = (label: string) =>
 
 export const splitsCard = () => screen.getByTestId("card-splits");
 export const timesForPaceCard = () => screen.getByTestId("card-times-for-pace");
+export const howFarInCard = () => screen.getByTestId("card-how-far-in");
 
 export const spinners = () => ({
   decrease: screen.getByRole("button", { name: "Decrease time" }),

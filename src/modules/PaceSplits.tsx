@@ -46,14 +46,14 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
         <div className="d-flex justify-content-end">
           <button
             type="button"
-            className="btn btn-link btn-sm p-0 text-decoration-none text-muted text-smallish"
+            className="btn btn-link btn-sm p-0 text-muted text-smallish"
             onClick={toggleSplitsUnit}
           >
             {t("result.splitsInUnit", { unit: nextUnitLabel })}
           </button>
         </div>
       )}
-      <table className="align-middle mt-2 w-100">
+      <table className="align-middle w-100">
         <thead>
           <tr>
             <th className="w-50">{t("result.columnDistance")}</th>

@@ -2,6 +2,7 @@ import { ExpandableCard } from "@/components/ExpandableCard";
 import useCalculatorStore from "@/state/useCalculatorStore";
 import TimesForPace from "@/modules/TimesForPace";
 import PaceSplits from "@/modules/PaceSplits";
+import HowFarIn from "@/modules/HowFarIn";
 import {
   formatDistanceValue,
   getDistanceUnitSingular,
@@ -51,6 +52,8 @@ function PaceResult() {
         >
           <PaceSplits splits={splits} />
         </ExpandableCard>
+
+        <HowFarIn paceResults={paceResults} />
       </div>
     </div>
   );

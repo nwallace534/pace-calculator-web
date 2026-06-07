@@ -38,6 +38,7 @@
       "speedKph": "Speed kph",
       "speedMph": "Speed mph",
       "timesForPace": "Times for pace",
+      "howFarIn": "How far in...",
       "splits": "Splits",
       "splitsInUnit": "Show in {{unit}}",
       "trackSummary": "First {{opening}}m in {{openingTime}} · {{lap}}m laps in {{lapTime}}",
@@ -63,11 +64,41 @@
         "errorDuplicateSaved": "That distance is already saved."
       }
     },
+    "howFarIn": {
+      "currentPace": "At {{pace}} pace",
+      "showInUnit": "Show in {{unit}}",
+      "columnDuration": "Duration",
+      "columnDistance": "Distance",
+      "addCustom": "+ Add custom duration",
+      "addCustomLimitReached": "Limit reached",
+      "addCustomTitle": "Add custom duration",
+      "customBadge": "Custom",
+      "removeAriaLabel": "Remove custom duration",
+      "closeAriaLabel": "Close",
+      "increaseDurationAriaLabel": "Increase duration",
+      "decreaseDurationAriaLabel": "Decrease duration",
+      "durationPreset": {
+        "thirtyMinutes": "30 minutes",
+        "oneHour": "1 hour",
+        "twoHours": "2 hours"
+      },
+      "form": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "errorEmpty": "Enter a duration.",
+        "errorDuplicate": "That duration is already in the list."
+      }
+    },
     "unit": {
       "perKm": "/km",
       "perMile": "/mile",
       "kph": "km/h",
-      "mph": "mph"
+      "mph": "mph",
+      "kilometersShort": "km",
+      "kilometersShortRunning": "K",
+      "mileSingular": "mile",
+      "milesShort": "mi",
+      "metersShort": "m"
     }
   },
   "events": {

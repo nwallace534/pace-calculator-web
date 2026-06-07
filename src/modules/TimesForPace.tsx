@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import useCalculatorStore from "@/state/useCalculatorStore";
 import {
   DISTANCE_MATCH_TOLERANCE_METERS,
@@ -22,6 +21,8 @@ import { useTranslation } from "react-i18next";
 import { DistanceUnit, getDistanceInAllUnits, Time } from "pace-calculator";
 import DistanceValueInput from "@/components/DistanceValueInput";
 import { SAVED_DISTANCE_CAP } from "@/state/savedDistancesSlice";
+import BottomSheet from "@/components/BottomSheet";
+import SheetActions from "@/components/SheetActions";
 
 type TimesForPaceRow = {
   id: string;
@@ -302,97 +303,51 @@ function AddCustomDistanceSheet({
   onClose,
 }: SheetProps) {
   const { t } = useTranslation(["events", "calculator"]);
-  // Mount without .show, then add it on the next frame so the offcanvas's
-  // CSS transition plays from translateY(100%) up to 0.
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setShown(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  return createPortal(
-    <>
-      <div
-        className={`offcanvas-backdrop fade ${shown ? "show" : ""}`}
-        onClick={onClose}
-      />
-      <div
-        className={`offcanvas offcanvas-bottom ${shown ? "show" : ""}`}
-        tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-        style={{ visibility: "visible" }}
-      >
-        {/* Caps the form column at 480px on wide screens; the sheet's
-            background still spans the full viewport. */}
-        <div
-          className="mx-auto w-100 d-flex flex-column flex-grow-1"
-          style={{ maxWidth: "480px" }}
-        >
-          <div className="offcanvas-header">
-            <h5 className="offcanvas-title">
-              {t("calculator:timesForPace.addCustomTitle")}
-            </h5>
-            <button
-              type="button"
-              className="btn-close"
-              aria-label={t("calculator:timesForPace.closeAriaLabel")}
-              onClick={onClose}
-            />
-          </div>
-          <div className="offcanvas-body">
-            <div className="d-flex align-items-center">
-              <DistanceValueInput
-                whole={whole}
-                fractional={fractional}
-                onWholeChange={(value) =>
-                  onWholeChange(getValidatedInput(value, 99999, 0))
-                }
-                onFractionalChange={(value) =>
-                  onFractionalChange(getValidatedInput(value, 999, 0))
-                }
-                wholeId="savedDistanceWhole"
-                fractionalId="savedDistanceFractional"
-              />
-              <div className="distance-unit ms-2">
-                <select
-                  id="savedDistanceUnit"
-                  className="form-select"
-                  value={unit}
-                  onChange={(e) => onUnitChange(e.target.value as DistanceUnit)}
-                >
-                  {DistanceUnitOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="d-flex justify-content-between align-items-center gap-2 mt-3">
-              <div className="text-danger small flex-grow-1">{error}</div>
-              <div className="d-flex gap-2 flex-shrink-0">
-                <button
-                  type="button"
-                  className="btn btn-link btn-link-muted"
-                  onClick={onClose}
-                >
-                  {t("calculator:timesForPace.form.cancel")}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-accent"
-                  onClick={onSave}
-                >
-                  {t("calculator:timesForPace.form.save")}
-                </button>
-              </div>
-            </div>
-          </div>
+  return (
+    <BottomSheet
+      title={t("calculator:timesForPace.addCustomTitle")}
+      closeAriaLabel={t("calculator:timesForPace.closeAriaLabel")}
+      onClose={onClose}
+      maxWidth="480px"
+    >
+      <div className="d-flex align-items-center">
+        <DistanceValueInput
+          whole={whole}
+          fractional={fractional}
+          onWholeChange={(value) =>
+            onWholeChange(getValidatedInput(value, 99999, 0))
+          }
+          onFractionalChange={(value) =>
+            onFractionalChange(getValidatedInput(value, 999, 0))
+          }
+          wholeId="savedDistanceWhole"
+          fractionalId="savedDistanceFractional"
+        />
+        <div className="distance-unit ms-2">
+          <select
+            id="savedDistanceUnit"
+            className="form-select"
+            value={unit}
+            onChange={(e) => onUnitChange(e.target.value as DistanceUnit)}
+          >
+            {DistanceUnitOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
-    </>,
-    document.body,
+
+      <SheetActions
+        error={error}
+        errorStyle="text"
+        cancelLabel={t("calculator:timesForPace.form.cancel")}
+        saveLabel={t("calculator:timesForPace.form.save")}
+        onCancel={onClose}
+        onSave={onSave}
+      />
+    </BottomSheet>
   );
 }
 
