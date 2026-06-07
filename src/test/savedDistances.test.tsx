@@ -22,9 +22,9 @@ const seedSavedDistance = (
 };
 
 describe("Saved custom distances — render and remove", () => {
-  it("renders a saved distance as a row in the Times-for-Pace table with a Custom badge", async () => {
+  it("renders a saved distance as a row in the Times & predictions table with a Custom badge", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(10, DistanceUnit.Miles);
 
@@ -36,7 +36,7 @@ describe("Saved custom distances — render and remove", () => {
 
   it("inserts the saved row at its meters-sorted position between built-ins", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     // 8K should slot between 5K and 10K.
     seedSavedDistance(8, DistanceUnit.Kilometers);
@@ -65,7 +65,7 @@ describe("Saved custom distances — render and remove", () => {
 
   it("removes a saved distance when its Custom badge is clicked", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(10, DistanceUnit.Miles);
 
@@ -82,7 +82,7 @@ describe("Saved custom distances — render and remove", () => {
 
   it("highlights the saved row when in Custom mode and the entered distance matches", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(8, DistanceUnit.Kilometers);
 
@@ -108,7 +108,7 @@ describe("Saved custom distances — render and remove", () => {
 
   it("falls back to inline custom row when the entered distance matches no saved distance", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(8, DistanceUnit.Kilometers);
 
@@ -127,7 +127,7 @@ describe("Saved custom distances — render and remove", () => {
 
   it("inserts an inline custom row before a saved row when the entered distance is shorter", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     // Saved 8K; enter 7K in Custom (no built-in matches 7K).
     seedSavedDistance(8, DistanceUnit.Kilometers);
@@ -156,7 +156,7 @@ describe("Saved custom distances — render and remove", () => {
 
   it("keeps saved rows in the table when the selected event changes", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(8, DistanceUnit.Kilometers);
 
@@ -183,10 +183,16 @@ describe("Saved custom distances — add form", () => {
   const wholeInput = () =>
     document.getElementById("savedDistanceWhole") as HTMLInputElement;
 
+  const fractionalInput = () =>
+    document.getElementById("savedDistanceFractional") as HTMLInputElement;
+
   it("adds a custom distance via the form and shows it in the table", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     await openForm();
+
+    expect(wholeInput()).toHaveValue("00");
+    expect(fractionalInput()).toHaveValue("00");
 
     await userEvent.fill(wholeInput(), "10");
     // Default unit is Kilometers — change to Miles via the native select.
@@ -205,18 +211,20 @@ describe("Saved custom distances — add form", () => {
 
   it("shows the empty-input error and does not save", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     await openForm();
 
     await userEvent.click(screen.getByRole("button", { name: /^save$/i }));
 
-    expect(await screen.findByText(/enter a distance/i)).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /enter a distance/i,
+    );
     expect(useCalculatorStore.getState().savedDistances).toHaveLength(0);
   });
 
   it("shows the built-in duplicate error when matching a catalog event", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     await openForm();
 
     // 5 km matches the built-in 5K.
@@ -231,7 +239,7 @@ describe("Saved custom distances — add form", () => {
 
   it("shows the saved-duplicate error when matching an already-saved distance", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(7, DistanceUnit.Kilometers);
 
@@ -247,21 +255,22 @@ describe("Saved custom distances — add form", () => {
 
   it("cancel collapses the form and discards input", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     await openForm();
     await userEvent.fill(wholeInput(), "10");
     await userEvent.click(screen.getByRole("button", { name: /cancel/i }));
 
     expect(document.getElementById("savedDistanceWhole")).toBeNull();
 
-    // Reopen — the whole input should be empty again.
+    // Reopen — the fields should return to their anti-autofill defaults.
     await openForm();
-    expect(wholeInput()).toHaveValue("");
+    expect(wholeInput()).toHaveValue("00");
+    expect(fractionalInput()).toHaveValue("00");
   });
 
   it("header close button collapses the form and discards input", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     await openForm();
     await userEvent.fill(wholeInput(), "10");
     await userEvent.click(screen.getByRole("button", { name: /^close$/i }));
@@ -269,12 +278,13 @@ describe("Saved custom distances — add form", () => {
     expect(document.getElementById("savedDistanceWhole")).toBeNull();
 
     await openForm();
-    expect(wholeInput()).toHaveValue("");
+    expect(wholeInput()).toHaveValue("00");
+    expect(fractionalInput()).toHaveValue("00");
   });
 
   it("backdrop click collapses the form and discards input", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     await openForm();
     await userEvent.fill(wholeInput(), "10");
 
@@ -286,12 +296,13 @@ describe("Saved custom distances — add form", () => {
     expect(document.getElementById("savedDistanceWhole")).toBeNull();
 
     await openForm();
-    expect(wholeInput()).toHaveValue("");
+    expect(wholeInput()).toHaveValue("00");
+    expect(fractionalInput()).toHaveValue("00");
   });
 
   it("disables the trigger at the cap", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     // Distinct sub-kilometre distances offset from the 100/200/400/800m
     // built-ins to avoid collisions.
@@ -303,18 +314,14 @@ describe("Saved custom distances — add form", () => {
       name: /add custom distance/i,
     });
     expect(trigger).toBeDisabled();
-    // Counter on the label communicates the limit — title tooltips don't
-    // fire on disabled buttons (or on touch devices), so we read the label.
-    expect(trigger).toHaveTextContent(
-      `(${SAVED_DISTANCE_CAP}/${SAVED_DISTANCE_CAP})`,
-    );
+    expect(screen.getByText("Limit reached")).toBeVisible();
   });
 });
 
 describe("Saved custom distances — persistence", () => {
   it("persists added distances to localStorage in the documented envelope", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(8, DistanceUnit.Kilometers);
 

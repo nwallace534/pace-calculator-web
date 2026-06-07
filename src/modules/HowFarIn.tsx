@@ -46,10 +46,19 @@ const defaultSheetDuration: HowFarInTime = {
   timeHundredths: "00",
 };
 
-const getDefaultOutputUnit = (distanceUnit: DistanceUnit): DistanceUnit =>
-  distanceUnit === DistanceUnit.Miles
-    ? DistanceUnit.Miles
-    : DistanceUnit.Kilometers;
+const getDurationOutputUnit = (
+  distanceUnit: DistanceUnit,
+  showAlternateUnit: boolean,
+): DistanceUnit => {
+  const defaultUnit =
+    distanceUnit === DistanceUnit.Miles
+      ? DistanceUnit.Miles
+      : DistanceUnit.Kilometers;
+
+  if (!showAlternateUnit) return defaultUnit;
+  if (defaultUnit === DistanceUnit.Kilometers) return DistanceUnit.Miles;
+  return DistanceUnit.Kilometers;
+};
 
 const secondsToTime = (seconds: number): Time => ({
   hours: Math.floor(seconds / 3600),
@@ -123,14 +132,7 @@ function HowFarIn({ paceResults }: { paceResults: MultiPace }) {
   const [error, setError] = useState<string | null>(null);
   const atCustomCap = savedDurations.length >= SAVED_DURATION_CAP;
 
-  const defaultOutputUnit = getDefaultOutputUnit(distanceUnit);
-  const isKmDefault = defaultOutputUnit === DistanceUnit.Kilometers;
-
-  const outputUnit = showAlternateUnit
-    ? isKmDefault
-      ? DistanceUnit.Miles
-      : DistanceUnit.Kilometers
-    : defaultOutputUnit;
+  const outputUnit = getDurationOutputUnit(distanceUnit, showAlternateUnit);
 
   const nextUnit =
     outputUnit === DistanceUnit.Kilometers

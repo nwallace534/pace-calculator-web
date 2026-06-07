@@ -10,12 +10,12 @@ import {
 } from "./helpers";
 
 describe("Goals and records dropdown", () => {
-  it("5K example fills the time and refreshes splits + times-for-pace", async () => {
+  it("5K example fills the time and refreshes splits + times & predictions", async () => {
     render(<App />);
 
     // Open both result panels so we can verify they update after the click.
     await userEvent.click(screen.getByText("Splits"));
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     const paceBefore = paceCellText("Pace per km");
     const finalSplitBefore = within(splitsCard())
@@ -34,7 +34,7 @@ describe("Goals and records dropdown", () => {
     expect(screen.getByLabelText("minutes")).toHaveValue("19");
     expect(screen.getByLabelText("seconds")).toHaveValue("59");
 
-    // Smoke check: pace, splits and times-for-pace all reflect the new time.
+    // Smoke check: pace, splits and times & predictions all reflect the new time.
     expect(paceCellText("Pace per km")).not.toBe(paceBefore);
 
     const finalSplitAfter = within(splitsCard())
@@ -53,7 +53,7 @@ describe("Goals and records dropdown", () => {
     await selectEvent("marathon");
 
     await userEvent.click(screen.getByText("Splits"));
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     const paceBefore = paceCellText("Pace per mile");
     const finalSplitBefore = within(splitsCard())

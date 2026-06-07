@@ -53,6 +53,16 @@ export interface DistanceSlice {
   setEvent: (event: string) => void;
 }
 
+const getRememberedCustomDistance = (
+  event: string,
+  customDistance: DistanceSlice["customDistance"],
+  customTrackDistance: DistanceSlice["customTrackDistance"],
+) => {
+  if (event === DistanceMode.Custom) return customDistance;
+  if (event === DistanceMode.CustomTrack) return customTrackDistance;
+  return null;
+};
+
 export const createDistanceSlice: StateCreator<
   CalculatorStore,
   [],
@@ -196,12 +206,11 @@ export const createDistanceSlice: StateCreator<
       // the remembered value, or start blank. Track Custom blanks in meters,
       // road Custom keeps whatever unit the user was last in.
       const distanceDetails = getDistanceDetailsFromEvent(newEvent);
-      const rememberedCustomDistance =
-        newEvent === DistanceMode.Custom
-          ? customDistance
-          : newEvent === DistanceMode.CustomTrack
-            ? customTrackDistance
-            : null;
+      const rememberedCustomDistance = getRememberedCustomDistance(
+        newEvent,
+        customDistance,
+        customTrackDistance,
+      );
       const blankCustomUnit =
         newEvent === DistanceMode.CustomTrack
           ? DistanceUnit.Meters

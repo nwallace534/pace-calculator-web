@@ -9,7 +9,7 @@ import {
   selectEvent,
 } from "./helpers";
 
-// Read the time cell for a given event row in the Times-for-pace table.
+// Read the time cell for a given event row in the Times & predictions table.
 const timesForPaceRowText = (eventLabel: string) =>
   within(timesForPaceCard()).getByText(eventLabel).closest("tr")!.textContent ??
   "";
@@ -108,9 +108,9 @@ describe("Per-event memory across event switches", () => {
     expect(within(rows[5]).getByText("00:30:00")).toBeInTheDocument();
   });
 
-  it("keeps Times-for-pace in sync with the remembered time across switches", async () => {
+  it("keeps Times & predictions in sync with the remembered time across switches", async () => {
     render(<App />);
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     // Capture 5K row at the default 29:59, then change to 30:00 (clear
     // seconds too — the new default seeds them at "59").

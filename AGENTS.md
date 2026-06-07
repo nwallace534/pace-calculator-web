@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance for working with code in this repository.
 
 ## Ground Rules
 
@@ -25,6 +25,7 @@ npm run reload  # clean reinstall — npm install --force (e.g. to restore the p
 - **Bootstrap 5 only** — no second CSS framework. Dark mode toggles via `data-bs-theme`.
 - **Fields are hidden per event** (e.g. `showHours` in `src/utils/events.ts`) — missing fields are deliberate, not bugs.
 - **Default-then-remember:** an event loads preset values first, then remembers the user's own edits. Backed by `eventTimes` / `customDistance` in `src/state/distanceSlice.ts`.
+- **No nested ternaries.** Prefer named variables, early returns, or small helper functions so conditional code stays easy to read.
 
 ## Architecture
 
@@ -34,14 +35,17 @@ Vite + React 19 single-page app. Entry point is `src/main.tsx`; root component i
 
 All UI state lives in a single Zustand store (`src/state/useCalculatorStore.ts`) composed from slices. Centralisation is deliberate — nearly every piece of the UI derives from the same calculator state, so a single store avoids synchronisation complexity between components.
 
-| Slice                  | Responsibility                                           |
-| ---------------------- | -------------------------------------------------------- |
-| `calculatorSlice`      | `computeMode`, `theme`, `showSplits`, `showTimesForPace` |
-| `timeSlice`            | Time field strings for the time input                    |
-| `distanceSlice`        | Distance field strings + unit                            |
-| `paceSlice`            | Pace field strings + unit                                |
-| `paceResultsSlice`     | Calculated pace output                                   |
-| `distanceResultsSlice` | Calculated distance output                               |
+| Slice                  | Responsibility                                                  |
+| ---------------------- | --------------------------------------------------------------- |
+| `calculatorSlice`      | `computeMode`, theme, result-panel visibility, splits unit      |
+| `timeSlice`            | Time field strings for the time input                           |
+| `distanceSlice`        | Event selection, distance field strings, unit, per-event memory |
+| `paceSlice`            | Pace field strings + unit                                       |
+| `paceResultsSlice`     | Calculated pace, times by event/predictions source data, splits |
+| `distanceResultsSlice` | Calculated distance conversions                                 |
+| `spinnerHintSlice`     | Spinner hold/tap hint learning state                            |
+| `savedDistancesSlice`  | User-saved custom distances for Times & predictions             |
+| `savedDurationsSlice`  | User-saved custom durations for Distance covered                |
 
 All time/distance/pace values in the store are **strings** (as typed by the user), not numbers. Conversion to numbers happens in `src/utils/input.ts` (`GetNumericValue`, `GetDecimalValue`).
 

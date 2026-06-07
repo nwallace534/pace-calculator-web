@@ -24,6 +24,7 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+      "no-nested-ternary": "error",
       "@typescript-eslint/naming-convention": [
         "error",
         {

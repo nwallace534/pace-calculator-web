@@ -11,7 +11,7 @@ import {
 } from "./helpers";
 
 describe("5K (default event)", () => {
-  it("paces, splits and times-for-pace react to time and unit changes", async () => {
+  it("paces, splits and times & predictions react to time and unit changes", async () => {
     render(<App />);
 
     // Default 5K bootstraps to 29:59 → 05:59 /km, 10.0 km/h.
@@ -39,7 +39,7 @@ describe("5K (default event)", () => {
     expect(within(splitRows[1]).getByText("1 mile")).toBeInTheDocument();
 
     // Open Times for Pace; confirm standard events appear.
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     const timesCard = timesForPaceCard();
     expect(within(timesCard).getByText("5K")).toBeInTheDocument();
     expect(within(timesCard).getByText("10K")).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe("5K (default event)", () => {
       .getByText("5K")
       .closest("tr")!.textContent;
 
-    // Change time again → paces, splits (still in miles) and times-for-pace
+    // Change time again → paces, splits (still in miles) and times & predictions
     // all reflect the new pace. Seconds is still "00" from the previous fill.
     await userEvent.fill(screen.getByLabelText("minutes"), "20");
     expect(paceCellText("Pace per km")).toMatch(/^04:00\s+\/km$/);
@@ -62,7 +62,7 @@ describe("5K (default event)", () => {
     expect(splitRows[1].textContent).toMatch(/1 mile/);
   });
 
-  it("Splits and Times for pace start collapsed and toggle on click", async () => {
+  it("Splits and Times & predictions start collapsed and toggle on click", async () => {
     render(<App />);
 
     // Children are only rendered when expanded, so the inner table is absent.
@@ -73,15 +73,68 @@ describe("5K (default event)", () => {
     await userEvent.click(screen.getByText("Splits"));
     expect(within(splitsCard()).getByRole("table")).toBeInTheDocument();
 
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     expect(within(timesForPaceCard()).getByRole("table")).toBeInTheDocument();
 
     // Click again → collapses.
     await userEvent.click(screen.getByText("Splits"));
     expect(within(splitsCard()).queryByRole("table")).toBeNull();
 
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
     expect(within(timesForPaceCard()).queryByRole("table")).toBeNull();
+  });
+
+  it("shows times by default and Riegel predictions in a stable event table", async () => {
+    render(<App />);
+
+    await userEvent.fill(screen.getByLabelText("minutes"), "20");
+    await userEvent.fill(screen.getByLabelText("seconds"), "00");
+    await userEvent.click(screen.getByText("Times & predictions"));
+
+    const timesCard = timesForPaceCard();
+    const timesTab = within(timesCard).getByRole("tab", { name: "Times" });
+    const predictionsTab = within(timesCard).getByRole("tab", {
+      name: "Predictions",
+    });
+
+    expect(timesTab).toHaveAttribute("aria-selected", "true");
+    expect(
+      within(timesCard).getByRole("columnheader", { name: "Time" }),
+    ).toBeInTheDocument();
+    expect(within(timesCard).getByText("+ Add custom distance")).toBeVisible();
+
+    const timesRows = within(timesCard).getAllByRole("row");
+    expect(
+      within(timesCard).getByText("5K").closest("tr")!.textContent,
+    ).toMatch(/00:20:00/);
+
+    await userEvent.click(predictionsTab);
+
+    expect(predictionsTab).toHaveAttribute("aria-selected", "true");
+    expect(
+      within(timesCard).getByRole("columnheader", { name: "Prediction" }),
+    ).toBeInTheDocument();
+    expect(within(timesCard).getAllByRole("row")).toHaveLength(
+      timesRows.length,
+    );
+    expect(
+      within(timesCard).getByText("Predictions are estimates", {
+        exact: false,
+      }),
+    ).toBeVisible();
+    expect(
+      within(timesCard).queryByText("+ Add custom distance"),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(timesCard).getByText("100m").closest("tr")!.textContent,
+    ).toContain("—");
+    expect(
+      within(timesCard).getByText("800m").closest("tr")!.textContent,
+    ).toMatch(/00:02:52/);
+    expect(
+      within(timesCard).getByText("10K").closest("tr")!.textContent,
+    ).toMatch(/00:41:41/);
   });
 
   it("spinner up/down steps the time by 1 second and recalculates the pace", async () => {

@@ -83,10 +83,10 @@ describe("Custom (road) — happy path", () => {
     expect(optionLabels).toEqual(["K", "miles"]);
   });
 
-  it("recomputes splits and times-for-pace when the custom distance changes", async () => {
+  it("recomputes splits and times & predictions when the custom distance changes", async () => {
     render(<App />);
     await userEvent.click(screen.getByText("Splits"));
-    await userEvent.click(screen.getByText("Times for pace"));
+    await userEvent.click(screen.getByText("Times & predictions"));
 
     await selectEvent("Custom");
     // Custom starts blank — enter a 5km/25:00 to get a comparable baseline.
@@ -95,7 +95,7 @@ describe("Custom (road) — happy path", () => {
     let rows = within(splitsCard()).getAllByRole("row");
     expect(rows).toHaveLength(1 + 5);
 
-    // Stretch distance to 8km — splits now 8 rows, times-for-pace shifts too.
+    // Stretch distance to 8km — splits now 8 rows, and times & predictions shifts too.
     const tenKBefore = within(timesForPaceCard())
       .getByText("10K")
       .closest("tr")!.textContent;

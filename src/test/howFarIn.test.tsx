@@ -12,7 +12,7 @@ import { howFarInCard, selectEvent } from "./helpers";
 
 const openHowFarIn = async () => {
   render(<App />);
-  await userEvent.click(screen.getByText("How far in..."));
+  await userEvent.click(screen.getByText("Distance covered"));
   return howFarInCard();
 };
 
@@ -60,7 +60,7 @@ describe("How far in — default rows and units", () => {
   it("defaults to miles for mile-based events", async () => {
     render(<App />);
     await selectEvent("marathon");
-    await userEvent.click(screen.getByText("How far in..."));
+    await userEvent.click(screen.getByText("Distance covered"));
 
     const card = howFarInCard();
     expect(within(card).getByText("Show in K")).toBeInTheDocument();

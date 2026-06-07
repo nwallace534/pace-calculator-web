@@ -150,6 +150,16 @@
   font-size: 1.25rem;
 }
 
+.times-for-pace-footer {
+  min-height: 2rem;
+}
+
+[data-bs-theme="dark"] .times-for-pace-tabs .btn-outline-secondary {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-active-color: var(--bs-body-color);
+}
+
 .rotatable-icon {
   transform-box: fill-box;
   transform-origin: center;
