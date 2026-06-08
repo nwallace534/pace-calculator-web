@@ -73,13 +73,11 @@ function Distance() {
   };
 
   return (
-    <div className="row">
-      <div className="col-md-6">
-        <label className="form-label" htmlFor="labelDistance">
-          {t("calculator:selectedRunDistance")}
-        </label>
-      </div>
-      <div className="col-md-6">
+    <div>
+      <label className="form-label" htmlFor="labelDistance">
+        {t("calculator:selectedRunDistance")}
+      </label>
+      <div>
         <select
           className="form-select border-secondary shadow-sm"
           style={{ cursor: "pointer" }}

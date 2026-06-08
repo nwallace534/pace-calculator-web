@@ -82,12 +82,31 @@
 }
 
 .flow-container {
-  max-width: 704px;
+  max-width: 720px;
 }
 
 @media (max-width: 767.98px) {
   .flow-container {
     max-width: 340px;
+  }
+}
+
+.calculator-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 2rem;
+  row-gap: 1rem;
+}
+
+.calculator-col {
+  width: 340px;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .calculator-col-right {
+    padding-top: 0.75rem;
   }
 }
 

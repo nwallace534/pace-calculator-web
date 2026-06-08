@@ -3,6 +3,7 @@ import useCalculatorStore from "@/state/useCalculatorStore";
 import { getMaxTimeMs, getStepMs, getVisibleTimeFields } from "@/utils/events";
 import { timeStringsToMs } from "@/utils/time";
 import SampleTimes from "./SampleTimes";
+import CalculatorHint from "./CalculatorHint";
 import TimeControl from "@/components/TimeControl";
 
 function Time() {
@@ -48,15 +49,12 @@ function Time() {
     stepMs < 1000 ? { minRate: 100, maxRate: 1500 } : undefined;
 
   return (
-    <div className="row align-items-baseline">
-      <div className="col-6">
+    <div>
+      <div className="d-flex align-items-baseline justify-content-between">
         <label>{t("runDuration")}</label>
-      </div>
-      <div className="col-6 justify-content-end d-flex">
         <SampleTimes />
       </div>
-      <div className="col-md-6 d-none d-md-block"></div>
-      <div className="col-md-6 mt-2">
+      <div className="mt-2">
         <TimeControl
           ids={{
             hours: "hours",
@@ -82,6 +80,9 @@ function Time() {
           atMax={atMax}
           tuning={spinnerTuning}
         />
+      </div>
+      <div className="mt-3">
+        <CalculatorHint />
       </div>
     </div>
   );

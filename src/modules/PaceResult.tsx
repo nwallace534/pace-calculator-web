@@ -30,32 +30,28 @@ function PaceResult() {
   if (!paceResults) return null;
 
   return (
-    <div className="row">
-      <div className="col-md-6"></div>
+    <div>
+      <PaceSummary results={paceResults} />
 
-      <div className="col-md-6">
-        <PaceSummary results={paceResults} />
+      <ExpandableCard
+        title={t("result.timesForPace")}
+        testId="card-times-for-pace"
+        isExpanded={showTimesForPace}
+        handleToggle={setShowTimesForPace}
+      >
+        <TimesForPace results={timesForPace} />
+      </ExpandableCard>
 
-        <ExpandableCard
-          title={t("result.timesForPace")}
-          testId="card-times-for-pace"
-          isExpanded={showTimesForPace}
-          handleToggle={setShowTimesForPace}
-        >
-          <TimesForPace results={timesForPace} />
-        </ExpandableCard>
+      <ExpandableCard
+        title={t("result.splits")}
+        testId="card-splits"
+        isExpanded={showSplits}
+        handleToggle={setShowSplits}
+      >
+        <PaceSplits splits={splits} />
+      </ExpandableCard>
 
-        <ExpandableCard
-          title={t("result.splits")}
-          testId="card-splits"
-          isExpanded={showSplits}
-          handleToggle={setShowSplits}
-        >
-          <PaceSplits splits={splits} />
-        </ExpandableCard>
-
-        <HowFarIn paceResults={paceResults} />
-      </div>
+      <HowFarIn paceResults={paceResults} />
     </div>
   );
 }
