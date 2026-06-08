@@ -1,5 +1,5 @@
 import { getCalculationUpdate } from "@/utils/calculator";
-import { getValidatedInput } from "@/utils/input";
+import { sanitizeTime, sanitizeTimeField, TimeField } from "@/utils/input";
 import { StateCreator } from "zustand";
 import { CalculatorStore } from "./useCalculatorStore";
 import { applyTimeStep } from "@/utils/time";
@@ -37,13 +37,9 @@ export const createTimeSlice: StateCreator<
   [],
   TimeSlice
 > = (set, get): TimeSlice => {
-  const createTimeSetter = (
-    field: "timeHours" | "timeMinutes" | "timeSeconds" | "timeHundredths",
-    maxNumber: number,
-    padZeroLength: number,
-  ) => {
+  const createTimeSetter = (field: TimeField) => {
     return (value: string) => {
-      const validated = getValidatedInput(value, maxNumber, padZeroLength);
+      const validated = sanitizeTimeField(field, value);
 
       const calculationUpdate = getCalculationUpdate({
         ...extractCalculatorInput(get()),
@@ -53,7 +49,10 @@ export const createTimeSlice: StateCreator<
       // Once per session, with which field — answers "do visitors type
       // into the time inputs at all?" without per-keystroke noise.
       trackOnce(AnalyticsEvent.TimeFieldEdited, { field });
-      set({ [field]: validated, ...calculationUpdate });
+      set({
+        [field]: validated,
+        ...calculationUpdate,
+      });
     };
   };
 
@@ -74,10 +73,10 @@ export const createTimeSlice: StateCreator<
   return {
     ...initialTime,
 
-    setTimeHours: createTimeSetter("timeHours", 99, 2),
-    setTimeMinutes: createTimeSetter("timeMinutes", 59, 2),
-    setTimeSeconds: createTimeSetter("timeSeconds", 59, 2),
-    setTimeHundredths: createTimeSetter("timeHundredths", 99, 2),
+    setTimeHours: createTimeSetter("timeHours"),
+    setTimeMinutes: createTimeSetter("timeMinutes"),
+    setTimeSeconds: createTimeSetter("timeSeconds"),
+    setTimeHundredths: createTimeSetter("timeHundredths"),
 
     setFullTime: (
       hours: string,
@@ -85,24 +84,20 @@ export const createTimeSlice: StateCreator<
       seconds: string,
       hundredths: string,
     ) => {
-      const validatedHours = getValidatedInput(hours, 99, 2);
-      const validatedMinutes = getValidatedInput(minutes, 59, 2);
-      const validatedSeconds = getValidatedInput(seconds, 59, 2);
-      const validatedHundredths = getValidatedInput(hundredths, 99, 2);
+      const validated = sanitizeTime({
+        timeHours: hours,
+        timeMinutes: minutes,
+        timeSeconds: seconds,
+        timeHundredths: hundredths,
+      });
 
       const calculationUpdate = getCalculationUpdate({
         ...extractCalculatorInput(get()),
-        timeHours: validatedHours,
-        timeMinutes: validatedMinutes,
-        timeSeconds: validatedSeconds,
-        timeHundredths: validatedHundredths,
+        ...validated,
       });
 
       set({
-        timeHours: validatedHours,
-        timeMinutes: validatedMinutes,
-        timeSeconds: validatedSeconds,
-        timeHundredths: validatedHundredths,
+        ...validated,
         ...calculationUpdate,
       });
     },

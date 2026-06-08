@@ -2,7 +2,7 @@ import { StateCreator } from "zustand";
 import { CalculatorStore } from "./useCalculatorStore";
 import { DistanceUnit } from "pace-calculator";
 import { DistanceMode } from "@/types/distance";
-import { getValidatedInput } from "@/utils/input";
+import { sanitizeDistanceField } from "@/utils/input";
 import {
   getCalculationUpdate,
   getDistanceConversionUpdates,
@@ -78,7 +78,10 @@ export const createDistanceSlice: StateCreator<
     customDistance: null,
     customTrackDistance: null,
     setDistanceWhole: (distanceWhole: string) => {
-      const validatedDistanceWhole = getValidatedInput(distanceWhole, 99999, 0);
+      const validatedDistanceWhole = sanitizeDistanceField(
+        "distanceWhole",
+        distanceWhole,
+      );
 
       const calculationUpdate = getCalculationUpdate({
         ...extractCalculatorInput(get()),
@@ -98,10 +101,9 @@ export const createDistanceSlice: StateCreator<
       });
     },
     setDistanceFractional: (distanceFractional: string) => {
-      const validatedDistanceFractional = getValidatedInput(
+      const validatedDistanceFractional = sanitizeDistanceField(
+        "distanceFractional",
         distanceFractional,
-        999,
-        0,
       );
 
       const calculationUpdate = getCalculationUpdate({
@@ -134,7 +136,11 @@ export const createDistanceSlice: StateCreator<
       if (distanceUnit !== get().distanceUnit) {
         track(AnalyticsEvent.DistanceUnitChanged, { to: distanceUnit });
       }
-      set({ distanceUnit, ...calculationUpdate, ...allDistancesUpdate });
+      set({
+        distanceUnit,
+        ...calculationUpdate,
+        ...allDistancesUpdate,
+      });
     },
 
     setEvent: (newEvent: string) => {

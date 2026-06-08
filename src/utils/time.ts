@@ -1,5 +1,5 @@
 import { Time } from "pace-calculator";
-import { getValidatedInput } from "./input";
+import { sanitizeTime } from "./input";
 
 export const timeToMs = (t: Time): number =>
   t.hours * 3600000 + t.minutes * 60000 + t.seconds * 1000 + t.milliseconds;
@@ -52,12 +52,12 @@ export const applyTimeStep = ({
   const seconds = Math.floor((totalMs / 1000) % 60);
   const hundredths = Math.floor((totalMs % 1000) / 10);
 
-  return {
-    timeHours: getValidatedInput(hours.toString(), 99, 2),
-    timeMinutes: getValidatedInput(minutes.toString(), 59, 2),
-    timeSeconds: getValidatedInput(seconds.toString(), 59, 2),
-    timeHundredths: getValidatedInput(hundredths.toString(), 99, 2),
-  };
+  return sanitizeTime({
+    timeHours: hours.toString(),
+    timeMinutes: minutes.toString(),
+    timeSeconds: seconds.toString(),
+    timeHundredths: hundredths.toString(),
+  });
 };
 
 export function hasMeaningfulTime({

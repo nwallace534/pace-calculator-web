@@ -8,6 +8,7 @@ This file provides guidance for working with code in this repository.
 - Don't read `README.md`, `package-lock.json`, or `dist/` unless explicitly asked — they're not needed for context and cost tokens.
 - Run `npm run lint` after edits. Don't start the dev server unless asked.
 - If a message is obviously just a terminal command (e.g. `pwd`, `ls`, `npm run dev`), stop immediately — don't execute or analyse it. Assume it was meant for a shell and remind the user to use `! <cmd>` to run a command inline.
+- Treat the current workspace as the source of truth. Before replacing, restoring, or simplifying existing code, read the current file and preserve any user changes that may have happened since your last context. Never reconstruct a file from memory or prior conversation alone. If restoring older behaviour would remove current functionality, stop and ask before editing.
 
 ## Commands
 

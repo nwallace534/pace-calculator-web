@@ -3,6 +3,7 @@ import useCalculatorStore from "@/state/useCalculatorStore";
 import TimesForPace from "@/modules/TimesForPace";
 import PaceSplits from "@/modules/PaceSplits";
 import HowFarIn from "@/modules/HowFarIn";
+import ShareTargetButton from "@/modules/ShareTargetButton";
 import {
   formatDistanceValue,
   getDistanceUnitSingular,
@@ -141,9 +142,12 @@ function PaceSummary({ results }: { results: MultiPace }) {
         </div>
       </div>
 
-      {allDistances && (
-        <div className="col mt-2 text-muted text-smallish">{displayText}</div>
-      )}
+      <div className="d-flex justify-content-between align-items-center mt-2 gap-2">
+        <div className="text-muted text-smallish">
+          {allDistances ? displayText : null}
+        </div>
+        <ShareTargetButton />
+      </div>
     </div>
   );
 }

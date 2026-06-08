@@ -8,7 +8,7 @@ import { DistanceUnitOptions } from "@/utils/distances";
 import {
   getDecimalValue,
   getNumericValue,
-  getValidatedInput,
+  sanitizeDistanceField,
 } from "@/utils/input";
 import useCalculatorStore from "@/state/useCalculatorStore";
 import { SAVED_DISTANCE_CAP } from "@/state/savedDistancesSlice";
@@ -149,10 +149,12 @@ function AddCustomDistanceSheet({
           whole={whole}
           fractional={fractional}
           onWholeChange={(value) =>
-            onWholeChange(getValidatedInput(value, 99999, 0))
+            onWholeChange(sanitizeDistanceField("distanceWhole", value))
           }
           onFractionalChange={(value) =>
-            onFractionalChange(getValidatedInput(value, 999, 0))
+            onFractionalChange(
+              sanitizeDistanceField("distanceFractional", value),
+            )
           }
           wholeId="savedDistanceWhole"
           fractionalId="savedDistanceFractional"

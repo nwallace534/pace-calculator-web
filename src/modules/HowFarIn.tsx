@@ -20,7 +20,7 @@ import {
 import { DistanceUnitOptions, formatDistanceValue } from "@/utils/distances";
 import { formatTime } from "@/utils/formatTime";
 import { applyTimeStep, timeStringsToMs } from "@/utils/time";
-import { getValidatedInput } from "@/utils/input";
+import { sanitizeTimeField } from "@/utils/input";
 
 const MAX_TIME_MS = 99 * 3600000 + 59 * 60000 + 59 * 1000;
 const STEP_MS = 1000;
@@ -372,10 +372,9 @@ function AddCustomDurationSheet({
     field: "timeHours" | "timeMinutes" | "timeSeconds",
     value: string,
   ) => {
-    const maxNumber = field === "timeHours" ? 99 : 59;
     onDurationChange({
       ...duration,
-      [field]: getValidatedInput(value, maxNumber, 2),
+      [field]: sanitizeTimeField(field, value),
     });
   };
 

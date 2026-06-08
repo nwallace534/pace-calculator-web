@@ -4,6 +4,7 @@ import "@/i18n/config";
 import useCalculatorStore from "@/state/useCalculatorStore";
 import { ComputeMode } from "@/utils/calculator";
 import { DEFAULT_EVENT_ID } from "@/utils/events";
+import { DistanceUnit } from "pace-calculator";
 
 beforeEach(() => {
   // RTL flips IS_REACT_ACT_ENVIRONMENT on each render. Playwright drives real
@@ -35,6 +36,9 @@ beforeEach(() => {
     eventTimes: {},
     customDistance: null,
     customTrackDistance: null,
+    distanceWhole: "",
+    distanceFractional: "",
+    distanceUnit: DistanceUnit.Kilometers,
     timeHours: "",
     timeMinutes: "",
     timeSeconds: "",

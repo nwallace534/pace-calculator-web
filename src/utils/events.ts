@@ -1,6 +1,6 @@
 import { DistanceMode } from "@/types/distance";
 import { Distance, DistanceUnit, getDistanceInAllUnits } from "pace-calculator";
-import { getDecimalValue, getNumericValue, getValidatedInput } from "./input";
+import { getDecimalValue, getNumericValue, sanitizeTime } from "./input";
 import { CalculatorTime, timeStringsToMs } from "./time";
 import { Event, Events, EventTags, TimeExample } from "./events-data";
 import { SavedDistance } from "@/state/savedDistancesSlice";
@@ -169,16 +169,12 @@ export const sanitizeTimeForEvent = (
 ): CalculatorTime => {
   const { showHours, showMinutes, showHundredths } =
     getVisibleTimeFields(eventId);
-  return {
-    timeHours: getValidatedInput(showHours ? time.timeHours : "0", 99, 2),
-    timeMinutes: getValidatedInput(showMinutes ? time.timeMinutes : "0", 59, 2),
-    timeSeconds: getValidatedInput(time.timeSeconds, 59, 2),
-    timeHundredths: getValidatedInput(
-      showHundredths ? time.timeHundredths : "0",
-      99,
-      2,
-    ),
-  };
+  return sanitizeTime({
+    timeHours: showHours ? time.timeHours : "0",
+    timeMinutes: showMinutes ? time.timeMinutes : "0",
+    timeSeconds: time.timeSeconds,
+    timeHundredths: showHundredths ? time.timeHundredths : "0",
+  });
 };
 
 const timeExampleToMs = (t: TimeExample["time"]): number => timeStringsToMs(t);

@@ -11,6 +11,16 @@
   },
   "calculator": {
     "distanceApproximation": "{{from}} is approximately {{to}}",
+    "share": {
+      "button": "Share",
+      "popoverTitle": "Share this pace",
+      "popoverText": "Shareable link to this pace",
+      "urlLabel": "Share URL",
+      "copyLink": "Copy",
+      "copied": "Copied — ready to paste",
+      "copyFailed": "Copy failed",
+      "close": "Close"
+    },
     "runDuration": "Run duration",
     "holdHint": "Tip: press and hold to change faster",
     "increaseTimeAriaLabel": "Increase time",

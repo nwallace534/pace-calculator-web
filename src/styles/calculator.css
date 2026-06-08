@@ -242,3 +242,41 @@
 .calculator-form :is(input, select) {
   background-color: var(--bs-tertiary-bg);
 }
+
+.share-popover {
+  width: min(19rem, calc(100vw - 2rem));
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  color: var(--bs-body-color);
+}
+
+.share-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  border: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-bs-theme="dark"] .share-backdrop {
+  background: rgba(0, 0, 0, 0.36);
+}
+
+@media (min-width: 768px) {
+  .share-popover {
+    width: min(30rem, calc(100vw - 2rem));
+  }
+}
+
+.share-url-box {
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  user-select: text;
+  cursor: text;
+  background-color: var(--bs-tertiary-bg);
+  color: var(--bs-body-color);
+  font-size: 0.8rem;
+  -webkit-overflow-scrolling: touch;
+}
