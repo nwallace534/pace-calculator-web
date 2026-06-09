@@ -2,7 +2,7 @@ import { Time } from "pace-calculator";
 import { msToTime, timeToMs } from "./time";
 
 const RIEGEL_EXPONENT = 1.06;
-const MIN_PREDICTION_DISTANCE_METERS = 800;
+export const MIN_PREDICTION_DISTANCE_METERS = 800;
 
 export const predictRaceTime = ({
   inputTime,

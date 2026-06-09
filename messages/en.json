@@ -54,7 +54,26 @@
       "trackSummary": "First {{opening}}m in {{openingTime}} · {{lap}}m laps in {{lapTime}}",
       "eventGuideTitle": "{{event}} goals",
       "columnDistance": "Distance",
-      "columnTime": "Time"
+      "columnTime": "Time",
+      "summary": {
+        "openButton": "Race card"
+      }
+    },
+    "summary": {
+      "back": "Back",
+      "goalHeading": "Goal Summary",
+      "goalMatched": "{{event}} in {{label}}",
+      "goalFallback": "A {{event}} in {{time}}",
+      "predictionsHeading": "At this fitness, you should also run",
+      "predictionRow": "A {{label}} in around {{time}}",
+      "intervalsHeading": "At goal pace",
+      "splitsHeading": "Splits in {{unit}}",
+      "splitsUnit": {
+        "miles": "miles",
+        "kilometers": "km",
+        "meters": "m"
+      },
+      "hint": "Screenshot this card for race day."
     },
     "timesForPace": {
       "columnPrediction": "Prediction",

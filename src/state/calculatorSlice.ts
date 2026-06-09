@@ -34,6 +34,9 @@ export interface CalculatorSlice {
   /** Unit for the splits table; `null` follows the entered distance unit. */
   splitsUnit: DistanceUnit | null;
   toggleSplitsUnit: () => void;
+  summaryViewOpen: boolean;
+  openSummaryView: () => void;
+  closeSummaryView: () => void;
 }
 
 export const createCalculatorSlice: StateCreator<
@@ -48,6 +51,23 @@ export const createCalculatorSlice: StateCreator<
   showTimesForPace: false,
   timesForPaceTab: "times",
   splitsUnit: null,
+  summaryViewOpen: false,
+  openSummaryView: () => {
+    if (!get().summaryViewOpen) {
+      trackOnce(AnalyticsEvent.SummaryViewOpened);
+    }
+    // Force showSplits so the splits table is ready to render in the summary
+    // card. Without this, the view shows an empty splits section the first
+    // time it's opened.
+    const calculationUpdate = getCalculationUpdate({
+      ...get(),
+      showSplits: true,
+    });
+    set({ summaryViewOpen: true, showSplits: true, ...calculationUpdate });
+  },
+  closeSummaryView: () => {
+    set({ summaryViewOpen: false });
+  },
   setShowSplits: (showSplits) => {
     const calculationUpdate = getCalculationUpdate({
       ...get(),

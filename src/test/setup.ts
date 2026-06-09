@@ -30,6 +30,7 @@ beforeEach(() => {
     showTimesForPace: false,
     timesForPaceTab: "times",
     splitsUnit: null,
+    summaryViewOpen: false,
     computeMode: ComputeMode.Pace,
     theme: "light",
     event: DEFAULT_EVENT_ID,

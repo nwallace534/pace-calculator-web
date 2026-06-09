@@ -18,6 +18,7 @@ export const AnalyticsEvent = {
   CalculationCompleted: "calculation_completed",
   SavedDistanceAdded: "saved_distance_added",
   SavedDistanceRemoved: "saved_distance_removed",
+  SummaryViewOpened: "summary_view_opened",
 } as const;
 
 export type AnalyticsEventName =
