@@ -17,7 +17,6 @@
       "copyFailed": "Couldn't copy link"
     },
     "runDuration": "Run duration",
-    "runDurationHelp": "How to set the run duration",
     "holdHint": "Tip: press and hold to change faster",
     "increaseTimeAriaLabel": "Increase time",
     "decreaseTimeAriaLabel": "Decrease time",
@@ -38,7 +37,6 @@
     "result": {
       "needsDistance": "Enter a distance to see your pace.",
       "needsTime": "Enter a time to see your pace.",
-      "timeUsageTip": "Type a time directly, tap +/− to step, or pick a goal from the dropdown above.",
       "fasterThanRecordPace": "Faster than world record pace.",
       "pacePerKm": "Pace per km",
       "pacePerMile": "Pace per mile",
@@ -279,7 +277,7 @@
       "fiveK": {
         "label": "5K",
         "guide": {
-          "description": "The 5K is the world's most-run race distance thanks to parkrun. A typical finish is <strong>33 mins</strong>."
+          "description": "The 5K is the world's most-run race distance thanks to parkrun. A typical finish is <strong>33 mins</strong>. You can type a time, tap <strong>+/−</strong>, or pick a goal."
         },
         "avg": {
           "label": "Avg 33 mins ⏱️"
