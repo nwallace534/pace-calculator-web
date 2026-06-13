@@ -8,11 +8,6 @@ import {
 import type { SplitsResult } from "@/utils/calculator";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
 
-// Local splits-display override for the summary card — does NOT touch the
-// store. Closing the card discards the choice. The "Show in X" button cycles
-// through one alternative at a time; `nextAction` describes what that button
-// should do for the current event/distance, or `null` when there's nothing
-// useful to toggle to.
 export type SplitsOverrideTarget = "K" | "miles" | "100m" | null;
 
 export type NextSplitsAction = {
@@ -21,7 +16,7 @@ export type NextSplitsAction = {
 } | null;
 
 export type SplitsOverride = {
-  /** Merged splits: override if set, otherwise the store-computed splits. */
+  /** Override if set, otherwise the store-computed splits. */
   splits: SplitsResult | null;
   setOverride: (next: SplitsOverrideTarget) => void;
   nextAction: NextSplitsAction;
@@ -38,6 +33,7 @@ type Params = {
   timeHundredths: string;
 };
 
+// Local override that does NOT touch the store; closing the card discards it.
 export function useSplitsOverride({
   storeSplits,
   distanceWhole,
@@ -92,7 +88,6 @@ export function useSplitsOverride({
         }),
       };
     }
-    // 100m
     return {
       unit: DistanceUnit.Meters,
       showHundredths: false,
@@ -114,11 +109,11 @@ export function useSplitsOverride({
 
   const splits = overrideResult ?? storeSplits;
 
-  // Single-button cycle, matching the main splits panel pattern. For road
-  // events it flips between km and miles. For meter events it cycles
-  // landmarks ↔ K (≥ 1km) or landmarks ↔ 100m (400m < total ≤ 800m); below
-  // 400m the default splits are already 100m landmarks, above 800m the 100m
-  // row count gets unwieldy, so neither shows a toggle.
+  // Cycle ranges:
+  //  - meters ≥ 1km → landmarks ↔ K (100m would be 30+ rows on a 3km card).
+  //  - 400m < meters ≤ 800m → landmarks ↔ 100m.
+  //  - meters ≤ 400m → no toggle (defaults are already 100m landmarks).
+  //  - road events → km ↔ miles.
   const nextAction: NextSplitsAction = useMemo(() => {
     if (!splits) return null;
     const totalMeters = distanceAll.inMeters.distanceValue;

@@ -8,10 +8,8 @@ import type { SplitsOverrideTarget } from "@/hooks/useSplitsOverride";
 import { PencilIcon } from "./icons";
 import { sectionTitleStyle, valueStyle } from "./styles";
 
-// Splits grid + the "Show in X" override toggle + the optional track-summary
-// caption underneath. CSS Grid with explicit row/column counts (rather than
-// multi-column) so each row is strictly contained in its cell — no chance of
-// leaking into the next column the way `column-count` does.
+// CSS Grid with explicit row/column counts (not multi-column) so each row
+// stays in its cell — multi-column was leaking rows between columns.
 export function SummarySplits({
   splits,
   splitsColumnCount,
@@ -33,8 +31,8 @@ export function SummarySplits({
 
   return (
     <>
-      {/* Row reserves enough height for the toggle button up front, so
-          showing/hiding the button doesn't reflow the splits grid. */}
+      {/* Fixed minHeight reserves space for the toggle so showing/hiding it
+          doesn't reflow the splits grid. */}
       <div
         className="d-flex align-items-center mb-1 gap-3"
         style={{ minHeight: "1.75rem" }}
@@ -64,14 +62,11 @@ export function SummarySplits({
           gridTemplateColumns: `repeat(${splitsColumnCount}, max-content)`,
           gridTemplateRows: `repeat(${splitsRowsPerColumn}, auto)`,
           gridAutoFlow: "column",
-          // Pack columns flush to the left with a fixed gap between them,
-          // matching the Times-at-goal-pace section. Was `space-between`,
-          // which stretched the columns across the full card width.
+          // Left-packed; `space-between` stretched columns across the card.
           justifyContent: "start",
           columnGap: "1.5rem",
-          // Match the other sections at 1rem when the split list is manageable
-          // (≤20 rows). Shrink only when the list gets long (marathon-scale)
-          // so it still fits inside the card.
+          // Shrink only at marathon-scale row counts; otherwise match the
+          // 1rem of other sections.
           fontSize: splits.rows.length > 20 ? "0.8rem" : "1rem",
           lineHeight: 1.3,
         }}

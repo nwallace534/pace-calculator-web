@@ -2,9 +2,7 @@ import { useEffect } from "react";
 
 const COPY_TOAST_DURATION_MS = 3000;
 
-// Self-dismissing toast for the "Copied" / "Couldn't copy" feedback. Schedules
-// its own teardown so the parent only owns the `toast` state itself, not the
-// timing of when it goes away.
+// Owns its dismissal timer so the parent only tracks toast content, not lifetime.
 export function CopyToast({
   message,
   url,

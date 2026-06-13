@@ -14,8 +14,7 @@ export type SharedTarget = {
   distanceUnit?: DistanceUnit;
   /** "summary" auto-opens the goal-summary view after the link loads. */
   view?: "summary";
-  /** True when the recipient arrived via a "share goal summary" link — used
-   *  to show a one-liner hint that closing the card reveals the calculator. */
+  /** Triggers the from-share orientation hint on the card. */
   fromShare?: boolean;
 };
 
@@ -89,8 +88,7 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
 
 type ShareUrlOptions = {
   view?: "summary";
-  /** Stamp the URL so the recipient knows it came from "share goal summary"
-   *  and we can render the "close to see calculator" hint. */
+  /** Stamps `from=share` so the recipient gets the orientation hint. */
   fromShare?: boolean;
 };
 

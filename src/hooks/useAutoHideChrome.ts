@@ -1,13 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// Drives the fade-in/auto-fade-out behaviour of the summary card's chrome
-// (controls, screenshot-mode toast, from-share hint). Mounts hidden, fades in
-// on the next frame so the opacity transition fires, then schedules a hide.
-// `reveal()` resets the hide countdown — wire it to user interaction (tap,
-// move, etc.) to keep the controls visible while the user is engaging. Use
-// `pinOpen()` while a modal interaction (e.g. title editing) holds the chrome
-// open with no timer; pair it with `fadeNow()` on the modal's resolve to
-// snap the chrome straight to hidden.
+// Mounts hidden, fades in on the next frame so the opacity transition fires,
+// then auto-hides. `pinOpen` + `fadeNow` are for modal interactions (e.g.
+// title editing) that need to override the timer.
 export type AutoHideChrome = {
   visible: boolean;
   reveal: () => void;
@@ -27,8 +22,8 @@ export function useAutoHideChrome({
   }, []);
 
   useEffect(() => {
-    // Mount with controls invisible, then flip on next frame so the opacity
-    // transition fires (no flash; controls appear via the fade-in).
+    // rAF so the opacity transition fires from a hidden start, not from
+    // first paint (which would flash visible-then-faded).
     const rafId = requestAnimationFrame(() => {
       setVisible(true);
       scheduleHide(hideDelayMs);

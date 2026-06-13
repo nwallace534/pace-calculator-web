@@ -3,9 +3,8 @@ import { useTranslation } from "react-i18next";
 import { formatTime } from "@/utils/formatTime";
 import { valueStyle } from "./styles";
 
-// Pace per km / Pace per mile / speeds stack. Single baseline-aligned row so
-// the two pace columns and the speeds column share a baseline regardless of
-// the mixed monospace/regular-text fonts.
+// Baseline-aligned so the mixed monospace + regular-text columns share a
+// baseline across pace labels and speed values.
 export function SummaryPaces({ paceResults }: { paceResults: MultiPace }) {
   const { t } = useTranslation("calculator");
 
@@ -23,8 +22,8 @@ export function SummaryPaces({ paceResults }: { paceResults: MultiPace }) {
           {formatTime({ time: paceResults.perMile })} {t("unit.perMile")}
         </output>
       </div>
-      {/* Vertical equivalent of <hr>: currentColor + opacity 0.25, inset
-          top/bottom so it doesn't span the full section height. */}
+      {/* Vertical divider — currentColor at low opacity, inset so it doesn't
+          span the full section height. */}
       <div
         aria-hidden="true"
         className="ms-2"

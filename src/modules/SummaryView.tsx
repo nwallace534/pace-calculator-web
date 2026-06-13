@@ -46,11 +46,9 @@ function SummaryView() {
   const timeHundredths = useCalculatorStore((s) => s.timeHundredths);
   const arrivedFromShare = useCalculatorStore((s) => s.summaryArrivedFromShare);
 
-  // Recomputed when the underlying state changes — kept reactive so the URL
-  // preview always reflects the actual link the Copy button will produce.
-  // Body reads via useCalculatorStore.getState() rather than the hook values
-  // directly, so eslint flags the deps as "unused"; they're still load-bearing
-  // for triggering the recompute on input edits.
+  // Body reads via useCalculatorStore.getState() rather than the hook values,
+  // so eslint flags the deps as unused; they're still load-bearing to trigger
+  // the recompute on input edits.
   const shareUrl = useMemo(() => {
     return buildShareUrl(useCalculatorStore.getState(), window.location, {
       view: "summary",
@@ -81,19 +79,11 @@ function SummaryView() {
     }
   };
 
-  // Screenshot-mode chrome: header controls + orientation text fade in on
-  // load, hold for 3s, fade out. Any tap restarts the cycle.
   const chrome = useAutoHideChrome({ hideDelayMs: 3000 });
-
-  // Editable title — ephemeral; closing the card discards the edit.
   const title = useEditableTitle({ maxLength: TITLE_MAX_LENGTH });
-
-  // While `closing` is true the card swaps its flip-in animation for the
-  // reverse. The actual unmount fires from onAnimationEnd so the animation
-  // has time to finish.
+  // Two-step close: animation runs, onAnimationEnd unmounts. See
+  // useCardCloseAnimation.
   const close = useCardCloseAnimation(closeSummaryView);
-
-  // Local splits-display override. Closing the card discards the choice.
   const splitsControl = useSplitsOverride({
     storeSplits,
     distanceWhole,
@@ -105,27 +95,23 @@ function SummaryView() {
     timeHundredths,
   });
 
+  // Editing pins the chrome open via handleStartEdit / handleFinishEdit; a
+  // mid-edit reveal would let the hide timer race the save.
   const handleRevealControls = () => {
-    // While editing, the controls are pinned visible and shouldn't reset
-    // the hide timer — let the edit/save action drive visibility instead.
     if (title.editing) return;
     chrome.reveal();
   };
 
   const handleStartEdit = () => {
     title.startEdit();
-    // Pin controls open for the duration of the edit; finishEdit will trigger
-    // the fade.
     chrome.pinOpen();
   };
 
   const handleFinishEdit = () => {
     title.finishEdit();
-    // Per spec: finishing the edit fades all controls immediately.
     chrome.fadeNow();
   };
 
-  // Shared opacity/pointer-events transition so all chrome fades as one.
   const controlsFadeStyle: CSSProperties = {
     opacity: chrome.visible ? 1 : 0,
     pointerEvents: chrome.visible ? "auto" : "none",
@@ -133,9 +119,8 @@ function SummaryView() {
   };
 
   if (!paceResults) {
-    // Defensive: the entry button is only rendered alongside paceResults, but
-    // if state changes (e.g. distance cleared via share-link load), bail out
-    // gracefully back to the calculator.
+    // Share-link load may clear the distance; bail back to the calculator
+    // rather than render half a card.
     return (
       <div className="container py-3 d-flex justify-content-end">
         <CloseButton
@@ -146,9 +131,8 @@ function SummaryView() {
     );
   }
 
-  // Sprints / track / custom-track events stash precision in hundredths;
-  // surface that in every friendly-time render (goal title, predictions,
-  // intervals) so a 9.58 100m doesn't read as a flat "9s".
+  // Track / custom-track / sprint events carry sub-second precision; surface
+  // it in every friendly-time render so a 9.58 100m doesn't read as "9s".
   const { showHundredths } = getVisibleTimeFields(event);
   const goalTime: Time = {
     hours: getNumericValue(timeHours),
@@ -172,8 +156,6 @@ function SummaryView() {
     distanceUnit,
   });
 
-  // Merged splits (override if set, otherwise store) and the toggle action
-  // are owned by useSplitsOverride.
   const splits = splitsControl.splits;
   const nextAction = splitsControl.nextAction;
 
@@ -200,10 +182,8 @@ function SummaryView() {
     : "";
 
   const splitsColumnCount = getSplitsColumnCount(splits?.rows.length ?? 0);
-  // CSS Grid with explicit row count + column-flow so each split row is
-  // strictly contained in its grid cell — no chance of leaking into the next
-  // column the way CSS multi-column was doing. Trades perfect time alignment
-  // for guaranteed-no-overlap, which the user explicitly preferred.
+  // Explicit row count + column-flow so each row stays in its grid cell —
+  // CSS multi-column was leaking rows between columns.
   const splitsRowsPerColumn = Math.ceil(
     (splits?.rows.length ?? 0) / Math.max(1, splitsColumnCount),
   );
@@ -220,9 +200,8 @@ function SummaryView() {
       }}
       data-testid="summary-view"
       onClick={() => {
-        // Any click that bubbles up while editing the title commits the
-        // change and exits edit mode. The input + check button both
-        // stopPropagation, so this only fires for taps outside them.
+        // Bubbled click while editing commits the title. The input and check
+        // button both stopPropagation, so this only fires for taps outside.
         if (title.editing) {
           handleFinishEdit();
           return;
@@ -246,10 +225,8 @@ function SummaryView() {
         style={{
           backgroundColor: "var(--bs-secondary-bg)",
           color: "var(--bs-body-color)",
-          // Width capped at the Pixel 9 Pro XL (largest mainstream portrait
-          // phone, 448 × 998 CSS px ≈ 28 × 62.5rem). Height is a cap, not a
-          // target — sparse goals shrink to fit content, marathon grows to
-          // the cap and overflow-clips anything past it.
+          // Pixel 9 Pro XL portrait (~28rem) as the cap; height is a ceiling,
+          // not a target — sparse goals shrink, marathon overflow-clips.
           maxWidth: "28rem",
           maxHeight: "62.5rem",
           overflow: "hidden",

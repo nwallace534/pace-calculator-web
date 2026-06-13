@@ -31,16 +31,13 @@ export enum ComputeMode {
   Pace = "Pace",
 }
 
-// Everything the splits view needs, pre-resolved so the component can render
-// without re-deriving event/unit/precision rules.
 export type SplitsResult = {
   unit: DistanceUnit;
   showHundredths: boolean;
   rows: CalculateSplitsOutput;
   trackSummary: {
-    /** `null` when the splits are pure laps (e.g. the mile: 4×400 + a tiny
-     *  trailing 9m we'd rather not call an "opener"). The renderer drops the
-     *  "First Xm in Y · " prefix in that case. */
+    /** Null for pure-laps (e.g. the mile: 4×400 + a trailing 9m we won't
+     *  call an "opener"); the renderer drops the "First Xm in Y · " prefix. */
     opening: number | null;
     openingTime: Time | null;
     lap: number;
@@ -95,7 +92,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
 
         let rows: CalculateSplitsOutput;
         if (trackLandmarks) {
-          // Library only handles uniform intervals — scale each materialised
+          // pace-calculator only handles uniform intervals; scale each
           // landmark by proportion of the total instead.
           const totalMs = timeToMs(time);
           rows = trackLandmarks.map((landmark, i) => ({
@@ -104,9 +101,8 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
             time: msToTime((totalMs * landmark) / totalMeters),
           }));
         } else {
-          // Road branch: splitsUnit is always Km or Miles here. Custom (road)
-          // forbids Meters in its distance dropdown, and every meter-distance
-          // event routes through trackLandmarks above.
+          // splitsUnit is Km or Miles here — Custom (road) forbids Meters
+          // and meter-distance events route through trackLandmarks above.
           const splitsDistance =
             splitsUnit === DistanceUnit.Miles
               ? distanceInAllUnits.inMiles
@@ -121,12 +117,9 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
 
         const showHundredths = getVisibleTimeFields(state.event).showHundredths;
 
-        // Surface "first X in Y, then Z-meter laps in W" when there's a
-        // non-uniform opener, or just "Z-meter laps in W" for a clean lap
-        // run with a tiny sub-100m trailing partial (e.g. the mile). Pure
-        // uniform sequences (800m / sprints) leave trackSummary null; so
-        // do all sub-400m distances since the "opener + laps" frame doesn't
-        // apply to a 150m or 250m sprint.
+        // Three shapes: opener + laps (1500m), laps-only with trailing
+        // partial (mile), or null (clean uniform like 800m, and all sub-400m
+        // distances where "opener + laps" doesn't apply).
         const trackSummary =
           trackLandmarks && rows.length >= 2 && totalMeters >= 400
             ? (() => {
@@ -142,7 +135,6 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
                   timeToMs(rows[1].time) - timeToMs(rows[0].time),
                 );
                 if (!hasOpener) {
-                  // Mile-style: laps only, no opening preface.
                   return {
                     opening: null,
                     openingTime: null,

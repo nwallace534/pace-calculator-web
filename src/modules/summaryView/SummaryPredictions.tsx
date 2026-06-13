@@ -5,15 +5,12 @@ import {
 } from "@/modules/summaryRows";
 import { sectionTitleStyle, valueStyle } from "./styles";
 
-// Short forms for the prediction column. Catalog labels are correct globally
-// (event picker etc.), but "Half Marathon" makes this column too wide. The
-// shortened "1/2 Mar" reads fine in context with the time beside it.
+// "Half Marathon" is too wide for the prediction column; the time alongside
+// makes the shortened "1/2 Mar" unambiguous.
 const SHORT_EVENT_LABELS: Record<string, string> = {
   halfMarathon: "1/2 Mar",
 };
 
-// Multi-column list of "5K | 41m 41s" rows for predicted race times. Hidden
-// entirely when the parent passes no rows (the middle-range tier).
 export function SummaryPredictions({
   rows,
   showHundredths,

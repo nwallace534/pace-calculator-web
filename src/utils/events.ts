@@ -103,16 +103,11 @@ export const getStepMs = (eventId: string): number => {
   return event?.stepMs ?? 1000;
 };
 
-// opening = total % interval (a partial first lap when total isn't a clean
-// multiple), then full intervals up to total. The pace-calculator library
-// only handles uniform intervals, so these landmarks are scaled by proportion
-// in calculator.ts.
-//
-// Exception: when the leftover is sub-100m (the canonical case is the mile
-// at 1609.344m → 9.344m), we flip to the trailing-partial layout so the
-// landmarks read as full 400m laps with the tiny remainder on the end —
-// not as a 9m opener. Distances with a sensible-sized opener (1500m → 300,
-// 3000m → 200, etc.) keep the existing race-convention layout.
+// opening = total % interval (a partial first lap). When the leftover is
+// sub-100m we flip to the trailing layout so the mile (1609.344m → 9.344m
+// remainder) reads as 4×400m laps + trailing partial, not as a 9m opener.
+// pace-calculator handles only uniform intervals; landmarks are scaled by
+// proportion in calculator.ts.
 const generateLandmarks = (total: number, interval: number): number[] => {
   const opening = total % interval;
   if (opening > 0 && opening < 100) {
@@ -130,10 +125,9 @@ const generateLandmarks = (total: number, interval: number): number[] => {
   return landmarks;
 };
 
-// Trailing-partial variant — full intervals first (100m, 200m, …) and any
-// remainder tacked on the end. Used for sub-400m custom-track distances where
-// a "300m opener then 400m laps" model doesn't apply; runners want the first
-// split at the first natural marker (100m), not at the leftover 50m / 75m.
+// Full intervals first with any remainder tacked on the end. Used for
+// sub-400m custom-track distances where a "50m opener + laps" frame is
+// useless — runners want the first split at the natural marker.
 const generateLandmarksTrailing = (
   total: number,
   interval: number,
@@ -148,9 +142,8 @@ const generateLandmarksTrailing = (
   return landmarks;
 };
 
-// Track-style cumulative landmarks for events that pace by laps rather than
-// road km/miles. Returns null for road events (5K+) — calculator.ts falls
-// through to its km/mile splits path for those.
+// Track-style landmarks for lap-paced events. Returns null for road events
+// (calculator.ts falls through to its km/mile splits path).
 export const getEventLandmarks = (
   eventId: string,
   totalMeters: number,
@@ -160,19 +153,14 @@ export const getEventLandmarks = (
   const event = Events.find((e) => e.id === eventId);
   const tags = event?.eventTags ?? [];
 
-  // Sprints (100m / 200m / 400m) pace in 100m segments.
   if (tags.includes(EventTags.Sprints)) {
     return generateLandmarks(totalMeters, 100);
   }
-  // Middle-distance (800m / 1500m / mile / 3000m) paces in 400m laps.
   if (tags.includes(EventTags.MiddleDistance)) {
     return generateLandmarks(totalMeters, 400);
   }
-  // Custom Track is meters-only and always pace-by-laps:
-  //  - 400m+ uses the standard "opener + 400m laps" pattern
-  //  - sub-400m uses the trailing-partial variant so the first split is the
-  //    first natural 100m marker (not whatever leftover 50m / 75m exists).
   if (eventId === DistanceMode.CustomTrack) {
+    // Sub-400m falls back to 100m intervals via the trailing variant.
     if (totalMeters >= 400) return generateLandmarks(totalMeters, 400);
     return generateLandmarksTrailing(totalMeters, 100);
   }

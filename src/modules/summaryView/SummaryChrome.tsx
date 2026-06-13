@@ -2,9 +2,8 @@ import type { CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { CloseButton, CopyIcon } from "./icons";
 
-// Auto-hiding controls + screenshot-mode label + the optional "from share"
-// orientation hint. All four share a single fadeStyle so they appear/disappear
-// in lockstep — the parent owns the visibility state via useAutoHideChrome.
+// All four chrome elements share a single fadeStyle so they appear/disappear
+// in lockstep — visibility is owned by useAutoHideChrome in the parent.
 export function SummaryChrome({
   fadeStyle,
   arrivedFromShare,
@@ -20,8 +19,7 @@ export function SummaryChrome({
 
   return (
     <>
-      {/* Header controls — absolutely positioned so they fade in/out without
-          shifting the card. */}
+      {/* Absolute positioning so the fade doesn't reflow the card. */}
       <div
         data-testid="summary-controls-left"
         style={{
@@ -60,9 +58,6 @@ export function SummaryChrome({
         <CloseButton onClick={onClose} ariaLabel={t("summary.close")} />
       </div>
 
-      {/* "Screenshot mode" label — uses the same chrome colour as the
-          surrounding buttons so all three controls share a contrast tone,
-          without going as dark as pure emphasis. */}
       <div
         data-testid="summary-screenshot-mode-toast"
         className="text-smallish"

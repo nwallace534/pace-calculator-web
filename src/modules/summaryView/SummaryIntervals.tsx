@@ -5,8 +5,6 @@ import {
 } from "@/modules/summaryRows";
 import { sectionTitleStyle, valueStyle } from "./styles";
 
-// "Times at goal pace" — every reference distance shorter than the goal,
-// rendered with the same multi-column packing pattern as predictions.
 export function SummaryIntervals({
   rows,
   showHundredths,
@@ -24,9 +22,6 @@ export function SummaryIntervals({
       <div
         data-testid="summary-intervals"
         style={{
-          // Multi-column for responsive packing. No maxWidth — the card
-          // already caps width at phone-portrait, so the inner sections are
-          // free to use whatever room that leaves.
           columnWidth: "8rem",
           columnGap: "0.25rem",
         }}
@@ -42,9 +37,8 @@ export function SummaryIntervals({
               whiteSpace: "nowrap",
             }}
           >
-            {/* Fixed label box so times line up at the same x position across
-                every row in a column. Sized to fit "3000m" / "1/2 Mar" — the
-                widest labels after the shortening. */}
+            {/* Fixed label box so times align across rows. Sized for the
+                widest label after shortening ("3000m" / "1/2 Mar"). */}
             <span style={{ minWidth: "4em" }}>{row.label}</span>
             <span style={valueStyle}>
               {formatFriendlyTimeExact(row.time, showHundredths)}

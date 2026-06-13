@@ -35,17 +35,12 @@ export interface CalculatorSlice {
   splitsUnit: DistanceUnit | null;
   toggleSplitsUnit: () => void;
   summaryViewOpen: boolean;
-  /** True when the summary was opened by landing on a shared link — drives
-   *  the "close the card to use the calculator" hint in the chrome. */
+  /** True when opened via a share link; drives the orientation hint. */
   summaryArrivedFromShare: boolean;
-  /** Remembers the user's splits-panel choice while the summary is open,
-   *  so closing the summary restores it. The summary always forces splits
-   *  on to render its splits table; without this, a user who closed splits
-   *  before opening the summary would see them re-opened after closing it. */
+  /** Pre-open showSplits, restored on close. The card always forces splits
+   *  on to populate its grid; this preserves the user's panel choice. */
   showSplitsBeforeSummary: boolean | null;
   openSummaryView: () => void;
-  /** Same as openSummaryView but flags the visit as a share-link landing
-   *  so the recipient gets the orientation hint. */
   openSummaryViewFromShare: () => void;
   closeSummaryView: () => void;
 }
@@ -70,10 +65,8 @@ export const createCalculatorSlice: StateCreator<
     if (!wasOpen) {
       trackOnce(AnalyticsEvent.SummaryViewOpened);
     }
-    // Force showSplits so the splits table is ready to render in the summary
-    // card. Without this, the view shows an empty splits section the first
-    // time it's opened. Remember the prior choice so closeSummaryView can
-    // restore it instead of leaving the calculator's splits panel open.
+    // Force showSplits so the card has data to render; remember the prior
+    // choice for closeSummaryView to restore.
     const calculationUpdate = getCalculationUpdate({
       ...get(),
       showSplits: true,

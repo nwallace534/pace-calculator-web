@@ -1,8 +1,5 @@
-// Visual primitives shared across the summary-card components. SVGs are
-// inline so they pick up colour from `currentColor` / parent `color`, which
-// is how the dark/light theme + chrome-colour swap works without per-asset
-// variants. SectionSpacer is here too — it's a tiny layout helper that
-// belongs with the other low-level UI bits.
+// Icons are inline so they pick up `currentColor` for the theme/chrome
+// colour swap without per-asset variants.
 
 export function CloseIcon() {
   return (
@@ -109,10 +106,8 @@ export function CloseButton({
   );
 }
 
-// Flex-grow separator: gap that can stretch when the card has spare height,
-// bounded so sparse goals don't grow embarrassingly large blank bands. The
-// hr inside is centered vertically and gets the standard Bootstrap muted look,
-// so visually it still reads as a section divider.
+// Flex-grow separator with capped max so sparse goals get breathing space
+// and dense ones (marathon) still get a perceptible gap.
 export function SectionSpacer() {
   return (
     <div
@@ -120,8 +115,6 @@ export function SectionSpacer() {
       style={{
         flexGrow: 1,
         flexShrink: 0,
-        // Bumped both ends so sparse goals have visible breathing between
-        // sections and dense ones (marathon) still get a perceptible gap.
         minHeight: "0.8rem",
         maxHeight: "2rem",
         display: "flex",

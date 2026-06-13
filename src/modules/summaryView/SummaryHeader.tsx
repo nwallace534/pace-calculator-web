@@ -2,9 +2,8 @@ import { useTranslation } from "react-i18next";
 import type { EditableTitle } from "@/hooks/useEditableTitle";
 import { CheckIcon, PencilIcon } from "./icons";
 
-// Title row (editable input ↔ display) + details line + branding cluster.
-// Two-column flex so the title can wrap without colliding with the right-side
-// branding, which never shrinks.
+// Two-column flex so the title can wrap without colliding with the
+// fixed-size branding cluster on the right.
 export function SummaryHeader({
   title,
   chromeVisible,
@@ -29,10 +28,6 @@ export function SummaryHeader({
   return (
     <div className="d-flex align-items-start gap-3">
       <div className="flex-grow-1" style={{ minWidth: 0 }}>
-        {/* Editable card title. Defaults to the i18n value of
-            summary.goalHeading; saved edits override. Accent-coloured, bigger
-            than every other heading. Pencil sits beside it in display mode,
-            replaced by the input + check while editing. */}
         <div
           className="d-flex align-items-center gap-2"
           style={{ minWidth: 0 }}
@@ -110,9 +105,6 @@ export function SummaryHeader({
           )}
         </div>
 
-        {/* Detail line beneath the title — event • friendly time • equivalent
-            distance. Body-coloured (matches the calculator's label tone) so
-            it reads darker than the previous muted look. */}
         <div
           style={{
             fontSize: "0.9rem",
