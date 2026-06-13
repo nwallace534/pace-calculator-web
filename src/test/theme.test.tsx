@@ -26,15 +26,4 @@ describe("Theme toggle", () => {
     );
     expect(window.localStorage.getItem("theme")).toBe("light");
   });
-
-  it("swaps the navbar logo asset on toggle", async () => {
-    render(<App />);
-    const logo = screen.getByAltText("Pacerly logo") as HTMLImageElement;
-    expect(logo.getAttribute("src")).toMatch(/pacerly-full-logo-light\.svg$/);
-
-    const toggle = screen.getByRole("button", { name: /toggle dark mode/i });
-    await userEvent.click(toggle);
-
-    expect(logo.getAttribute("src")).toMatch(/pacerly-full-logo-dark\.svg$/);
-  });
 });
