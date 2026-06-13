@@ -1,5 +1,13 @@
+// Smoke-only browser coverage (see test-layering-with-screenshots memory):
+// per-event variety lives in the screenshot script and the summaryRows /
+// trackLandmarks unit suites. These tests only prove the component wires up
+// for the behaviours that can't be unit-tested cleanly — open/close, chrome
+// autohide, title editing, the splits-override toggle — and run one of each
+// event type (track / middle distance / most popular) so we'd catch a wiring
+// regression that breaks only one path.
+
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { userEvent } from "vitest/browser";
 import App from "@/App";
 import { selectEvent } from "./helpers";
@@ -10,20 +18,27 @@ const openSummary = async () => {
 };
 
 describe("Summary view — entry and chrome", () => {
-  it("hides the header and renders the summary card when opened", async () => {
+  it("opens, hides the navbar, and renders the card's main sections", async () => {
     render(<App />);
 
-    // Header is visible up front.
+    // Navbar is visible up front.
     expect(screen.getByAltText("Pacerly logo")).toBeInTheDocument();
 
     const card = await openSummary();
     expect(card).toBeInTheDocument();
 
-    // Header / Footer should disappear so a screenshot is just the card.
+    // Navbar disappears so a screenshot is just the card.
     expect(screen.queryByAltText("Pacerly logo")).toBeNull();
+
+    // Default 5K renders branding + intervals + splits; predictions are
+    // correctly omitted (5K is in the middle range).
+    expect(within(card).getByTestId("summary-branding")).toBeInTheDocument();
+    expect(within(card).getByTestId("summary-intervals")).toBeInTheDocument();
+    expect(within(card).getByTestId("summary-splits")).toBeInTheDocument();
+    expect(within(card).queryByTestId("summary-predictions")).toBeNull();
   });
 
-  it("restores the calculator when the close control is clicked", async () => {
+  it("closes via the close control and restores the calculator", async () => {
     render(<App />);
     await openSummary();
     expect(screen.queryByAltText("Pacerly logo")).toBeNull();
@@ -35,93 +50,108 @@ describe("Summary view — entry and chrome", () => {
     expect(await screen.findByAltText("Pacerly logo")).toBeInTheDocument();
     expect(screen.queryByTestId("summary-card")).toBeNull();
   });
+
+  it("fades the chrome controls out after the 3-second autohide timeout", async () => {
+    render(<App />);
+    await openSummary();
+
+    const controls = screen.getByTestId("summary-controls-left");
+
+    // Mounts hidden, then rAF fires the fade-in. Wait until visible first so
+    // we're measuring the fade-out from a known state.
+    await waitFor(() => {
+      expect(controls).toHaveStyle({ opacity: "1" });
+    });
+
+    // 3000ms autohide + 500ms transition + slack.
+    await waitFor(
+      () => {
+        expect(controls).toHaveStyle({ opacity: "0" });
+      },
+      { timeout: 5000 },
+    );
+  });
 });
 
-describe("Summary view — event-aware predictions", () => {
-  it("5K goal hides the predictions section (middle range — no tier applies)", async () => {
+describe("Summary view — title editing", () => {
+  it("commits the edit and exits edit mode when the user taps anywhere off the input", async () => {
     render(<App />);
-    // Default 5K sits in the middle range between the short tier (≤ 3K) and
-    // long tier (≥ 10K), so getPredictionFloorMeters returns null and the
-    // section is omitted entirely.
     const card = await openSummary();
 
-    expect(within(card).queryByTestId("summary-predictions")).toBeNull();
+    // Open the title editor via the pencil.
+    await userEvent.click(within(card).getByTestId("summary-title-edit"));
+    const input = within(card).getByTestId("summary-title-input");
+    await userEvent.type(input, "Race day plan");
+
+    // Click anywhere outside the input — the splits area is convenient,
+    // doesn't stopPropagation, and is well inside the card.
+    await userEvent.click(within(card).getByTestId("summary-splits"));
+
+    // Display flips back, the input goes away, and the typed title sticks.
+    await waitFor(() => {
+      expect(within(card).queryByTestId("summary-title-input")).toBeNull();
+    });
+    expect(within(card).getByTestId("summary-title-display")).toHaveTextContent(
+      "Race day plan",
+    );
+  });
+});
+
+describe("Summary view — per event type", () => {
+  it("track sprint (100m) opens cleanly and hides the splits-override toggle", async () => {
+    render(<App />);
+    await selectEvent("oneHundredMeters");
+
+    const card = await openSummary();
+    // Splits still render — a single 100m landmark row.
+    const rows = within(card)
+      .getByTestId("summary-splits")
+      .querySelectorAll('[data-testid="summary-split-row"]');
+    expect(rows.length).toBeGreaterThanOrEqual(1);
+
+    // Sub-400m has nothing meaningful to toggle to, so the override hides.
     expect(
-      within(card).queryByTestId("summary-predictions-heading"),
+      within(card).queryByTestId("summary-splits-override-toggle"),
     ).toBeNull();
   });
 
-  it("marathon goal predicts the 5K/10K/half (long tier, 5K floor)", async () => {
-    render(<App />);
-    await selectEvent("marathon");
-
-    const card = await openSummary();
-    const rows = within(card).getAllByTestId("summary-prediction-row");
-    const labels = rows.map((r) => r.textContent ?? "");
-
-    // Three shorter TimesForPace events ≥ the 5K floor; "1/2 Mar" is the
-    // SHORT_EVENT_LABELS override for halfMarathon to keep the column tight.
-    // textContent concatenates label + time with no whitespace, so simple
-    // startsWith / substring checks beat \b word boundaries.
-    expect(labels).toHaveLength(3);
-    expect(labels.some((l) => l.startsWith("5K"))).toBe(true);
-    expect(labels.some((l) => l.startsWith("10K"))).toBe(true);
-    expect(labels.some((l) => l.startsWith("1/2 Mar"))).toBe(true);
-
-    // Marathon shouldn't predict itself (and the half marathon uses the
-    // "1/2 Mar" short label, not "Marathon").
-    expect(labels.some((l) => l.startsWith("Marathon"))).toBe(false);
-  });
-
-  it("800m goal hides the predictions section entirely (no shorter race)", async () => {
+  it("middle distance (800m) splits-override flips lap landmarks to 100m intervals", async () => {
     render(<App />);
     await selectEvent("eightHundredMeters");
 
     const card = await openSummary();
-    expect(within(card).queryByTestId("summary-predictions")).toBeNull();
+    const splits = () => within(card).getByTestId("summary-splits");
+
+    // Default: 2 lap landmarks ([400, 800]).
     expect(
-      within(card).queryByTestId("summary-predictions-heading"),
-    ).toBeNull();
-  });
-});
+      splits().querySelectorAll('[data-testid="summary-split-row"]'),
+    ).toHaveLength(2);
 
-describe("Summary view — splits and intervals", () => {
-  it("renders condensed splits matching the entered distance", async () => {
+    await userEvent.click(
+      within(card).getByTestId("summary-splits-override-toggle"),
+    );
+
+    // After toggle: 8 × 100m rows.
+    await waitFor(() => {
+      expect(
+        splits().querySelectorAll('[data-testid="summary-split-row"]'),
+      ).toHaveLength(8);
+    });
+  });
+
+  it("most popular event (5K) splits-override flips km to miles", async () => {
     render(<App />);
-    // Default 5K in km → 5 split rows; heading carries the unit.
+    // 5K is the default event — no selectEvent call needed.
+
     const card = await openSummary();
-    const splits = within(card).getByTestId("summary-splits");
-    const rows = within(splits).getAllByTestId("summary-split-row");
-    expect(rows).toHaveLength(5);
     expect(within(card).getByText(/Splits in km/i)).toBeInTheDocument();
-  });
 
-  it("renders a marathon's full mile splits (26+ rows)", async () => {
-    render(<App />);
-    await selectEvent("marathon");
-    const card = await openSummary();
+    await userEvent.click(
+      within(card).getByTestId("summary-splits-override-toggle"),
+    );
 
-    const splits = within(card).getByTestId("summary-splits");
-    const rows = within(splits).getAllByTestId("summary-split-row");
-    // 26 whole-mile rows + the 26.218 tail.
-    expect(rows.length).toBeGreaterThanOrEqual(26);
-    expect(within(card).getByText(/Splits in miles/i)).toBeInTheDocument();
-  });
-
-  it("renders interval reference rows shorter than the goal", async () => {
-    render(<App />);
-    // Default 5K → 400m, 800m, 1km, 1mi, 3000m all shorter than 5km.
-    // Sprints (100m/200m) are filtered out by the endurance threshold.
-    const card = await openSummary();
-    const intervals = within(card).getByTestId("summary-intervals");
-    const labels = within(intervals)
-      .getAllByTestId("summary-interval-row")
-      .map((r) => r.textContent ?? "");
-    expect(labels.some((l) => l.includes("400m"))).toBe(true);
-    expect(labels.some((l) => l.includes("1km"))).toBe(true);
-    expect(labels.some((l) => l.includes("1mi"))).toBe(true);
-    // Endurance threshold suppresses the sprint references.
-    expect(labels.some((l) => l.includes("100m"))).toBe(false);
-    expect(labels.some((l) => l.includes("200m"))).toBe(false);
+    await waitFor(() => {
+      expect(within(card).getByText(/Splits in miles/i)).toBeInTheDocument();
+    });
   });
 });
