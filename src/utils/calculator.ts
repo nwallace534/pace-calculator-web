@@ -38,8 +38,11 @@ export type SplitsResult = {
   showHundredths: boolean;
   rows: CalculateSplitsOutput;
   trackSummary: {
-    opening: number;
-    openingTime: Time;
+    /** `null` when the splits are pure laps (e.g. the mile: 4×400 + a tiny
+     *  trailing 9m we'd rather not call an "opener"). The renderer drops the
+     *  "First Xm in Y · " prefix in that case. */
+    opening: number | null;
+    openingTime: Time | null;
     lap: number;
     lapTime: Time;
   } | null;
@@ -119,21 +122,39 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
         const showHundredths = getVisibleTimeFields(state.event).showHundredths;
 
         // Surface "first X in Y, then Z-meter laps in W" when there's a
-        // non-uniform opener (first landmark shorter than subsequent ones).
-        // Uniform-lap events (800m, sprints) leave trackSummary null.
+        // non-uniform opener, or just "Z-meter laps in W" for a clean lap
+        // run with a tiny sub-100m trailing partial (e.g. the mile). Pure
+        // uniform sequences (800m / sprints) leave trackSummary null; so
+        // do all sub-400m distances since the "opener + laps" frame doesn't
+        // apply to a 150m or 250m sprint.
         const trackSummary =
-          trackLandmarks && rows.length >= 2
+          trackLandmarks && rows.length >= 2 && totalMeters >= 400
             ? (() => {
                 const opening = trackLandmarks[0];
                 const lap = trackLandmarks[1] - trackLandmarks[0];
-                if (opening === lap) return null;
+                const lastGap =
+                  trackLandmarks[trackLandmarks.length - 1] -
+                  trackLandmarks[trackLandmarks.length - 2];
+                const hasOpener = opening !== lap;
+                const hasTrailing = lastGap !== lap;
+                if (!hasOpener && !hasTrailing) return null;
+                const lapTime = msToTime(
+                  timeToMs(rows[1].time) - timeToMs(rows[0].time),
+                );
+                if (!hasOpener) {
+                  // Mile-style: laps only, no opening preface.
+                  return {
+                    opening: null,
+                    openingTime: null,
+                    lap,
+                    lapTime,
+                  };
+                }
                 return {
                   opening,
                   openingTime: rows[0].time,
                   lap,
-                  lapTime: msToTime(
-                    timeToMs(rows[1].time) - timeToMs(rows[0].time),
-                  ),
+                  lapTime,
                 };
               })()
             : null;

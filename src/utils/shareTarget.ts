@@ -12,6 +12,11 @@ export type SharedTarget = {
   distanceWhole?: string;
   distanceFractional?: string;
   distanceUnit?: DistanceUnit;
+  /** "summary" auto-opens the goal-summary view after the link loads. */
+  view?: "summary";
+  /** True when the recipient arrived via a "share goal summary" link — used
+   *  to show a one-liner hint that closing the card reveals the calculator. */
+  fromShare?: boolean;
 };
 
 const VALID_DISTANCE_UNITS = new Set<string>(Object.values(DistanceUnit));
@@ -48,6 +53,9 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
   const event = params.get("event");
   if (!event || !hasTimeParam(params)) return null;
 
+  const view = params.get("view") === "summary" ? "summary" : undefined;
+  const fromShare = params.get("from") === "share";
+
   const target: SharedTarget = {
     event,
     ...sanitizeTime({
@@ -56,6 +64,8 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
       timeSeconds: getParam(params, "s"),
       timeHundredths: getParam(params, "cs"),
     }),
+    view,
+    fromShare,
   };
 
   if (!isCustomEvent(event)) return target;
@@ -77,9 +87,17 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
   };
 };
 
+export type ShareUrlOptions = {
+  view?: "summary";
+  /** Stamp the URL so the recipient knows it came from "share goal summary"
+   *  and we can render the "close to see calculator" hint. */
+  fromShare?: boolean;
+};
+
 export const buildShareUrl = (
   state: CalculatorStore,
   location: Location,
+  options: ShareUrlOptions = {},
 ): string => {
   const params = new URLSearchParams();
   params.set("event", state.event);
@@ -93,6 +111,9 @@ export const buildShareUrl = (
     params.set("df", state.distanceFractional || "0");
     params.set("unit", state.distanceUnit);
   }
+
+  if (options.view) params.set("view", options.view);
+  if (options.fromShare) params.set("from", "share");
 
   return `${location.origin}${location.pathname}?${params.toString()}`;
 };
@@ -119,4 +140,9 @@ export const applySharedTarget = (
     target.timeSeconds,
     target.timeHundredths,
   );
+
+  if (target.view === "summary") {
+    if (target.fromShare) store.openSummaryViewFromShare();
+    else store.openSummaryView();
+  }
 };

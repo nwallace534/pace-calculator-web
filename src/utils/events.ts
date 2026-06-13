@@ -107,14 +107,42 @@ export const getStepMs = (eventId: string): number => {
 // multiple), then full intervals up to total. The pace-calculator library
 // only handles uniform intervals, so these landmarks are scaled by proportion
 // in calculator.ts.
+//
+// Exception: when the leftover is sub-100m (the canonical case is the mile
+// at 1609.344m → 9.344m), we flip to the trailing-partial layout so the
+// landmarks read as full 400m laps with the tiny remainder on the end —
+// not as a 9m opener. Distances with a sensible-sized opener (1500m → 300,
+// 3000m → 200, etc.) keep the existing race-convention layout.
 const generateLandmarks = (total: number, interval: number): number[] => {
-  const landmarks: number[] = [];
   const opening = total % interval;
+  if (opening > 0 && opening < 100) {
+    return generateLandmarksTrailing(total, interval);
+  }
+
+  const landmarks: number[] = [];
   if (opening > 0) landmarks.push(opening);
   for (let m = opening + interval; m <= total; m += interval) {
     landmarks.push(m);
   }
   if (landmarks.length > 0 && landmarks[landmarks.length - 1] !== total) {
+    landmarks.push(total);
+  }
+  return landmarks;
+};
+
+// Trailing-partial variant — full intervals first (100m, 200m, …) and any
+// remainder tacked on the end. Used for sub-400m custom-track distances where
+// a "300m opener then 400m laps" model doesn't apply; runners want the first
+// split at the first natural marker (100m), not at the leftover 50m / 75m.
+const generateLandmarksTrailing = (
+  total: number,
+  interval: number,
+): number[] => {
+  const landmarks: number[] = [];
+  for (let m = interval; m <= total; m += interval) {
+    landmarks.push(m);
+  }
+  if (landmarks.length === 0 || landmarks[landmarks.length - 1] !== total) {
     landmarks.push(total);
   }
   return landmarks;
@@ -140,10 +168,13 @@ export const getEventLandmarks = (
   if (tags.includes(EventTags.MiddleDistance)) {
     return generateLandmarks(totalMeters, 400);
   }
-  // Custom Track is meters-only and always pace-by-laps: 400m above the
-  // threshold, 100m intervals below to keep splits useful at short distances.
+  // Custom Track is meters-only and always pace-by-laps:
+  //  - 400m+ uses the standard "opener + 400m laps" pattern
+  //  - sub-400m uses the trailing-partial variant so the first split is the
+  //    first natural 100m marker (not whatever leftover 50m / 75m exists).
   if (eventId === DistanceMode.CustomTrack) {
-    return generateLandmarks(totalMeters, totalMeters >= 400 ? 400 : 100);
+    if (totalMeters >= 400) return generateLandmarks(totalMeters, 400);
+    return generateLandmarksTrailing(totalMeters, 100);
   }
 
   return null;

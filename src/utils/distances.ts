@@ -42,6 +42,11 @@ export const getDistanceUnitSingular = (distanceUnit: DistanceUnit) =>
 export const formatDistanceValue = (value: number): string =>
   String(Number(value.toFixed(1)));
 
+// Two-decimal form for unit conversions where the precision matters: always
+// shows both decimal digits (e.g. 0.4971 -> "0.50", 42.2 -> "42.20").
+export const formatDistanceValueTwoDp = (value: number): string =>
+  value.toFixed(2);
+
 // Absorbs float drift from unit conversion — not a fuzzy match for user-entered
 // "near" distances. Small enough that distinct hand-entered distances stay
 // distinct.

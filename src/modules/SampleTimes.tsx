@@ -14,10 +14,7 @@ const SampleTimes = () => {
   return (
     <>
       <Dropdown menu={<SampleTimesDropdown />}>
-        <button
-          type="button"
-          className="btn btn-accent btn-attract dropdown-toggle"
-        >
+        <button type="button" className="btn btn-accent dropdown-toggle">
           {eventGuide.title}
         </button>
       </Dropdown>
@@ -51,17 +48,19 @@ const SampleTimesDropdown = () => {
 
   return (
     <>
-      {eventGuide.timeExamples.map((example) => (
-        <button
-          type="button"
-          onClick={handleExampleClick}
-          key={example.id}
-          id={example.id}
-          value={example.id}
-          className="dropdown-item"
-        >
-          {example.label}
-        </button>
+      {eventGuide.timeExamples.map((example, index) => (
+        <React.Fragment key={example.id}>
+          {index > 0 && <hr className="dropdown-divider" />}
+          <button
+            type="button"
+            onClick={handleExampleClick}
+            id={example.id}
+            value={example.id}
+            className="dropdown-item"
+          >
+            {example.label}
+          </button>
+        </React.Fragment>
       ))}
     </>
   );

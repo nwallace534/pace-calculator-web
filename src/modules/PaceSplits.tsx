@@ -1,10 +1,9 @@
 import useCalculatorStore from "@/state/useCalculatorStore";
 import { DistanceUnitOptions, DistanceUnitShortLabel } from "@/utils/distances";
 import { SplitsResult } from "@/utils/calculator";
-import { formatTime } from "@/utils/formatTime";
-import { timeToMs } from "@/utils/time";
+import { formatTime, formatNaturalDuration } from "@/utils/formatTime";
 import { useTranslation } from "react-i18next";
-import { DistanceUnit, Time } from "pace-calculator";
+import { DistanceUnit } from "pace-calculator";
 
 function PaceSplits({ splits }: { splits: SplitsResult | null }) {
   const { t } = useTranslation("calculator");
@@ -31,14 +30,7 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
   const formatSplitDistance = (d: number) =>
     Number.isInteger(d) ? `${d}` : d.toFixed(2);
 
-  // Under 90s reads more naturally as "78 seconds" than "01:18".
-  const formatNaturalDuration = (time: Time): string => {
-    const totalSeconds = Math.floor(timeToMs(time) / 1000);
-    if (totalSeconds < 90) {
-      return `${totalSeconds} ${t("timeUnit.seconds")}`;
-    }
-    return formatTime({ time });
-  };
+  const secondsLabel = t("timeUnit.seconds");
 
   return (
     <>
@@ -77,12 +69,27 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
       </table>
       {splits.trackSummary && (
         <div className="text-muted text-smallish mt-2">
-          {t("result.trackSummary", {
-            opening: splits.trackSummary.opening,
-            openingTime: formatNaturalDuration(splits.trackSummary.openingTime),
-            lap: splits.trackSummary.lap,
-            lapTime: formatNaturalDuration(splits.trackSummary.lapTime),
-          })}
+          {splits.trackSummary.opening !== null &&
+          splits.trackSummary.openingTime !== null
+            ? t("result.trackSummary", {
+                opening: splits.trackSummary.opening,
+                openingTime: formatNaturalDuration(
+                  splits.trackSummary.openingTime,
+                  secondsLabel,
+                ),
+                lap: splits.trackSummary.lap,
+                lapTime: formatNaturalDuration(
+                  splits.trackSummary.lapTime,
+                  secondsLabel,
+                ),
+              })
+            : t("result.trackSummaryLapsOnly", {
+                lap: splits.trackSummary.lap,
+                lapTime: formatNaturalDuration(
+                  splits.trackSummary.lapTime,
+                  secondsLabel,
+                ),
+              })}
         </div>
       )}
     </>

@@ -10,18 +10,14 @@
     "pacerlyClassic": "Visit Pacerly Classic"
   },
   "calculator": {
-    "distanceApproximation": "{{from}} is approximately {{to}}",
+    "distanceApproximation": "{{from}} = {{to}}",
     "share": {
       "button": "Share",
-      "popoverTitle": "Share this pace",
-      "popoverText": "Shareable link to this pace",
-      "urlLabel": "Share URL",
-      "copyLink": "Copy",
-      "copied": "Copied — ready to paste",
-      "copyFailed": "Copy failed",
-      "close": "Close"
+      "toastCopied": "Link copied",
+      "copyFailed": "Couldn't copy link"
     },
     "runDuration": "Run duration",
+    "runDurationHelp": "How to set the run duration",
     "holdHint": "Tip: press and hold to change faster",
     "increaseTimeAriaLabel": "Increase time",
     "decreaseTimeAriaLabel": "Decrease time",
@@ -42,38 +38,41 @@
     "result": {
       "needsDistance": "Enter a distance to see your pace.",
       "needsTime": "Enter a time to see your pace.",
+      "timeUsageTip": "Type a time directly, tap +/− to step, or pick a goal from the dropdown above.",
       "fasterThanRecordPace": "Faster than world record pace.",
       "pacePerKm": "Pace per km",
       "pacePerMile": "Pace per mile",
       "speedKph": "Speed kph",
       "speedMph": "Speed mph",
+      "speeds": "Speeds",
       "timesForPace": "Times & predictions",
       "howFarIn": "Distance covered",
       "splits": "Splits",
       "splitsInUnit": "Show in {{unit}}",
       "trackSummary": "First {{opening}}m in {{openingTime}} · {{lap}}m laps in {{lapTime}}",
-      "eventGuideTitle": "{{event}} goals",
+      "trackSummaryLapsOnly": "{{lap}}m laps in {{lapTime}}",
+      "eventGuideTitle": "Popular goals",
       "columnDistance": "Distance",
-      "columnTime": "Time",
-      "summary": {
-        "openButton": "Race card"
-      }
+      "columnTime": "Time"
     },
     "summary": {
-      "back": "Back",
+      "back": "Pacerly",
+      "close": "Close",
+      "copyLink": "Copy link",
+      "screenshotModeToast": "Screenshot mode",
+      "fromShareHint": "Close the card to use the calculator with this goal.",
       "goalHeading": "Goal Summary",
-      "goalMatched": "{{event}} in {{label}}",
-      "goalFallback": "A {{event}} in {{time}}",
-      "predictionsHeading": "At this fitness, you should also run",
-      "predictionRow": "A {{label}} in around {{time}}",
-      "intervalsHeading": "At goal pace",
+      "goalLine": "{{event}} in {{time}}",
+      "editTitle": "Edit title",
+      "saveTitle": "Save title",
+      "predictionsHeading": "Predicted race times",
+      "intervalsHeading": "Times at goal pace",
       "splitsHeading": "Splits in {{unit}}",
       "splitsUnit": {
         "miles": "miles",
         "kilometers": "km",
-        "meters": "m"
-      },
-      "hint": "Screenshot this card for race day."
+        "meters": "meters"
+      }
     },
     "timesForPace": {
       "columnPrediction": "Prediction",
@@ -280,7 +279,7 @@
       "fiveK": {
         "label": "5K",
         "guide": {
-          "description": "The 5K is the world's most-run race distance thanks to parkrun. A typical finish is <strong>33 mins</strong>. You can type a time, tap <strong>+/−</strong>, or pick a goal."
+          "description": "The 5K is the world's most-run race distance thanks to parkrun. A typical finish is <strong>33 mins</strong>."
         },
         "avg": {
           "label": "Avg 33 mins ⏱️"

@@ -6,10 +6,7 @@ function Header() {
   const { t } = useTranslation("theme");
   const toggleTheme = useCalculatorStore((state) => state.toggleTheme);
   const theme = useCalculatorStore((state) => state.theme);
-  // Icon-only mark; teal accent in light theme, lime in dark — same colour
-  // pairing the previous combined logo had.
-  const logoSrc =
-    theme === "dark" ? "/pacerly-logo.svg" : "/pacerly-logo-teal.svg";
+  const logoSrc = "/pacerly-logo.svg";
 
   return (
     <nav className="navbar fixed-top border-bottom bg-body-tertiary py-1 small text-boldish d-flex justify-content-between align-items-center px-3">

@@ -11,34 +11,35 @@ import { predictRaceTime } from "@/utils/predictions";
 import { DISTANCE_MATCH_TOLERANCE_METERS } from "@/utils/distances";
 import { msToTime, timeToMs } from "@/utils/time";
 
-// The shortest race we show as an equivalent. Below this, runners care about
-// laps/sprints rather than steady-pace endurance equivalents.
-const MIN_EQUIVALENT_DISTANCE_METERS = 5000;
+// Predicted-race-times tiers, applied by `getPredictionFloorMeters`:
+//
+//   - Long tier: goal ≥ 10K → predict down to the 5K floor (5K, 10K, Half
+//     for marathon goals; 5K, 10K for half marathon; 5K for 10K).
+//   - Short tier: goal ≤ 3K → predict down to the 800m floor (e.g. 3K shows
+//     800m + 1500m; 1500m shows 800m; 800m shows nothing).
+//   - Middle range (3K < goal < 10K, including a 5K goal) → no predictions.
+const LONG_TIER_INPUT_METERS = 10_000;
+const LONG_TIER_FLOOR_METERS = 5_000;
+const SHORT_TIER_INPUT_METERS = 3_000;
+const SHORT_TIER_FLOOR_METERS = 800;
+
+const getPredictionFloorMeters = (inputMeters: number): number | null => {
+  if (inputMeters >= LONG_TIER_INPUT_METERS) return LONG_TIER_FLOOR_METERS;
+  if (inputMeters <= SHORT_TIER_INPUT_METERS) return SHORT_TIER_FLOOR_METERS;
+  return null;
+};
 // Half-marathon distance. At/above this, friendly time is rounded to the
 // nearest minute; below it, to the nearest 15 seconds.
 const MINUTE_ROUNDING_THRESHOLD_METERS = 21097;
 
-// Lowercased forms so "A {label} in …" reads naturally mid-sentence. The set
-// is closed: only TimesForPace catalog events ≥ 5K can appear here, which is
-// these four ids.
-const FRIENDLY_LABELS: Record<string, string> = {
-  fiveK: "5K",
-  tenK: "10K",
-  halfMarathon: "half marathon",
-  marathon: "marathon",
-};
-
 export type SummaryPredictionRow = {
   id: string;
-  label: string;
-  friendlyTime: string;
+  time: Time;
 };
 
-const pluralise = (n: number, singular: string) =>
-  `${n} ${n === 1 ? singular : `${singular}s`}`;
-
-// "1 hour 26 minutes" / "18 minutes 45 seconds" / "39 minutes" / "3 hours".
-// Drops zero parts so single-unit outputs (e.g. exactly 39:00) read clean.
+// Compact column-friendly form: "1h 26m" / "18m 45s" / "39m" / "3h". Drops
+// zero parts so single-unit outputs read clean. Rounding step still depends
+// on the target distance (1m above half-marathon, else 15s).
 export const formatFriendlyTime = (
   ms: number,
   targetMeters: number,
@@ -46,16 +47,66 @@ export const formatFriendlyTime = (
   const stepMs =
     targetMeters >= MINUTE_ROUNDING_THRESHOLD_METERS ? 60_000 : 15_000;
   const rounded = Math.round(ms / stepMs) * stepMs;
-  const totalSec = Math.floor(rounded / 1000);
+  return formatFriendlyParts(rounded);
+};
+
+// Same compact format but no rounding at all — uses the Time fields as-is
+// and drops sub-second precision via truncation. Used for "Times at goal
+// pace" where the row IS the exact arrival time, so bumping a 9.988 second
+// total up to "10s" would mis-state the goal pace. Pass `showHundredths`
+// for meter / sprint events where 1/100s precision matters; the seconds
+// then render as the track-timing decimal "12.45s" / "1m 53.28s".
+export const formatFriendlyTimeExact = (
+  time: Time,
+  showHundredths = false,
+): string => {
+  const hundredths = Math.floor(time.milliseconds / 10);
+  return friendlyFromParts(
+    time.hours,
+    time.minutes,
+    time.seconds,
+    hundredths,
+    showHundredths,
+  );
+};
+
+const formatFriendlyParts = (ms: number): string => {
+  const totalSec = Math.floor(ms / 1000);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec / 60) % 60);
   const s = totalSec % 60;
-  const parts: string[] = [];
-  if (h > 0) parts.push(pluralise(h, "hour"));
-  if (m > 0) parts.push(pluralise(m, "minute"));
-  if (s > 0) parts.push(pluralise(s, "second"));
-  if (parts.length === 0) parts.push("0 minutes");
-  return parts.join(" ");
+  return friendlyFromParts(h, m, s, 0, false);
+};
+
+// Compact h/m/s renderer. Seconds always show when a larger unit is
+// present — "18m 00s" reads as "exactly 18 minutes" where "18m" alone
+// looks rounded. Same logic for minutes when hours are present. When
+// `showHundredths` is on (sprint / meter events), seconds become the
+// track-timing decimal "Xs.YY".
+const friendlyFromParts = (
+  h: number,
+  m: number,
+  s: number,
+  hundredths: number,
+  showHundredths: boolean,
+): string => {
+  const secondsString = (padded: boolean): string => {
+    if (showHundredths) {
+      const sec = padded ? String(s).padStart(2, "0") : String(s);
+      return `${sec}.${String(hundredths).padStart(2, "0")}s`;
+    }
+    if (padded) return s === 0 ? "00s" : `${s}s`;
+    return `${s}s`;
+  };
+
+  if (h > 0) {
+    const mPart = m === 0 ? "00m" : `${m}m`;
+    return `${h}h ${mPart} ${secondsString(true)}`;
+  }
+  if (m > 0) {
+    return `${m}m ${secondsString(true)}`;
+  }
+  return secondsString(false);
 };
 
 export type IntervalRow = {
@@ -109,9 +160,11 @@ export const buildSummaryPredictionRows = ({
     distanceUnit,
   });
 
-  // Below 5K is the floor: no race we'd predict from here. Also covers 5K
-  // itself, which has nothing shorter in this set.
-  if (inputMeters <= MIN_EQUIVALENT_DISTANCE_METERS) return [];
+  // Predictions only apply in two tiers (see `getPredictionFloorMeters`):
+  // long goals (≥ 10K) drop down to 5K; short goals (≤ 3K) drop down to
+  // 800m; the middle range — including a 5K goal exactly — gets nothing.
+  const floor = getPredictionFloorMeters(inputMeters);
+  if (floor === null) return [];
 
   return Events.filter((e) => e.eventTags.includes(EventTags.TimesForPace))
     .map((e) => ({
@@ -120,7 +173,7 @@ export const buildSummaryPredictionRows = ({
     }))
     .filter(
       (e) =>
-        e.meters >= MIN_EQUIVALENT_DISTANCE_METERS &&
+        e.meters >= floor &&
         e.meters < inputMeters - DISTANCE_MATCH_TOLERANCE_METERS,
     )
     .sort((a, b) => a.meters - b.meters)
@@ -131,11 +184,9 @@ export const buildSummaryPredictionRows = ({
         targetMeters: e.meters,
       });
       if (!prediction) return null;
-      const label = FRIENDLY_LABELS[e.id] ?? e.id;
       return {
         id: e.id,
-        label,
-        friendlyTime: formatFriendlyTime(timeToMs(prediction), e.meters),
+        time: prediction,
       };
     })
     .filter((row): row is SummaryPredictionRow => row !== null);
@@ -153,6 +204,8 @@ type BuildIntervalRowsParams = {
 // pace is — so a marathon goal lights up the whole list while a 5K shows just
 // the rows that fit.
 const INTERVAL_REFERENCE_METERS: { label: string; meters: number }[] = [
+  { label: "100m", meters: 100 },
+  { label: "200m", meters: 200 },
   { label: "400m", meters: 400 },
   { label: "800m", meters: 800 },
   { label: "1km", meters: 1000 },
@@ -160,7 +213,7 @@ const INTERVAL_REFERENCE_METERS: { label: string; meters: number }[] = [
   { label: "3000m", meters: 3000 },
   { label: "5K", meters: 5000 },
   { label: "10K", meters: 10000 },
-  { label: "Half Marathon", meters: 21097.5 },
+  { label: "1/2 Mar", meters: 21097.5 },
 ];
 
 export const buildIntervalRows = ({
@@ -178,10 +231,25 @@ export const buildIntervalRows = ({
   });
   if (inputMeters <= 0) return [];
 
+  // Goals at or under 400m don't get a Times-at-goal-pace section — the
+  // splits below already show 100m / 200m landmarks, so there's nothing
+  // extra to surface here.
+  if (inputMeters <= 400) return [];
+
   const msPerMeter = timeToMs(paceResults.perKilometer) / 1000;
 
+  // For 5K-and-above goals, hide the sprint references (100m / 200m). They
+  // don't carry useful pacing meaning at endurance distances, where 400m is
+  // the natural shortest split. Shorter goals (sprints, middle distance)
+  // keep the full ladder so a 1500m goal still sees 100m / 200m laps.
+  const ENDURANCE_GOAL_THRESHOLD_METERS = 5000;
+  const ENDURANCE_INTERVAL_FLOOR_METERS = 400;
+  const isEnduranceGoal = inputMeters >= ENDURANCE_GOAL_THRESHOLD_METERS;
+
   return INTERVAL_REFERENCE_METERS.filter(
-    (i) => i.meters < inputMeters - DISTANCE_MATCH_TOLERANCE_METERS,
+    (i) =>
+      i.meters < inputMeters - DISTANCE_MATCH_TOLERANCE_METERS &&
+      (!isEnduranceGoal || i.meters >= ENDURANCE_INTERVAL_FLOOR_METERS),
   ).map((i) => ({
     label: i.label,
     time: msToTime(i.meters * msPerMeter),

@@ -35,7 +35,18 @@ export interface CalculatorSlice {
   splitsUnit: DistanceUnit | null;
   toggleSplitsUnit: () => void;
   summaryViewOpen: boolean;
+  /** True when the summary was opened by landing on a shared link — drives
+   *  the "close the card to use the calculator" hint in the chrome. */
+  summaryArrivedFromShare: boolean;
+  /** Remembers the user's splits-panel choice while the summary is open,
+   *  so closing the summary restores it. The summary always forces splits
+   *  on to render its splits table; without this, a user who closed splits
+   *  before opening the summary would see them re-opened after closing it. */
+  showSplitsBeforeSummary: boolean | null;
   openSummaryView: () => void;
+  /** Same as openSummaryView but flags the visit as a share-link landing
+   *  so the recipient gets the orientation hint. */
+  openSummaryViewFromShare: () => void;
   closeSummaryView: () => void;
 }
 
@@ -52,21 +63,67 @@ export const createCalculatorSlice: StateCreator<
   timesForPaceTab: "times",
   splitsUnit: null,
   summaryViewOpen: false,
+  summaryArrivedFromShare: false,
+  showSplitsBeforeSummary: null,
   openSummaryView: () => {
-    if (!get().summaryViewOpen) {
+    const wasOpen = get().summaryViewOpen;
+    if (!wasOpen) {
       trackOnce(AnalyticsEvent.SummaryViewOpened);
     }
     // Force showSplits so the splits table is ready to render in the summary
     // card. Without this, the view shows an empty splits section the first
-    // time it's opened.
+    // time it's opened. Remember the prior choice so closeSummaryView can
+    // restore it instead of leaving the calculator's splits panel open.
     const calculationUpdate = getCalculationUpdate({
       ...get(),
       showSplits: true,
     });
-    set({ summaryViewOpen: true, showSplits: true, ...calculationUpdate });
+    set({
+      summaryViewOpen: true,
+      summaryArrivedFromShare: false,
+      showSplitsBeforeSummary: wasOpen
+        ? get().showSplitsBeforeSummary
+        : get().showSplits,
+      showSplits: true,
+      ...calculationUpdate,
+    });
+  },
+  openSummaryViewFromShare: () => {
+    const wasOpen = get().summaryViewOpen;
+    if (!wasOpen) {
+      trackOnce(AnalyticsEvent.SummaryViewOpened);
+    }
+    const calculationUpdate = getCalculationUpdate({
+      ...get(),
+      showSplits: true,
+    });
+    set({
+      summaryViewOpen: true,
+      summaryArrivedFromShare: true,
+      showSplitsBeforeSummary: wasOpen
+        ? get().showSplitsBeforeSummary
+        : get().showSplits,
+      showSplits: true,
+      ...calculationUpdate,
+    });
   },
   closeSummaryView: () => {
-    set({ summaryViewOpen: false });
+    const prior = get().showSplitsBeforeSummary;
+    if (prior === null) {
+      set({ summaryViewOpen: false, summaryArrivedFromShare: false });
+      return;
+    }
+    const calculationUpdate = getCalculationUpdate({
+      ...get(),
+      showSplits: prior,
+    });
+    set({
+      summaryViewOpen: false,
+      summaryArrivedFromShare: false,
+      showSplits: prior,
+      showSplitsBeforeSummary: null,
+      ...calculationUpdate,
+    });
   },
   setShowSplits: (showSplits) => {
     const calculationUpdate = getCalculationUpdate({

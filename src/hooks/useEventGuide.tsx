@@ -27,9 +27,7 @@ function useEventGuide(): { eventGuide: TranslatedEventGuide | null } {
     if (!rawEvent?.eventGuide) return null;
 
     const translatedGuide: TranslatedEventGuide = {
-      title: t("calculator:result.eventGuideTitle", {
-        event: t(`event.${event}.label`),
-      }),
+      title: t("calculator:result.eventGuideTitle"),
       description: t(`event.${event}.guide.description`),
       timeExamples: rawEvent.eventGuide.timeExamples.map((example) => ({
         id: example.id,

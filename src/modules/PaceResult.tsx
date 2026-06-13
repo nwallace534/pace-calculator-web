@@ -6,6 +6,7 @@ import HowFarIn from "@/modules/HowFarIn";
 import ShareTargetButton from "@/modules/ShareTargetButton";
 import {
   formatDistanceValue,
+  formatDistanceValueTwoDp,
   getDistanceUnitSingular,
 } from "@/utils/distances";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
@@ -63,7 +64,6 @@ function PaceSummary({ results }: { results: MultiPace }) {
     (state) => state.distanceFractional,
   );
   const distanceUnit = useCalculatorStore((state) => state.distanceUnit);
-  const openSummaryView = useCalculatorStore((state) => state.openSummaryView);
 
   const allDistances = useCalculatorStore((state) => state.allDistances);
 
@@ -80,7 +80,7 @@ function PaceSummary({ results }: { results: MultiPace }) {
       case DistanceUnit.Miles:
         return t("distanceApproximation", {
           from: `${enteredDistance} ${distanceUnit}`,
-          to: `${formatDistanceValue(
+          to: `${formatDistanceValueTwoDp(
             allDistances.inKilometers.distanceValue,
           )}${getDistanceUnitSingular(DistanceUnit.Kilometers)}`,
         });
@@ -88,7 +88,7 @@ function PaceSummary({ results }: { results: MultiPace }) {
       case DistanceUnit.Kilometers:
         return t("distanceApproximation", {
           from: `${enteredDistance}${getDistanceUnitSingular(distanceUnit)}`,
-          to: `${formatDistanceValue(allDistances.inMiles.distanceValue)} ${
+          to: `${formatDistanceValueTwoDp(allDistances.inMiles.distanceValue)} ${
             DistanceUnit.Miles
           }`,
         });
@@ -143,40 +143,9 @@ function PaceSummary({ results }: { results: MultiPace }) {
         <div className="text-muted text-smallish">
           {allDistances ? displayText : null}
         </div>
-        <div className="d-flex gap-2">
-          <button
-            type="button"
-            className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1"
-            onClick={openSummaryView}
-            data-testid="open-summary-view"
-          >
-            <CardIcon />
-            <span>{t("result.summary.openButton")}</span>
-          </button>
-          <ShareTargetButton />
-        </div>
+        <ShareTargetButton />
       </div>
     </div>
-  );
-}
-
-function CardIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="M3 10h18" />
-    </svg>
   );
 }
 
