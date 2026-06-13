@@ -5,7 +5,6 @@ import PaceSplits from "@/modules/PaceSplits";
 import HowFarIn from "@/modules/HowFarIn";
 import ShareTargetButton from "@/modules/ShareTargetButton";
 import {
-  formatDistanceValue,
   formatDistanceValueTwoDp,
   getDistanceUnitSingular,
 } from "@/utils/distances";
@@ -67,12 +66,12 @@ function PaceSummary({ results }: { results: MultiPace }) {
 
   const allDistances = useCalculatorStore((state) => state.allDistances);
 
-  const displayText = (() => {
+  // Both sides render at 2dp so the "from = to" reads as a precise
+  // conversion — users can trust they're not silently losing accuracy.
+  const distanceInBothUnits = (() => {
     if (!allDistances) return "";
 
-    // Round the entered distance the same way as the converted one, so both
-    // sides of the approximation show at most one decimal place.
-    const enteredDistance = formatDistanceValue(
+    const enteredDistance = formatDistanceValueTwoDp(
       getNumericValue(distance) + getDecimalValue(distanceDecimal),
     );
 
@@ -141,7 +140,7 @@ function PaceSummary({ results }: { results: MultiPace }) {
 
       <div className="d-flex justify-content-between align-items-center mt-2 gap-2">
         <div className="text-muted text-smallish">
-          {allDistances ? displayText : null}
+          {allDistances ? distanceInBothUnits : null}
         </div>
         <ShareTargetButton />
       </div>
