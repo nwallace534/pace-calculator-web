@@ -28,29 +28,12 @@ const getPredictionFloorMeters = (inputMeters: number): number | null => {
   if (inputMeters <= SHORT_TIER_INPUT_METERS) return SHORT_TIER_FLOOR_METERS;
   return null;
 };
-// Half-marathon distance. At/above this, friendly time is rounded to the
-// nearest minute; below it, to the nearest 15 seconds.
-const MINUTE_ROUNDING_THRESHOLD_METERS = 21097;
-
 export type SummaryPredictionRow = {
   id: string;
   time: Time;
 };
 
-// Compact column-friendly form: "1h 26m" / "18m 45s" / "39m" / "3h". Drops
-// zero parts so single-unit outputs read clean. Rounding step still depends
-// on the target distance (1m above half-marathon, else 15s).
-export const formatFriendlyTime = (
-  ms: number,
-  targetMeters: number,
-): string => {
-  const stepMs =
-    targetMeters >= MINUTE_ROUNDING_THRESHOLD_METERS ? 60_000 : 15_000;
-  const rounded = Math.round(ms / stepMs) * stepMs;
-  return formatFriendlyParts(rounded);
-};
-
-// Same compact format but no rounding at all — uses the Time fields as-is
+// Compact format with no rounding — uses the Time fields as-is
 // and drops sub-second precision via truncation. Used for "Times at goal
 // pace" where the row IS the exact arrival time, so bumping a 9.988 second
 // total up to "10s" would mis-state the goal pace. Pass `showHundredths`
@@ -68,14 +51,6 @@ export const formatFriendlyTimeExact = (
     hundredths,
     showHundredths,
   );
-};
-
-const formatFriendlyParts = (ms: number): string => {
-  const totalSec = Math.floor(ms / 1000);
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec / 60) % 60);
-  const s = totalSec % 60;
-  return friendlyFromParts(h, m, s, 0, false);
 };
 
 // Compact h/m/s renderer. Seconds always show when a larger unit is

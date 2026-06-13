@@ -87,7 +87,7 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
   };
 };
 
-export type ShareUrlOptions = {
+type ShareUrlOptions = {
   view?: "summary";
   /** Stamp the URL so the recipient knows it came from "share goal summary"
    *  and we can render the "close to see calculator" hint. */

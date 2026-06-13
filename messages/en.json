@@ -42,7 +42,6 @@
       "pacePerMile": "Pace per mile",
       "speedKph": "Speed kph",
       "speedMph": "Speed mph",
-      "speeds": "Speeds",
       "timesForPace": "Times & predictions",
       "howFarIn": "Distance covered",
       "splits": "Splits",
@@ -54,13 +53,11 @@
       "columnTime": "Time"
     },
     "summary": {
-      "back": "Pacerly",
       "close": "Close",
       "copyLink": "Copy link",
       "screenshotModeToast": "Screenshot mode",
       "fromShareHint": "Close the card to use the calculator with this goal.",
       "goalHeading": "Goal Summary",
-      "goalLine": "{{event}} in {{time}}",
       "editTitle": "Edit title",
       "saveTitle": "Save title",
       "predictionsHeading": "Predicted race times",
