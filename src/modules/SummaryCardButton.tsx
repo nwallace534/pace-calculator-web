@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next";
 import useCalculatorStore from "@/state/useCalculatorStore";
 
-function ShareIcon() {
+function CardIcon() {
   return (
     <svg
       aria-hidden="true"
       focusable="false"
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -15,36 +15,31 @@ function ShareIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M12 15V3" />
-      <path d="m7 8 5-5 5 5" />
-      <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 10h18" />
     </svg>
   );
 }
 
-// Tapping Share opens the goal-summary card directly. The card is the
-// shareable artifact, and it now carries its own Copy link control + URL
-// preview in the chrome — so the user lands on the thing they're sharing
-// without an interstitial dropdown.
-function ShareTargetButton() {
+function SummaryCardButton() {
   const { t } = useTranslation("calculator");
   const openSummaryView = useCalculatorStore((s) => s.openSummaryView);
 
   return (
     <button
       type="button"
-      className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center justify-content-center"
+      className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2"
       style={{
         color: "var(--bs-emphasis-color)",
         borderWidth: "2px",
         borderColor: "var(--bs-emphasis-color)",
       }}
-      aria-label={t("share.button")}
       onClick={openSummaryView}
     >
-      <ShareIcon />
+      <span>{t("result.summary.openButton")}</span>
+      <CardIcon />
     </button>
   );
 }
 
-export default ShareTargetButton;
+export default SummaryCardButton;

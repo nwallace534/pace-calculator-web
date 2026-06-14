@@ -1,8 +1,9 @@
 import { DistanceUnit } from "pace-calculator";
 import { useTranslation } from "react-i18next";
 import type { SplitsResult } from "@/utils/calculator";
-import { formatTime, formatNaturalDuration } from "@/utils/formatTime";
+import { formatTime } from "@/utils/formatTime";
 import { formatSplitLabel } from "@/modules/summaryFormat";
+import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
 import type { NextSplitsAction } from "@/hooks/useSplitsOverride";
 import type { SplitsOverrideTarget } from "@/hooks/useSplitsOverride";
 import { PencilIcon } from "./icons";
@@ -92,33 +93,12 @@ export function SummarySplits({
         ))}
       </div>
       {splits.trackSummary && (
-        <div
+        <TrackSummaryLine
+          trackSummary={splits.trackSummary}
           className="text-muted mt-1"
           style={{ fontSize: "0.75rem", lineHeight: 1.3 }}
           data-testid="summary-track-summary"
-        >
-          {splits.trackSummary.opening !== null &&
-          splits.trackSummary.openingTime !== null
-            ? t("result.trackSummary", {
-                opening: splits.trackSummary.opening,
-                openingTime: formatNaturalDuration(
-                  splits.trackSummary.openingTime,
-                  t("timeUnit.seconds"),
-                ),
-                lap: splits.trackSummary.lap,
-                lapTime: formatNaturalDuration(
-                  splits.trackSummary.lapTime,
-                  t("timeUnit.seconds"),
-                ),
-              })
-            : t("result.trackSummaryLapsOnly", {
-                lap: splits.trackSummary.lap,
-                lapTime: formatNaturalDuration(
-                  splits.trackSummary.lapTime,
-                  t("timeUnit.seconds"),
-                ),
-              })}
-        </div>
+        />
       )}
     </>
   );

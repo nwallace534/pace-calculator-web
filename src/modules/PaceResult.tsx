@@ -3,7 +3,7 @@ import useCalculatorStore from "@/state/useCalculatorStore";
 import TimesForPace from "@/modules/TimesForPace";
 import PaceSplits from "@/modules/PaceSplits";
 import HowFarIn from "@/modules/HowFarIn";
-import ShareTargetButton from "@/modules/ShareTargetButton";
+import SummaryCardButton from "@/modules/SummaryCardButton";
 import {
   formatDistanceValueTwoDp,
   getDistanceUnitSingular,
@@ -142,7 +142,7 @@ function PaceSummary({ results }: { results: MultiPace }) {
         <div className="text-muted text-smallish">
           {allDistances ? distanceInBothUnits : null}
         </div>
-        <ShareTargetButton />
+        <SummaryCardButton />
       </div>
     </div>
   );

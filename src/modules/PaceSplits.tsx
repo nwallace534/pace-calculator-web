@@ -1,9 +1,10 @@
 import useCalculatorStore from "@/state/useCalculatorStore";
 import { DistanceUnitOptions, DistanceUnitShortLabel } from "@/utils/distances";
 import { SplitsResult } from "@/utils/calculator";
-import { formatTime, formatNaturalDuration } from "@/utils/formatTime";
+import { formatTime } from "@/utils/formatTime";
 import { useTranslation } from "react-i18next";
 import { DistanceUnit } from "pace-calculator";
+import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
 
 function PaceSplits({ splits }: { splits: SplitsResult | null }) {
   const { t } = useTranslation("calculator");
@@ -29,8 +30,6 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
   // two decimals so it doesn't collide with the prior row.
   const formatSplitDistance = (d: number) =>
     Number.isInteger(d) ? `${d}` : d.toFixed(2);
-
-  const secondsLabel = t("timeUnit.seconds");
 
   return (
     <>
@@ -68,29 +67,10 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
         </tbody>
       </table>
       {splits.trackSummary && (
-        <div className="text-muted text-smallish mt-2">
-          {splits.trackSummary.opening !== null &&
-          splits.trackSummary.openingTime !== null
-            ? t("result.trackSummary", {
-                opening: splits.trackSummary.opening,
-                openingTime: formatNaturalDuration(
-                  splits.trackSummary.openingTime,
-                  secondsLabel,
-                ),
-                lap: splits.trackSummary.lap,
-                lapTime: formatNaturalDuration(
-                  splits.trackSummary.lapTime,
-                  secondsLabel,
-                ),
-              })
-            : t("result.trackSummaryLapsOnly", {
-                lap: splits.trackSummary.lap,
-                lapTime: formatNaturalDuration(
-                  splits.trackSummary.lapTime,
-                  secondsLabel,
-                ),
-              })}
-        </div>
+        <TrackSummaryLine
+          trackSummary={splits.trackSummary}
+          className="text-muted text-smallish mt-2"
+        />
       )}
     </>
   );

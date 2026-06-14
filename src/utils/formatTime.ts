@@ -2,10 +2,8 @@ import { Time } from "pace-calculator";
 
 import { timeToMs } from "./time";
 
-// Track-summary friendly format used by both the main splits panel and the
-// summary card: "78 seconds" when under 90s (where the natural-language form
-// reads clearer), else the standard MM:SS / HH:MM:SS clock format. Caller
-// supplies the localised "seconds" word so this utility stays i18n-agnostic.
+// Under 90s reads clearer in natural-language form ("78 seconds") than as
+// MM:SS. Caller passes the localised word so this stays i18n-agnostic.
 export const formatNaturalDuration = (
   time: Time,
   secondsLabel: string,

@@ -13,7 +13,7 @@ import App from "@/App";
 import { selectEvent } from "./helpers";
 
 const openSummary = async () => {
-  await userEvent.click(screen.getByRole("button", { name: /share/i }));
+  await userEvent.click(screen.getByRole("button", { name: /open card/i }));
   return screen.getByTestId("summary-card");
 };
 

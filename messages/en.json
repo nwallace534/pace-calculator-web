@@ -12,7 +12,6 @@
   "calculator": {
     "distanceApproximation": "{{from}} = {{to}}",
     "share": {
-      "button": "Share",
       "toastCopied": "Link copied",
       "copyFailed": "Couldn't copy link"
     },
@@ -50,7 +49,10 @@
       "trackSummaryLapsOnly": "{{lap}}m laps in {{lapTime}}",
       "eventGuideTitle": "Popular goals",
       "columnDistance": "Distance",
-      "columnTime": "Time"
+      "columnTime": "Time",
+      "summary": {
+        "openButton": "Open card"
+      }
     },
     "summary": {
       "close": "Close",

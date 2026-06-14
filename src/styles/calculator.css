@@ -3,9 +3,7 @@
 :root {
   --accent: #009688;
   --accent-fg: #ffffff;
-  /* Colour for the summary-card chrome (Close, Copy link, Screenshot mode
-     label). Dark grey in light mode — readable but a touch lighter than
-     pure black; mirrors --bs-emphasis-color in dark mode. */
+  /* Summary-card chrome (Close, Copy link, Screenshot mode label). */
   --summary-chrome-color: #495057;
 }
 [data-bs-theme="dark"] {
@@ -239,8 +237,7 @@
   }
 }
 
-/* Quick flip-in for the summary card on open. Almost instant; the perspective
-   keeps the rotation reading as a 3D flip rather than a 2D squish. */
+/* Perspective so the rotation reads as a 3D flip, not a 2D squish. */
 @keyframes summary-card-flip-in {
   from {
     transform: perspective(1200px) rotateY(-90deg);
@@ -257,9 +254,8 @@
   transform-origin: center center;
 }
 
-/* Close mirror — explicit keyframes (not just `reverse` on the in animation)
-   so the browser actually starts a new animation when the class swaps, and
-   animationend fires reliably to unmount the view. */
+/* Explicit keyframes (not `reverse`) so animationend fires reliably when
+   the class swaps and useCardCloseAnimation can unmount. */
 @keyframes summary-card-flip-out {
   from {
     transform: perspective(1200px) rotateY(0deg);
