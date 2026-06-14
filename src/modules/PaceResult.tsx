@@ -66,8 +66,7 @@ function PaceSummary({ results }: { results: MultiPace }) {
 
   const allDistances = useCalculatorStore((state) => state.allDistances);
 
-  // Both sides render at 2dp so the "from = to" reads as a precise
-  // conversion — users can trust they're not silently losing accuracy.
+  // Both sides at 2dp so the conversion can't silently lose accuracy.
   const distanceInBothUnits = (() => {
     if (!allDistances) return "";
 

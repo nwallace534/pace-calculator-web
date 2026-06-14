@@ -12,7 +12,7 @@ export type SharedTarget = {
   distanceWhole?: string;
   distanceFractional?: string;
   distanceUnit?: DistanceUnit;
-  /** "summary" auto-opens the goal-summary view after the link loads. */
+  /** Auto-opens the summary view after the link loads. */
   view?: "summary";
   /** Triggers the from-share orientation hint on the card. */
   fromShare?: boolean;

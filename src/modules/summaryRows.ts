@@ -11,11 +11,7 @@ import { predictRaceTime } from "@/utils/predictions";
 import { DISTANCE_MATCH_TOLERANCE_METERS } from "@/utils/distances";
 import { msToTime, timeToMs } from "@/utils/time";
 
-// Predictions apply in two tiers; the middle range (3K < goal < 10K, 5K
-// included) gets nothing because Riegel extrapolation across that gap is
-// too lossy to be useful.
-//   - Long tier (goal ≥ 10K) → 5K floor.
-//   - Short tier (goal ≤ 3K) → 800m floor.
+// Middle range (3K < goal < 10K) gets no predictions — Riegel across that gap is too lossy to be useful.
 const LONG_TIER_INPUT_METERS = 10_000;
 const LONG_TIER_FLOOR_METERS = 5_000;
 const SHORT_TIER_INPUT_METERS = 3_000;
@@ -31,10 +27,7 @@ export type SummaryPredictionRow = {
   time: Time;
 };
 
-// No rounding — these times are the exact arrival points, so a 9.988s
-// rounded to "10s" would misstate the goal pace. `showHundredths` switches
-// seconds to track-timing decimal ("12.45s" / "1m 53.28s") for meter /
-// sprint events.
+// No rounding — these are exact arrival points, so a 9.988s rounded to "10s" would misstate the goal pace.
 export const formatFriendlyTimeExact = (
   time: Time,
   showHundredths = false,
@@ -49,8 +42,7 @@ export const formatFriendlyTimeExact = (
   );
 };
 
-// "18m 00s" reads as exactly 18 minutes where "18m" looks rounded — so
-// seconds (and minutes, when hours are present) always show.
+// Seconds always show because "18m 00s" reads as exactly 18 minutes where "18m" looks rounded.
 const friendlyFromParts = (
   h: number,
   m: number,
@@ -164,8 +156,7 @@ type BuildIntervalRowsParams = {
   distanceUnit: DistanceUnit;
 };
 
-// Filtered to entries shorter than the goal, so a marathon lights up the
-// whole ladder while a 5K shows only what fits.
+// Filtered at runtime to entries shorter than the goal.
 const INTERVAL_REFERENCE_METERS: { label: string; meters: number }[] = [
   { label: "100m", meters: 100 },
   { label: "200m", meters: 200 },
@@ -194,14 +185,12 @@ export const buildIntervalRows = ({
   });
   if (inputMeters <= 0) return [];
 
-  // Sub-400m goals: the splits already show 100m / 200m landmarks below.
+  // Sub-400m goals would just duplicate the splits below.
   if (inputMeters <= 400) return [];
 
   const msPerMeter = timeToMs(paceResults.perKilometer) / 1000;
 
-  // 5K+ goals drop the sprint references (100m / 200m) — 400m is the natural
-  // shortest split at endurance distances. Sprints / middle distance keep
-  // them so a 1500m goal still sees the lap-quarter checkpoints.
+  // Sprint references (100m / 200m) carry no useful pacing at endurance distances.
   const ENDURANCE_GOAL_THRESHOLD_METERS = 5000;
   const ENDURANCE_INTERVAL_FLOOR_METERS = 400;
   const isEnduranceGoal = inputMeters >= ENDURANCE_GOAL_THRESHOLD_METERS;

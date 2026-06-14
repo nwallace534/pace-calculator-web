@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 const COPY_TOAST_DURATION_MS = 3000;
 
-// Owns its dismissal timer so the parent only tracks toast content, not lifetime.
+// Self-dismissing so the parent only owns toast content, not lifetime.
 export function CopyToast({
   message,
   url,

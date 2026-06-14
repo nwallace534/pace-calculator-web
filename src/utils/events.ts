@@ -103,11 +103,7 @@ export const getStepMs = (eventId: string): number => {
   return event?.stepMs ?? 1000;
 };
 
-// opening = total % interval (a partial first lap). When the leftover is
-// sub-100m we flip to the trailing layout so the mile (1609.344m → 9.344m
-// remainder) reads as 4×400m laps + trailing partial, not as a 9m opener.
-// pace-calculator handles only uniform intervals; landmarks are scaled by
-// proportion in calculator.ts.
+// Sub-100m leftovers flip to the trailing layout so the mile (1609.344m → 9.344m) reads as 4×400m + trailing, not as a 9m opener.
 const generateLandmarks = (total: number, interval: number): number[] => {
   const opening = total % interval;
   if (opening > 0 && opening < 100) {
@@ -125,9 +121,7 @@ const generateLandmarks = (total: number, interval: number): number[] => {
   return landmarks;
 };
 
-// Full intervals first with any remainder tacked on the end. Used for
-// sub-400m custom-track distances where a "50m opener + laps" frame is
-// useless — runners want the first split at the natural marker.
+// Sub-400m distances want the first split at a natural marker, not at a leftover 50m/75m opener.
 const generateLandmarksTrailing = (
   total: number,
   interval: number,
@@ -142,8 +136,7 @@ const generateLandmarksTrailing = (
   return landmarks;
 };
 
-// Track-style landmarks for lap-paced events. Returns null for road events
-// (calculator.ts falls through to its km/mile splits path).
+// Null for road events; calculator.ts falls through to its km/mile splits path.
 export const getEventLandmarks = (
   eventId: string,
   totalMeters: number,

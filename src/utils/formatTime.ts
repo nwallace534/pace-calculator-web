@@ -2,8 +2,7 @@ import { Time } from "pace-calculator";
 
 import { timeToMs } from "./time";
 
-// Under 90s reads clearer in natural-language form ("78 seconds") than as
-// MM:SS. Caller passes the localised word so this stays i18n-agnostic.
+// Under 90s reads clearer as "78 seconds" than as MM:SS.
 export const formatNaturalDuration = (
   time: Time,
   secondsLabel: string,

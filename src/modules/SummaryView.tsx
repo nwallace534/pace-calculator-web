@@ -46,9 +46,8 @@ function SummaryView() {
   const timeHundredths = useCalculatorStore((s) => s.timeHundredths);
   const arrivedFromShare = useCalculatorStore((s) => s.summaryArrivedFromShare);
 
-  // Body reads via useCalculatorStore.getState() rather than the hook values,
-  // so eslint flags the deps as unused; they're still load-bearing to trigger
-  // the recompute on input edits.
+  // The body reads via getState() so eslint flags the deps as unused, but
+  // they still trigger the recompute on input edits.
   const shareUrl = useMemo(() => {
     return buildShareUrl(useCalculatorStore.getState(), window.location, {
       view: "summary",
@@ -81,8 +80,6 @@ function SummaryView() {
 
   const chrome = useAutoHideChrome({ hideDelayMs: 3000 });
   const title = useEditableTitle({ maxLength: TITLE_MAX_LENGTH });
-  // Two-step close: animation runs, onAnimationEnd unmounts. See
-  // useCardCloseAnimation.
   const close = useCardCloseAnimation(closeSummaryView);
   const splitsControl = useSplitsOverride({
     storeSplits,
@@ -95,8 +92,7 @@ function SummaryView() {
     timeHundredths,
   });
 
-  // Editing pins the chrome open via handleStartEdit / handleFinishEdit; a
-  // mid-edit reveal would let the hide timer race the save.
+  // Reveal during editing would let the hide timer race the save.
   const handleRevealControls = () => {
     if (title.editing) return;
     chrome.reveal();
@@ -119,8 +115,7 @@ function SummaryView() {
   };
 
   if (!paceResults) {
-    // Share-link load may clear the distance; bail back to the calculator
-    // rather than render half a card.
+    // A share-link load can clear the distance — bail rather than render half a card.
     return (
       <div className="container py-3 d-flex justify-content-end">
         <CloseButton
@@ -131,8 +126,7 @@ function SummaryView() {
     );
   }
 
-  // Track / custom-track / sprint events carry sub-second precision; surface
-  // it in every friendly-time render so a 9.58 100m doesn't read as "9s".
+  // Sprint / track / custom-track events carry sub-second precision so a 9.58 100m doesn't read as "9s".
   const { showHundredths } = getVisibleTimeFields(event);
   const goalTime: Time = {
     hours: getNumericValue(timeHours),
@@ -182,8 +176,7 @@ function SummaryView() {
     : "";
 
   const splitsColumnCount = getSplitsColumnCount(splits?.rows.length ?? 0);
-  // Explicit row count + column-flow so each row stays in its grid cell —
-  // CSS multi-column was leaking rows between columns.
+  // CSS multi-column was leaking rows between columns; grid avoids it.
   const splitsRowsPerColumn = Math.ceil(
     (splits?.rows.length ?? 0) / Math.max(1, splitsColumnCount),
   );
@@ -200,8 +193,7 @@ function SummaryView() {
       }}
       data-testid="summary-view"
       onClick={() => {
-        // Bubbled click while editing commits the title. The input and check
-        // button both stopPropagation, so this only fires for taps outside.
+        // Bubbled clicks commit the edit; the input + check button stopPropagation so this only fires for taps outside.
         if (title.editing) {
           handleFinishEdit();
           return;
@@ -225,8 +217,7 @@ function SummaryView() {
         style={{
           backgroundColor: "var(--bs-secondary-bg)",
           color: "var(--bs-body-color)",
-          // Pixel 9 Pro XL portrait (~28rem) as the cap; height is a ceiling,
-          // not a target — sparse goals shrink, marathon overflow-clips.
+          // Width cap = Pixel 9 Pro XL portrait; height is a ceiling so sparse goals shrink and marathon overflow-clips.
           maxWidth: "28rem",
           maxHeight: "62.5rem",
           overflow: "hidden",

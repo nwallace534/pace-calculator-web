@@ -28,6 +28,29 @@ npm run reload  # clean reinstall — npm install --force (e.g. to restore the p
 - **Default-then-remember:** an event loads preset values first, then remembers the user's own edits. Backed by `eventTimes` / `customDistance` in `src/state/distanceSlice.ts`.
 - **No nested ternaries.** Prefer named variables, early returns, or small helper functions so conditional code stays easy to read.
 
+## Comments
+
+Default to no comments. Add one only when the WHY is non-obvious — a hidden constraint, a workaround, or behaviour that would surprise a reader. Style:
+
+- **One sentence, just the WHY.** A second sentence only when the surprise warrants it; never more.
+- Don't restate what the next line does. Well-named identifiers already do that.
+- Don't recount the dev journey ("was X, changed to Y", "per spec:", "now does Z").
+- Don't enumerate examples in prose unless an example IS the point.
+
+```tsx
+// Good
+{
+  /* Wrap the label so it can't be accidentally selected while using nearby spinner buttons. */
+}
+
+// Bad
+{
+  /* Wrap the label text so it can't be accidentally selected while
+    repeatedly tapping the adjacent spinner buttons. The input still
+    accepts text selection — only the label is locked. */
+}
+```
+
 ## Architecture
 
 Vite + React 19 single-page app. Entry point is `src/main.tsx`; root component is `src/App.tsx`; the calculator UI is composed from modules in `src/modules/`.

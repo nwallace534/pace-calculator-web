@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// Mounts hidden, fades in on the next frame so the opacity transition fires,
-// then auto-hides. `pinOpen` + `fadeNow` are for modal interactions (e.g.
-// title editing) that need to override the timer.
+// pinOpen / fadeNow let a modal interaction (e.g. title edit) override the
+// auto-hide timer.
 export type AutoHideChrome = {
   visible: boolean;
   reveal: () => void;
@@ -22,8 +21,8 @@ export function useAutoHideChrome({
   }, []);
 
   useEffect(() => {
-    // rAF so the opacity transition fires from a hidden start, not from
-    // first paint (which would flash visible-then-faded).
+    // rAF so the opacity transition fires from a hidden start; without it
+    // the chrome would flash visible on first paint.
     const rafId = requestAnimationFrame(() => {
       setVisible(true);
       scheduleHide(hideDelayMs);

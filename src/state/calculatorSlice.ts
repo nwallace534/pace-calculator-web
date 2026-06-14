@@ -37,8 +37,7 @@ export interface CalculatorSlice {
   summaryViewOpen: boolean;
   /** True when opened via a share link; drives the orientation hint. */
   summaryArrivedFromShare: boolean;
-  /** Pre-open showSplits, restored on close. The card always forces splits
-   *  on to populate its grid; this preserves the user's panel choice. */
+  /** Pre-open showSplits, restored on close so the user's panel choice survives. */
   showSplitsBeforeSummary: boolean | null;
   openSummaryView: () => void;
   openSummaryViewFromShare: () => void;
@@ -65,8 +64,7 @@ export const createCalculatorSlice: StateCreator<
     if (!wasOpen) {
       trackOnce(AnalyticsEvent.SummaryViewOpened);
     }
-    // Force showSplits so the card has data to render; remember the prior
-    // choice for closeSummaryView to restore.
+    // Force showSplits so the card has data; the prior choice is remembered for closeSummaryView.
     const calculationUpdate = getCalculationUpdate({
       ...get(),
       showSplits: true,

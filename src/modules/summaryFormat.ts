@@ -30,8 +30,7 @@ type EventLabelParams = {
   eventLabel: string;
 };
 
-// Custom / CustomTrack render the entered distance as the label; built-in
-// events use their catalog label.
+// Custom / CustomTrack have no catalog label so use the entered distance.
 export const getEventLabelText = ({
   event,
   distanceWhole,
@@ -53,8 +52,7 @@ type DistanceLineParams = {
   distanceUnit: DistanceUnit;
 };
 
-// Miles events get both sides ("26.20 miles = 42.16 km") because the headline
-// has no unit suffix; km/meter events get only the imperial equivalent.
+// Miles events render both sides because the headline carries no unit suffix.
 export const buildDistanceLine = ({
   distanceWhole,
   distanceFractional,
@@ -77,9 +75,7 @@ export const buildDistanceLine = ({
   return inMiles;
 };
 
-// Track events label by the cumulative meter landmark (300 / 700 / …) since
-// the number carries pacing meaning; road events index by integer split
-// number (the unit is in the heading) with a 2dp tail for partial rows.
+// Track events label by cumulative meter landmark (the number carries pacing meaning); road events use the split index.
 export const formatSplitLabel = (
   unit: DistanceUnit | undefined,
   distance: number,

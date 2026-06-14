@@ -36,8 +36,7 @@ export type SplitsResult = {
   showHundredths: boolean;
   rows: CalculateSplitsOutput;
   trackSummary: {
-    /** Null for pure-laps (e.g. the mile: 4×400 + a trailing 9m we won't
-     *  call an "opener"); the renderer drops the "First Xm in Y · " prefix. */
+    /** Null for pure-laps (e.g. the mile); the renderer drops the "First Xm in Y · " prefix. */
     opening: number | null;
     openingTime: Time | null;
     lap: number;
@@ -92,8 +91,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
 
         let rows: CalculateSplitsOutput;
         if (trackLandmarks) {
-          // pace-calculator only handles uniform intervals; scale each
-          // landmark by proportion of the total instead.
+          // pace-calculator only handles uniform intervals, so scale each landmark by proportion of the total.
           const totalMs = timeToMs(time);
           rows = trackLandmarks.map((landmark, i) => ({
             splitNumber: i + 1,
@@ -101,8 +99,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
             time: msToTime((totalMs * landmark) / totalMeters),
           }));
         } else {
-          // splitsUnit is Km or Miles here — Custom (road) forbids Meters
-          // and meter-distance events route through trackLandmarks above.
+          // splitsUnit is Km or Miles here — meter events route through trackLandmarks above.
           const splitsDistance =
             splitsUnit === DistanceUnit.Miles
               ? distanceInAllUnits.inMiles
@@ -117,9 +114,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
 
         const showHundredths = getVisibleTimeFields(state.event).showHundredths;
 
-        // Three shapes: opener + laps (1500m), laps-only with trailing
-        // partial (mile), or null (clean uniform like 800m, and all sub-400m
-        // distances where "opener + laps" doesn't apply).
+        // Three shapes: opener + laps (1500m), laps-only with trailing partial (mile), or null (clean uniform / sub-400m).
         const trackSummary =
           trackLandmarks && rows.length >= 2 && totalMeters >= 400
             ? (() => {

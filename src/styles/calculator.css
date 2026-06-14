@@ -254,8 +254,7 @@
   transform-origin: center center;
 }
 
-/* Explicit keyframes (not `reverse`) so animationend fires reliably when
-   the class swaps and useCardCloseAnimation can unmount. */
+/* Explicit keyframes (not `reverse`) so animationend fires reliably when the class swaps. */
 @keyframes summary-card-flip-out {
   from {
     transform: perspective(1200px) rotateY(0deg);

@@ -11,8 +11,7 @@ export type EditableTitle = {
 
 export const TITLE_MAX_LENGTH = 50;
 
-// State is per-mount on purpose: nothing persists to the store, closing the
-// card discards the edit.
+// Per-mount only — closing the card discards the edit, nothing persists.
 export function useEditableTitle({
   maxLength = TITLE_MAX_LENGTH,
 }: { maxLength?: number } = {}): EditableTitle {

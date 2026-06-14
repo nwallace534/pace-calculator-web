@@ -9,10 +9,8 @@ export type CardCloseAnimation = {
 
 const CLOSE_ANIMATION_NAME = "summary-card-flip-out";
 
-// Two-step close: triggerClose flips `closing` so the JSX swaps to the
-// flip-out animation; handleAnimationEnd then fires onClosed. The open
-// animation bubbles through the same handler on mount — match by name to
-// ignore it.
+// Two-step close so the flip-out animation plays before unmount; the
+// mount's open animation bubbles through too so we match by name.
 export function useCardCloseAnimation(
   onClosed: () => void,
 ): CardCloseAnimation {

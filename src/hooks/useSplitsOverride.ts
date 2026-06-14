@@ -33,7 +33,7 @@ type Params = {
   timeHundredths: string;
 };
 
-// Local override that does NOT touch the store; closing the card discards it.
+// Local to the card — closing discards the choice so nothing leaks into the store.
 export function useSplitsOverride({
   storeSplits,
   distanceWhole,
@@ -109,11 +109,8 @@ export function useSplitsOverride({
 
   const splits = overrideResult ?? storeSplits;
 
-  // Cycle ranges:
-  //  - meters ≥ 1km → landmarks ↔ K (100m would be 30+ rows on a 3km card).
-  //  - 400m < meters ≤ 800m → landmarks ↔ 100m.
-  //  - meters ≤ 400m → no toggle (defaults are already 100m landmarks).
-  //  - road events → km ↔ miles.
+  // 100m above 800m would balloon the row count (30+ on a 3km card), and
+  // below 400m the defaults are already 100m landmarks — both skip the toggle.
   const nextAction: NextSplitsAction = useMemo(() => {
     if (!splits) return null;
     const totalMeters = distanceAll.inMeters.distanceValue;

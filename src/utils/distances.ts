@@ -1,7 +1,6 @@
 import { DistanceUnit } from "pace-calculator";
 
-// "K" matches catalog labels ("5K"); "mile" has a leading space since it's
-// a word; lowercase "m" avoids the SI mega-prefix / miles ambiguity.
+// Lowercase "m" avoids the SI mega-prefix / miles ambiguity; "mile" carries a leading space because it's a word.
 export const DistanceUnitShortLabel: Record<DistanceUnit, string> = {
   [DistanceUnit.Kilometers]: "K",
   [DistanceUnit.Miles]: " mile",
@@ -42,6 +41,5 @@ export const formatDistanceValue = (value: number): string =>
 export const formatDistanceValueTwoDp = (value: number): string =>
   value.toFixed(2);
 
-// Absorbs float drift from unit conversion; small enough that distinct
-// hand-entered distances stay distinct.
+// Absorbs float drift from unit conversion without collapsing distinct hand-entered distances.
 export const DISTANCE_MATCH_TOLERANCE_METERS = 0.5;

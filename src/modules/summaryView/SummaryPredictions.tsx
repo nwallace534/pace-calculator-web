@@ -5,8 +5,7 @@ import {
 } from "@/modules/summaryRows";
 import { sectionTitleStyle, valueStyle } from "./styles";
 
-// "Half Marathon" is too wide for the prediction column; the time alongside
-// makes the shortened "1/2 Mar" unambiguous.
+// "Half Marathon" is too wide for this column; the adjacent time disambiguates "1/2 Mar".
 const SHORT_EVENT_LABELS: Record<string, string> = {
   halfMarathon: "1/2 Mar",
 };

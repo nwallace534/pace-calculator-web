@@ -106,8 +106,7 @@ export function CloseButton({
   );
 }
 
-// Flex-grow separator with capped max so sparse goals get breathing space
-// and dense ones (marathon) still get a perceptible gap.
+// Flex-grow with a max so sparse goals get breathing space and dense ones still get a perceptible gap.
 export function SectionSpacer() {
   return (
     <div

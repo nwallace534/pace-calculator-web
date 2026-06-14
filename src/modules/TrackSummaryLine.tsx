@@ -5,9 +5,7 @@ import { formatNaturalDuration } from "@/utils/formatTime";
 
 type TrackSummary = NonNullable<SplitsResult["trackSummary"]>;
 
-// Shared "First Xm in Y · Zm laps in W" caption used by both the calculator
-// splits panel and the summary card. opening=null collapses to the laps-only
-// variant (e.g. the mile's 4×400m + trailing partial).
+// opening=null collapses to the laps-only variant (e.g. the mile).
 export function TrackSummaryLine({
   trackSummary,
   ...divProps

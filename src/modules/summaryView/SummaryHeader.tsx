@@ -2,8 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { EditableTitle } from "@/hooks/useEditableTitle";
 import { CheckIcon, PencilIcon } from "./icons";
 
-// Two-column flex so the title can wrap without colliding with the
-// fixed-size branding cluster on the right.
+// Two-column flex so the title wraps before colliding with the fixed-size branding.
 export function SummaryHeader({
   title,
   chromeVisible,

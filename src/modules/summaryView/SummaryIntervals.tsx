@@ -37,8 +37,7 @@ export function SummaryIntervals({
               whiteSpace: "nowrap",
             }}
           >
-            {/* Fixed label box so times align across rows. Sized for the
-                widest label after shortening ("3000m" / "1/2 Mar"). */}
+            {/* Fixed label box so times align; sized for the widest label ("3000m" / "1/2 Mar"). */}
             <span style={{ minWidth: "4em" }}>{row.label}</span>
             <span style={valueStyle}>
               {formatFriendlyTimeExact(row.time, showHundredths)}

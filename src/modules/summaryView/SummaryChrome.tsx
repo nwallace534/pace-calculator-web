@@ -2,8 +2,7 @@ import type { CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { CloseButton, CopyIcon } from "./icons";
 
-// All four chrome elements share a single fadeStyle so they appear/disappear
-// in lockstep — visibility is owned by useAutoHideChrome in the parent.
+// Single fadeStyle so all four chrome elements fade in lockstep.
 export function SummaryChrome({
   fadeStyle,
   arrivedFromShare,
@@ -19,7 +18,7 @@ export function SummaryChrome({
 
   return (
     <>
-      {/* Absolute positioning so the fade doesn't reflow the card. */}
+      {/* Absolutely positioned so the fade doesn't reflow the card. */}
       <div
         data-testid="summary-controls-left"
         style={{
