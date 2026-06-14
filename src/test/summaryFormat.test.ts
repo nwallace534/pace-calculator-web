@@ -1,7 +1,5 @@
 // Unit-test exception (per testing-approach memory): summaryFormat.ts is a
-// pure helper module — getSplitsUnitKey / getSplitsColumnCount / etc. have
-// no DOM, no store, no i18n. Per-branch coverage here is what the screenshot
-// script and browser smokes don't try to give.
+// pure helper module with no DOM, store, or i18n surface.
 
 import { describe, expect, it } from "vitest";
 import { DistanceUnit } from "pace-calculator";
@@ -10,7 +8,6 @@ import {
   buildDistanceLine,
   formatSplitLabel,
   getEventLabelText,
-  getSplitsColumnCount,
   getSplitsUnitKey,
 } from "@/modules/summaryFormat";
 
@@ -23,27 +20,6 @@ describe("getSplitsUnitKey", () => {
 
   it("returns null for undefined (no splits → no unit suffix)", () => {
     expect(getSplitsUnitKey(undefined)).toBeNull();
-  });
-});
-
-describe("getSplitsColumnCount", () => {
-  it("uses a single column for sparse split lists (≤ 8 rows)", () => {
-    expect(getSplitsColumnCount(0)).toBe(1);
-    expect(getSplitsColumnCount(1)).toBe(1);
-    expect(getSplitsColumnCount(5)).toBe(1);
-    expect(getSplitsColumnCount(8)).toBe(1);
-  });
-
-  it("uses two columns for medium lists (9–16 rows)", () => {
-    expect(getSplitsColumnCount(9)).toBe(2);
-    expect(getSplitsColumnCount(12)).toBe(2);
-    expect(getSplitsColumnCount(16)).toBe(2);
-  });
-
-  it("uses three columns for dense lists (> 16 rows)", () => {
-    expect(getSplitsColumnCount(17)).toBe(3);
-    expect(getSplitsColumnCount(27)).toBe(3); // marathon-ish
-    expect(getSplitsColumnCount(100)).toBe(3);
   });
 });
 

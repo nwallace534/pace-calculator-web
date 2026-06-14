@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 export const sectionTitleStyle: CSSProperties = {
   fontWeight: 700,
-  fontSize: "1rem",
+  fontSize: "0.9rem",
   lineHeight: 1.2,
 };
 

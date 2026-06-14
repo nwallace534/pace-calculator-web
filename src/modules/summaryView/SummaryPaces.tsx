@@ -8,7 +8,7 @@ export function SummaryPaces({ paceResults }: { paceResults: MultiPace }) {
   const { t } = useTranslation("calculator");
 
   return (
-    <div className="d-flex align-items-baseline">
+    <div className="d-flex align-items-baseline" style={{ fontSize: "0.9rem" }}>
       <div className="flex-grow-1">
         <div>{t("result.pacePerKm")}</div>
         <output style={valueStyle}>

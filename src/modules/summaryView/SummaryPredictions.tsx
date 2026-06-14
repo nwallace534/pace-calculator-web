@@ -31,8 +31,10 @@ export function SummaryPredictions({
       <div
         data-testid="summary-predictions"
         style={{
-          columnWidth: "8rem",
-          columnGap: "0.25rem",
+          columnCount: 2,
+          columnWidth: "9rem",
+          columnGap: "0.5rem",
+          fontSize: "0.9rem",
         }}
       >
         {rows.map((row) => (

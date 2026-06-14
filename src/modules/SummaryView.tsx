@@ -14,7 +14,6 @@ import {
 import {
   buildDistanceLine,
   getEventLabelText,
-  getSplitsColumnCount,
   getSplitsUnitKey,
 } from "@/modules/summaryFormat";
 import { useAutoHideChrome } from "@/hooks/useAutoHideChrome";
@@ -175,12 +174,6 @@ function SummaryView() {
     ? t(`calculator:summary.splitsUnit.${splitsUnitKey}`)
     : "";
 
-  const splitsColumnCount = getSplitsColumnCount(splits?.rows.length ?? 0);
-  // CSS multi-column was leaking rows between columns; grid avoids it.
-  const splitsRowsPerColumn = Math.ceil(
-    (splits?.rows.length ?? 0) / Math.max(1, splitsColumnCount),
-  );
-
   return (
     <div
       className="px-3"
@@ -264,8 +257,6 @@ function SummaryView() {
             <SectionSpacer />
             <SummarySplits
               splits={splits}
-              splitsColumnCount={splitsColumnCount}
-              splitsRowsPerColumn={splitsRowsPerColumn}
               splitsHeadingUnit={splitsHeadingUnit}
               chromeVisible={chrome.visible}
               nextAction={nextAction}

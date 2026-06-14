@@ -16,12 +16,6 @@ export const getSplitsUnitKey = (
   return null;
 };
 
-export const getSplitsColumnCount = (rowCount: number): number => {
-  if (rowCount > 16) return 3;
-  if (rowCount > 8) return 2;
-  return 1;
-};
-
 type EventLabelParams = {
   event: string;
   distanceWhole: string;

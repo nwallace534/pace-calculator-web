@@ -9,19 +9,14 @@ import type { SplitsOverrideTarget } from "@/hooks/useSplitsOverride";
 import { PencilIcon } from "./icons";
 import { sectionTitleStyle, valueStyle } from "./styles";
 
-// Grid (not multi-column) because multi-column was leaking rows between columns.
 export function SummarySplits({
   splits,
-  splitsColumnCount,
-  splitsRowsPerColumn,
   splitsHeadingUnit,
   chromeVisible,
   nextAction,
   onOverride,
 }: {
   splits: SplitsResult;
-  splitsColumnCount: number;
-  splitsRowsPerColumn: number;
   splitsHeadingUnit: string;
   chromeVisible: boolean;
   nextAction: NextSplitsAction;
@@ -57,15 +52,12 @@ export function SummarySplits({
       <div
         data-testid="summary-splits"
         style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${splitsColumnCount}, max-content)`,
-          gridTemplateRows: `repeat(${splitsRowsPerColumn}, auto)`,
-          gridAutoFlow: "column",
-          // Left-packed; `space-between` was stretching columns across the card.
-          justifyContent: "start",
-          columnGap: "1.5rem",
+          // Stay single-column for sparse goals; only break out once it pays off.
+          columnCount: splits.rows.length > 5 ? 3 : 1,
+          columnWidth: "6rem",
+          columnGap: "1rem",
           // Shrink only at marathon-scale row counts.
-          fontSize: splits.rows.length > 20 ? "0.8rem" : "1rem",
+          fontSize: splits.rows.length > 20 ? "0.8rem" : "0.9rem",
           lineHeight: 1.3,
         }}
       >
@@ -74,7 +66,11 @@ export function SummarySplits({
             key={split.splitNumber}
             data-testid="summary-split-row"
             className="d-flex"
-            style={{ gap: "0.5rem" }}
+            style={{
+              gap: "0.5rem",
+              breakInside: "avoid",
+              whiteSpace: "nowrap",
+            }}
           >
             <span className="text-muted">
               {formatSplitLabel(splits.unit, split.distance, split.splitNumber)}
