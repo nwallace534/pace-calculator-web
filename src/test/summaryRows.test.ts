@@ -23,6 +23,7 @@ const TIME_EMPTY = {
   timeMinutes: "0",
   timeSeconds: "0",
   timeHundredths: "0",
+  showHundredths: false,
 };
 
 const distanceParams = (
@@ -87,6 +88,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
         timeMinutes: "25",
         timeSeconds: "0",
         timeHundredths: "0",
+        showHundredths: false,
       }),
     ).toEqual([]);
 
@@ -98,6 +100,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
         timeMinutes: "18",
         timeSeconds: "0",
         timeHundredths: "0",
+        showHundredths: false,
       }),
     ).toEqual([]);
   });
@@ -110,6 +113,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
         timeMinutes: "2",
         timeSeconds: "0",
         timeHundredths: "0",
+        showHundredths: false,
       }),
     ).toEqual([]);
   });
@@ -121,6 +125,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
       timeMinutes: "5",
       timeSeconds: "0",
       timeHundredths: "0",
+      showHundredths: false,
     });
     expect(rows.map((r) => r.id)).toEqual(["eightHundredMeters"]);
   });
@@ -132,6 +137,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
       timeMinutes: "12",
       timeSeconds: "0",
       timeHundredths: "0",
+      showHundredths: false,
     });
     expect(rows.map((r) => r.id)).toEqual([
       "eightHundredMeters",
@@ -146,6 +152,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
       timeMinutes: "45",
       timeSeconds: "0",
       timeHundredths: "0",
+      showHundredths: false,
     });
     expect(rows.map((r) => r.id)).toEqual(["fiveK"]);
   });
@@ -157,6 +164,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
       timeMinutes: "45",
       timeSeconds: "0",
       timeHundredths: "0",
+      showHundredths: false,
     });
     expect(rows.map((r) => r.id)).toEqual(["fiveK", "tenK"]);
   });
@@ -168,6 +176,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
       timeMinutes: "30",
       timeSeconds: "0",
       timeHundredths: "0",
+      showHundredths: false,
     });
     expect(rows.map((r) => r.id)).toEqual(["fiveK", "tenK", "halfMarathon"]);
     expect(rows.some((r) => r.id === "marathon")).toBe(false);
@@ -182,7 +191,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     ).toEqual([]);
   });
 
-  it("produces real prediction Time objects, not nulls or wrappers", () => {
+  it("produces real prediction times formatted as friendly strings", () => {
     // Pinning the Riegel output for a known case: 1500m @ 5:00 → 800m
     // prediction. Riegel: 5:00 × (800/1500)^1.06 ≈ 2:34.
     const rows = buildSummaryPredictionRows({
@@ -191,14 +200,11 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
       timeMinutes: "5",
       timeSeconds: "0",
       timeHundredths: "0",
+      showHundredths: false,
     });
     expect(rows).toHaveLength(1);
-    const t = rows[0].time;
-    expect(t.hours).toBe(0);
-    expect(t.minutes).toBe(2);
-    // Allow a couple of ms either side for floating-point drift.
-    expect(t.seconds).toBeGreaterThanOrEqual(33);
-    expect(t.seconds).toBeLessThanOrEqual(35);
+    // Allow a couple of seconds either side for floating-point drift.
+    expect(["2m 33s", "2m 34s", "2m 35s"]).toContain(rows[0].timeText);
   });
 });
 
@@ -215,6 +221,7 @@ describe("buildIntervalRows", () => {
       buildIntervalRows({
         paceResults: null,
         ...distanceParams("5", DistanceUnit.Kilometers),
+        showHundredths: false,
       }),
     ).toEqual([]);
   });
@@ -224,6 +231,7 @@ describe("buildIntervalRows", () => {
       buildIntervalRows({
         paceResults: PACE_6_PER_KM,
         ...distanceParams("0", DistanceUnit.Kilometers),
+        showHundredths: false,
       }),
     ).toEqual([]);
   });
@@ -233,42 +241,37 @@ describe("buildIntervalRows", () => {
       buildIntervalRows({
         paceResults: PACE_6_PER_KM,
         ...distanceParams("400", DistanceUnit.Meters),
+        showHundredths: false,
       }),
     ).toEqual([]);
     expect(
       buildIntervalRows({
         paceResults: PACE_6_PER_KM,
         ...distanceParams("200", DistanceUnit.Meters),
+        showHundredths: false,
       }),
     ).toEqual([]);
   });
 
   it("keeps the sprint references (100m, 200m) for sub-5K goals — they're meaningful at middle-distance pace", () => {
-    // 1500m goal: full ladder up to <1500m.
+    // 1km / 1mi are excluded from the ladder (race-distance entries only).
     const rows = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("1500", DistanceUnit.Meters),
+      showHundredths: false,
     });
-    expect(rows.map((r) => r.label)).toEqual([
-      "100m",
-      "200m",
-      "400m",
-      "800m",
-      "1km",
-    ]);
+    expect(rows.map((r) => r.label)).toEqual(["100m", "200m", "400m", "800m"]);
 
-    // 3000m goal: ladder extends one rung further to include 1mi.
     const threeK = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("3", DistanceUnit.Kilometers),
+      showHundredths: false,
     });
     expect(threeK.map((r) => r.label)).toEqual([
       "100m",
       "200m",
       "400m",
       "800m",
-      "1km",
-      "1mi",
     ]);
   });
 
@@ -276,28 +279,22 @@ describe("buildIntervalRows", () => {
     const fiveK = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("5", DistanceUnit.Kilometers),
+      showHundredths: false,
     });
-    expect(fiveK.map((r) => r.label)).toEqual([
-      "400m",
-      "800m",
-      "1km",
-      "1mi",
-      "3000m",
-    ]);
+    expect(fiveK.map((r) => r.label)).toEqual(["400m", "800m", "3000m"]);
     expect(fiveK.some((r) => r.label === "100m")).toBe(false);
     expect(fiveK.some((r) => r.label === "200m")).toBe(false);
   });
 
-  it("lights up the full ladder (minus sprints) for a marathon goal", () => {
+  it("lights up the full ladder (minus sprints, 1km, 1mi) for a marathon goal", () => {
     const rows = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("26", DistanceUnit.Miles, "2"),
+      showHundredths: false,
     });
     expect(rows.map((r) => r.label)).toEqual([
       "400m",
       "800m",
-      "1km",
-      "1mi",
       "3000m",
       "5K",
       "10K",
@@ -310,20 +307,12 @@ describe("buildIntervalRows", () => {
     const rows = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("5", DistanceUnit.Kilometers),
+      showHundredths: false,
     });
     const fourHundred = rows.find((r) => r.label === "400m")!;
-    expect(fourHundred.time).toEqual({
-      hours: 0,
-      minutes: 2,
-      seconds: 24,
-      milliseconds: 0,
-    });
-    const oneKm = rows.find((r) => r.label === "1km")!;
-    expect(oneKm.time).toEqual({
-      hours: 0,
-      minutes: 6,
-      seconds: 0,
-      milliseconds: 0,
-    });
+    expect(fourHundred.timeText).toBe("2m 24s");
+    // 3000m × 360 = 1,080,000 ms = 18:00.
+    const threeK = rows.find((r) => r.label === "3000m")!;
+    expect(threeK.timeText).toBe("18m 00s");
   });
 });

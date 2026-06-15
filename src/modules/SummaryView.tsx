@@ -1,21 +1,9 @@
 import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Time } from "pace-calculator";
 import useCalculatorStore from "@/state/useCalculatorStore";
-import { getNumericValue } from "@/utils/input";
-import { getVisibleTimeFields } from "@/utils/events";
+import { getSplitsUnitKey } from "@/modules/summaryFormat";
 import { buildShareUrl } from "@/utils/shareTarget";
-import {
-  buildIntervalRows,
-  buildSummaryPredictionRows,
-  formatFriendlyTimeExact,
-} from "@/modules/summaryRows";
-import {
-  buildDistanceLine,
-  getEventLabelText,
-  getSplitsUnitKey,
-} from "@/modules/summaryFormat";
 import { useAutoHideControls } from "@/hooks/useAutoHideControls";
 import { useCardCloseAnimation } from "@/hooks/useCardCloseAnimation";
 import { TITLE_MAX_LENGTH, useEditableTitle } from "@/hooks/useEditableTitle";
@@ -35,34 +23,21 @@ function SummaryView() {
   const closeSummaryView = useCalculatorStore((s) => s.closeSummaryView);
   const event = useCalculatorStore((s) => s.event);
   const paceResults = useCalculatorStore((s) => s.paceResults);
-  const storeSplits = useCalculatorStore((s) => s.splits);
-  const distanceWhole = useCalculatorStore((s) => s.distanceWhole);
-  const distanceFractional = useCalculatorStore((s) => s.distanceFractional);
-  const distanceUnit = useCalculatorStore((s) => s.distanceUnit);
-  const timeHours = useCalculatorStore((s) => s.timeHours);
-  const timeMinutes = useCalculatorStore((s) => s.timeMinutes);
-  const timeSeconds = useCalculatorStore((s) => s.timeSeconds);
-  const timeHundredths = useCalculatorStore((s) => s.timeHundredths);
+  const friendlyGoalTime = useCalculatorStore((s) => s.friendlyGoalTime);
+  const distanceLine = useCalculatorStore((s) => s.distanceLine);
+  const customDistanceLabel = useCalculatorStore((s) => s.customDistanceLabel);
+  const predictionRows = useCalculatorStore((s) => s.predictionRows);
+  const intervalRows = useCalculatorStore((s) => s.intervalRows);
   const arrivedFromShare = useCalculatorStore((s) => s.summaryArrivedFromShare);
 
-  // The body reads via getState() so eslint flags the deps as unused, but
-  // they still trigger the recompute on input edits.
+  // paceResults changes ref on every input edit, so it's a sufficient invalidation key.
   const shareUrl = useMemo(() => {
     return buildShareUrl(useCalculatorStore.getState(), window.location, {
       view: "summary",
       fromShare: true,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    event,
-    distanceWhole,
-    distanceFractional,
-    distanceUnit,
-    timeHours,
-    timeMinutes,
-    timeSeconds,
-    timeHundredths,
-  ]);
+  }, [paceResults]);
 
   const [toast, setToast] = useState<{ message: string; url?: string } | null>(
     null,
@@ -80,16 +55,7 @@ function SummaryView() {
   const controls = useAutoHideControls({ hideDelayMs: 3000 });
   const title = useEditableTitle({ maxLength: TITLE_MAX_LENGTH });
   const close = useCardCloseAnimation(closeSummaryView);
-  const splitsControl = useSplitsOverride({
-    storeSplits,
-    distanceWhole,
-    distanceFractional,
-    distanceUnit,
-    timeHours,
-    timeMinutes,
-    timeSeconds,
-    timeHundredths,
-  });
+  const splitsControl = useSplitsOverride();
 
   // Reveal during editing would let the hide timer race the save.
   const handleRevealControls = () => {
@@ -125,50 +91,14 @@ function SummaryView() {
     );
   }
 
-  // Sprint / track / custom-track events carry sub-second precision so a 9.58 100m doesn't read as "9s".
-  const { showHundredths } = getVisibleTimeFields(event);
-  const goalTime: Time = {
-    hours: getNumericValue(timeHours),
-    minutes: getNumericValue(timeMinutes),
-    seconds: getNumericValue(timeSeconds),
-    milliseconds: getNumericValue(timeHundredths) * 10,
-  };
-  const friendlyGoalTime = formatFriendlyTimeExact(goalTime, showHundredths);
-
-  const eventLabel = getEventLabelText({
-    event,
-    distanceWhole,
-    distanceFractional,
-    distanceUnit,
-    eventLabel: t(`events:event.${event}.label`, { defaultValue: "" }),
-  });
-
-  const distanceLine = buildDistanceLine({
-    distanceWhole,
-    distanceFractional,
-    distanceUnit,
-  });
+  const eventLabel =
+    customDistanceLabel ??
+    t(`events:event.${event}.label`, { defaultValue: "" });
 
   const splits = splitsControl.splits;
   const nextAction = splitsControl.nextAction;
 
-  const predictionRows = buildSummaryPredictionRows({
-    distanceWhole,
-    distanceFractional,
-    distanceUnit,
-    timeHours,
-    timeMinutes,
-    timeSeconds,
-    timeHundredths,
-  });
-
-  const intervalRows = buildIntervalRows({
-    paceResults,
-    distanceWhole,
-    distanceFractional,
-    distanceUnit,
-  });
-
+  // Unit-key reflects the effective splits (override or store), not the store value.
   const splitsUnitKey = getSplitsUnitKey(splits?.unit);
   const splitsHeadingUnit = splitsUnitKey
     ? t(`calculator:summary.splitsUnit.${splitsUnitKey}`)
@@ -206,8 +136,8 @@ function SummaryView() {
           title={title}
           controlsVisible={controls.visible}
           eventLabel={eventLabel}
-          friendlyGoalTime={friendlyGoalTime}
-          distanceLine={distanceLine}
+          friendlyGoalTime={friendlyGoalTime ?? ""}
+          distanceLine={distanceLine ?? ""}
           titleMaxLength={TITLE_MAX_LENGTH}
           onStartEdit={handleStartEdit}
           onFinishEdit={handleFinishEdit}
@@ -220,20 +150,14 @@ function SummaryView() {
         {predictionRows.length > 0 && (
           <>
             <SectionSpacer />
-            <SummaryPredictions
-              rows={predictionRows}
-              showHundredths={showHundredths}
-            />
+            <SummaryPredictions rows={predictionRows} />
           </>
         )}
 
         {intervalRows.length > 0 && (
           <>
             <SectionSpacer />
-            <SummaryIntervals
-              rows={intervalRows}
-              showHundredths={showHundredths}
-            />
+            <SummaryIntervals rows={intervalRows} />
           </>
         )}
 

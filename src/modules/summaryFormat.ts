@@ -32,12 +32,35 @@ export const getEventLabelText = ({
   distanceUnit,
   eventLabel,
 }: EventLabelParams): string => {
-  if (event === DistanceMode.Custom || event === DistanceMode.CustomTrack) {
-    const value =
-      getNumericValue(distanceWhole) + getDecimalValue(distanceFractional);
-    return `${formatDistanceValue(value)}${DistanceUnitShortLabel[distanceUnit]}`;
+  const customLabel = getCustomDistanceLabel({
+    event,
+    distanceWhole,
+    distanceFractional,
+    distanceUnit,
+  });
+  return customLabel ?? eventLabel;
+};
+
+type CustomDistanceLabelParams = {
+  event: string;
+  distanceWhole: string;
+  distanceFractional: string;
+  distanceUnit: DistanceUnit;
+};
+
+// Returns null for built-in events so callers can fall back to the i18n label.
+export const getCustomDistanceLabel = ({
+  event,
+  distanceWhole,
+  distanceFractional,
+  distanceUnit,
+}: CustomDistanceLabelParams): string | null => {
+  if (event !== DistanceMode.Custom && event !== DistanceMode.CustomTrack) {
+    return null;
   }
-  return eventLabel;
+  const value =
+    getNumericValue(distanceWhole) + getDecimalValue(distanceFractional);
+  return `${formatDistanceValue(value)}${DistanceUnitShortLabel[distanceUnit]}`;
 };
 
 type DistanceLineParams = {

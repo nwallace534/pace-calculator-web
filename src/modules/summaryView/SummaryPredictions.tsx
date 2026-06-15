@@ -1,21 +1,12 @@
 import { useTranslation } from "react-i18next";
-import {
-  formatFriendlyTimeExact,
-  type SummaryPredictionRow,
-} from "@/modules/summaryRows";
+import { type SummaryPredictionRow } from "@/modules/summaryRows";
 
 // "Half Marathon" is too wide for this column; the adjacent time disambiguates "1/2 Mar".
 const SHORT_EVENT_LABELS: Record<string, string> = {
   halfMarathon: "1/2 Mar",
 };
 
-export function SummaryPredictions({
-  rows,
-  showHundredths,
-}: {
-  rows: SummaryPredictionRow[];
-  showHundredths: boolean;
-}) {
+export function SummaryPredictions({ rows }: { rows: SummaryPredictionRow[] }) {
   const { t } = useTranslation(["calculator", "events"]);
 
   return (
@@ -36,9 +27,7 @@ export function SummaryPredictions({
             <span className="summary-list-label">
               {SHORT_EVENT_LABELS[row.id] ?? t(`events:event.${row.id}.label`)}
             </span>
-            <span className="summary-section-value">
-              {formatFriendlyTimeExact(row.time, showHundredths)}
-            </span>
+            <span className="summary-section-value">{row.timeText}</span>
           </div>
         ))}
       </div>

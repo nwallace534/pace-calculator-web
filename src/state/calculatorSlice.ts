@@ -37,8 +37,6 @@ export interface CalculatorSlice {
   summaryViewOpen: boolean;
   /** True when opened via a share link; drives the orientation hint. */
   summaryArrivedFromShare: boolean;
-  /** Pre-open showSplits, restored on close so the user's panel choice survives. */
-  showSplitsBeforeSummary: boolean | null;
   openSummaryView: () => void;
   openSummaryViewFromShare: () => void;
   closeSummaryView: () => void;
@@ -58,87 +56,32 @@ export const createCalculatorSlice: StateCreator<
   splitsUnit: null,
   summaryViewOpen: false,
   summaryArrivedFromShare: false,
-  showSplitsBeforeSummary: null,
   openSummaryView: () => {
-    const wasOpen = get().summaryViewOpen;
-    if (!wasOpen) {
+    if (!get().summaryViewOpen) {
       trackOnce(AnalyticsEvent.SummaryViewOpened);
     }
-    // Force showSplits so the card has data; the prior choice is remembered for closeSummaryView.
-    const calculationUpdate = getCalculationUpdate({
-      ...get(),
-      showSplits: true,
-    });
-    set({
-      summaryViewOpen: true,
-      summaryArrivedFromShare: false,
-      showSplitsBeforeSummary: wasOpen
-        ? get().showSplitsBeforeSummary
-        : get().showSplits,
-      showSplits: true,
-      ...calculationUpdate,
-    });
+    set({ summaryViewOpen: true, summaryArrivedFromShare: false });
   },
   openSummaryViewFromShare: () => {
-    const wasOpen = get().summaryViewOpen;
-    if (!wasOpen) {
+    if (!get().summaryViewOpen) {
       trackOnce(AnalyticsEvent.SummaryViewOpened);
     }
-    const calculationUpdate = getCalculationUpdate({
-      ...get(),
-      showSplits: true,
-    });
-    set({
-      summaryViewOpen: true,
-      summaryArrivedFromShare: true,
-      showSplitsBeforeSummary: wasOpen
-        ? get().showSplitsBeforeSummary
-        : get().showSplits,
-      showSplits: true,
-      ...calculationUpdate,
-    });
+    set({ summaryViewOpen: true, summaryArrivedFromShare: true });
   },
   closeSummaryView: () => {
-    const prior = get().showSplitsBeforeSummary;
-    if (prior === null) {
-      set({ summaryViewOpen: false, summaryArrivedFromShare: false });
-      return;
-    }
-    const calculationUpdate = getCalculationUpdate({
-      ...get(),
-      showSplits: prior,
-    });
-    set({
-      summaryViewOpen: false,
-      summaryArrivedFromShare: false,
-      showSplits: prior,
-      showSplitsBeforeSummary: null,
-      ...calculationUpdate,
-    });
+    set({ summaryViewOpen: false, summaryArrivedFromShare: false });
   },
   setShowSplits: (showSplits) => {
-    const calculationUpdate = getCalculationUpdate({
-      ...get(),
-      showSplits,
-    });
-
     if (showSplits && !get().showSplits) {
       trackOnce(AnalyticsEvent.SplitsOpened);
     }
-
-    set({ showSplits, ...calculationUpdate });
+    set({ showSplits });
   },
   setShowTimesForPace: (showTimesForPace) => {
-    const calculationUpdate = getCalculationUpdate({
-      ...get(),
-      showTimesForPace,
-    });
-
     if (showTimesForPace && !get().showTimesForPace) {
       trackOnce(AnalyticsEvent.TimesForPaceOpened);
     }
-
-    set({ showTimesForPace, ...calculationUpdate });
+    set({ showTimesForPace });
   },
 
   setTimesForPaceTab: (timesForPaceTab) => {

@@ -24,6 +24,17 @@ import {
   CalculatorInputSubset,
   DistanceInputSubset,
 } from "@/types/calculatorInput";
+import {
+  buildIntervalRows,
+  buildSummaryPredictionRows,
+  formatFriendlyTimeExact,
+  type IntervalRow,
+  type SummaryPredictionRow,
+} from "@/modules/summaryRows";
+import {
+  buildDistanceLine,
+  getCustomDistanceLabel,
+} from "@/modules/summaryFormat";
 
 export enum ComputeMode {
   Distance = "Distance",
@@ -48,6 +59,15 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
   let paceResults: MultiPace | null = null;
   let splits: SplitsResult | null = null;
   let timesForPace: Record<string, Time> | null = null;
+  let friendlyGoalTime: string | null = null;
+  let distanceLine: string | null = null;
+  let customDistanceLabel: string | null = null;
+  let predictionRows: SummaryPredictionRow[] = [];
+  let intervalRows: IntervalRow[] = [];
+  let splitsByKilometers: SplitsResult | null = null;
+  let splitsByMiles: SplitsResult | null = null;
+  let splitsBy100m: SplitsResult | null = null;
+  let totalDistanceMeters: number | null = null;
 
   if (state.computeMode === ComputeMode.Pace) {
     const {
@@ -80,9 +100,11 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
         time,
       });
 
-      if (state.showSplits) {
-        const distanceInAllUnits = getDistanceInAllUnits(distance);
-        const totalMeters = distanceInAllUnits.inMeters.distanceValue;
+      const distanceInAllUnits = getDistanceInAllUnits(distance);
+      const totalMeters = distanceInAllUnits.inMeters.distanceValue;
+      totalDistanceMeters = totalMeters;
+
+      {
         const trackLandmarks = getEventLandmarks(state.event, totalMeters);
 
         const splitsUnit = trackLandmarks
@@ -149,7 +171,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
         splits = { unit: splitsUnit, showHundredths, rows, trackSummary };
       }
 
-      if (state.showTimesForPace) {
+      {
         const kPace = {
           minutes: paceResults.perKilometer.minutes,
           seconds: paceResults.perKilometer.seconds,
@@ -201,6 +223,70 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
           ),
         );
       }
+
+      const showHundredths = getVisibleTimeFields(state.event).showHundredths;
+      friendlyGoalTime = formatFriendlyTimeExact(time, showHundredths);
+      distanceLine = buildDistanceLine({
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+      });
+      customDistanceLabel = getCustomDistanceLabel({
+        event: state.event,
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+      });
+      predictionRows = buildSummaryPredictionRows({
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+        timeHours: state.timeHours,
+        timeMinutes: state.timeMinutes,
+        timeSeconds: state.timeSeconds,
+        timeHundredths: state.timeHundredths,
+        showHundredths,
+      });
+      intervalRows = buildIntervalRows({
+        paceResults,
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+        showHundredths,
+      });
+
+      // Override variants for the splits-unit toggle (K / miles / 100m); the
+      // card picks one based on its local override state, no recompute needed.
+      splitsByKilometers = {
+        unit: DistanceUnit.Kilometers,
+        showHundredths: false,
+        trackSummary: null,
+        rows: calculateSplits({
+          time,
+          distance: distanceInAllUnits.inKilometers,
+          splitInterval: 1,
+        }),
+      };
+      splitsByMiles = {
+        unit: DistanceUnit.Miles,
+        showHundredths: false,
+        trackSummary: null,
+        rows: calculateSplits({
+          time,
+          distance: distanceInAllUnits.inMiles,
+          splitInterval: 1,
+        }),
+      };
+      splitsBy100m = {
+        unit: DistanceUnit.Meters,
+        showHundredths: false,
+        trackSummary: null,
+        rows: calculateSplits({
+          time,
+          distance: distanceInAllUnits.inMeters,
+          splitInterval: 100,
+        }),
+      };
     }
   }
 
@@ -208,6 +294,15 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
     paceResults,
     timesForPace,
     splits,
+    friendlyGoalTime,
+    distanceLine,
+    customDistanceLabel,
+    predictionRows,
+    intervalRows,
+    splitsByKilometers,
+    splitsByMiles,
+    splitsBy100m,
+    totalDistanceMeters,
   };
 };
 

@@ -1,16 +1,7 @@
 import { useTranslation } from "react-i18next";
-import {
-  formatFriendlyTimeExact,
-  type IntervalRow,
-} from "@/modules/summaryRows";
+import { type IntervalRow } from "@/modules/summaryRows";
 
-export function SummaryIntervals({
-  rows,
-  showHundredths,
-}: {
-  rows: IntervalRow[];
-  showHundredths: boolean;
-}) {
+export function SummaryIntervals({ rows }: { rows: IntervalRow[] }) {
   const { t } = useTranslation("calculator");
 
   return (
@@ -27,9 +18,7 @@ export function SummaryIntervals({
           >
             {/* Fixed label box so times align; sized for the widest label ("3000m" / "1/2 Mar"). */}
             <span className="summary-list-label">{row.label}</span>
-            <span className="summary-section-value">
-              {formatFriendlyTimeExact(row.time, showHundredths)}
-            </span>
+            <span className="summary-section-value">{row.timeText}</span>
           </div>
         ))}
       </div>

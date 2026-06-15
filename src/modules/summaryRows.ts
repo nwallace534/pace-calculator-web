@@ -24,7 +24,7 @@ const getPredictionFloorMeters = (inputMeters: number): number | null => {
 };
 export type SummaryPredictionRow = {
   id: string;
-  time: Time;
+  timeText: string;
 };
 
 // No rounding — these are exact arrival points, so a 9.988s rounded to "10s" would misstate the goal pace.
@@ -71,7 +71,7 @@ const friendlyFromParts = (
 
 export type IntervalRow = {
   label: string;
-  time: Time;
+  timeText: string;
 };
 
 type BuildSummaryPredictionRowsParams = {
@@ -82,6 +82,7 @@ type BuildSummaryPredictionRowsParams = {
   timeMinutes: string;
   timeSeconds: string;
   timeHundredths: string;
+  showHundredths: boolean;
 };
 
 const getInputMeters = (params: {
@@ -106,6 +107,7 @@ export const buildSummaryPredictionRows = ({
   timeMinutes,
   timeSeconds,
   timeHundredths,
+  showHundredths,
 }: BuildSummaryPredictionRowsParams): SummaryPredictionRow[] => {
   const inputTime: Time = {
     hours: getNumericValue(timeHours),
@@ -143,7 +145,7 @@ export const buildSummaryPredictionRows = ({
       if (!prediction) return null;
       return {
         id: e.id,
-        time: prediction,
+        timeText: formatFriendlyTimeExact(prediction, showHundredths),
       };
     })
     .filter((row): row is SummaryPredictionRow => row !== null);
@@ -154,16 +156,18 @@ type BuildIntervalRowsParams = {
   distanceWhole: string;
   distanceFractional: string;
   distanceUnit: DistanceUnit;
+  showHundredths: boolean;
 };
 
 // Filtered at runtime to entries shorter than the goal.
+// 1km and 1mi are deliberately omitted — matches the Times & Predictions
+// panel which leaves them out for the same reason: 1km/1mi aren't race
+// distances, they're already the pace headline above.
 const INTERVAL_REFERENCE_METERS: { label: string; meters: number }[] = [
   { label: "100m", meters: 100 },
   { label: "200m", meters: 200 },
   { label: "400m", meters: 400 },
   { label: "800m", meters: 800 },
-  { label: "1km", meters: 1000 },
-  { label: "1mi", meters: 1609.344 },
   { label: "3000m", meters: 3000 },
   { label: "5K", meters: 5000 },
   { label: "10K", meters: 10000 },
@@ -175,6 +179,7 @@ export const buildIntervalRows = ({
   distanceWhole,
   distanceFractional,
   distanceUnit,
+  showHundredths,
 }: BuildIntervalRowsParams): IntervalRow[] => {
   if (!paceResults) return [];
 
@@ -201,6 +206,9 @@ export const buildIntervalRows = ({
       (!isEnduranceGoal || i.meters >= ENDURANCE_INTERVAL_FLOOR_METERS),
   ).map((i) => ({
     label: i.label,
-    time: msToTime(i.meters * msPerMeter),
+    timeText: formatFriendlyTimeExact(
+      msToTime(i.meters * msPerMeter),
+      showHundredths,
+    ),
   }));
 };

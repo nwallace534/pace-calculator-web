@@ -1,12 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
-import {
-  calculateSplits,
-  DistanceUnit,
-  getDistanceInAllUnits,
-  Time,
-} from "pace-calculator";
+import { DistanceUnit } from "pace-calculator";
 import type { SplitsResult } from "@/utils/calculator";
-import { getDecimalValue, getNumericValue } from "@/utils/input";
+import useCalculatorStore from "@/state/useCalculatorStore";
 
 export type SplitsOverrideTarget = "K" | "miles" | "100m" | null;
 
@@ -22,106 +17,36 @@ export type SplitsOverride = {
   nextAction: NextSplitsAction;
 };
 
-type Params = {
-  storeSplits: SplitsResult | null;
-  distanceWhole: string;
-  distanceFractional: string;
-  distanceUnit: DistanceUnit;
-  timeHours: string;
-  timeMinutes: string;
-  timeSeconds: string;
-  timeHundredths: string;
-};
-
 // Local to the card — closing discards the choice so nothing leaks into the store.
-export function useSplitsOverride({
-  storeSplits,
-  distanceWhole,
-  distanceFractional,
-  distanceUnit,
-  timeHours,
-  timeMinutes,
-  timeSeconds,
-  timeHundredths,
-}: Params): SplitsOverride {
+export function useSplitsOverride(): SplitsOverride {
+  const storeSplits = useCalculatorStore((s) => s.splits);
+  const splitsByKilometers = useCalculatorStore((s) => s.splitsByKilometers);
+  const splitsByMiles = useCalculatorStore((s) => s.splitsByMiles);
+  const splitsBy100m = useCalculatorStore((s) => s.splitsBy100m);
+  const totalDistanceMeters = useCalculatorStore((s) => s.totalDistanceMeters);
+  const distanceUnit = useCalculatorStore((s) => s.distanceUnit);
+
   const [override, setOverride] = useState<SplitsOverrideTarget>(null);
 
-  const distanceAll = useMemo(
-    () =>
-      getDistanceInAllUnits({
-        distanceValue:
-          getNumericValue(distanceWhole) + getDecimalValue(distanceFractional),
-        distanceUnit,
-      }),
-    [distanceWhole, distanceFractional, distanceUnit],
-  );
-
-  const overrideResult: SplitsResult | null = useMemo(() => {
-    if (override === null) return null;
-    const inputTime: Time = {
-      hours: getNumericValue(timeHours),
-      minutes: getNumericValue(timeMinutes),
-      seconds: getNumericValue(timeSeconds),
-      milliseconds: getNumericValue(timeHundredths) * 10,
-    };
-    if (override === "K") {
-      return {
-        unit: DistanceUnit.Kilometers,
-        showHundredths: false,
-        trackSummary: null,
-        rows: calculateSplits({
-          time: inputTime,
-          distance: distanceAll.inKilometers,
-          splitInterval: 1,
-        }),
-      };
-    }
-    if (override === "miles") {
-      return {
-        unit: DistanceUnit.Miles,
-        showHundredths: false,
-        trackSummary: null,
-        rows: calculateSplits({
-          time: inputTime,
-          distance: distanceAll.inMiles,
-          splitInterval: 1,
-        }),
-      };
-    }
-    return {
-      unit: DistanceUnit.Meters,
-      showHundredths: false,
-      trackSummary: null,
-      rows: calculateSplits({
-        time: inputTime,
-        distance: distanceAll.inMeters,
-        splitInterval: 100,
-      }),
-    };
-  }, [
-    override,
-    distanceAll,
-    timeHours,
-    timeMinutes,
-    timeSeconds,
-    timeHundredths,
-  ]);
-
-  const splits = overrideResult ?? storeSplits;
+  const splits: SplitsResult | null = useMemo(() => {
+    if (override === "K") return splitsByKilometers;
+    if (override === "miles") return splitsByMiles;
+    if (override === "100m") return splitsBy100m;
+    return storeSplits;
+  }, [override, storeSplits, splitsByKilometers, splitsByMiles, splitsBy100m]);
 
   // 100m above 800m would balloon the row count (30+ on a 3km card), and
   // below 400m the defaults are already 100m landmarks — both skip the toggle.
   const nextAction: NextSplitsAction = useMemo(() => {
-    if (!splits) return null;
-    const totalMeters = distanceAll.inMeters.distanceValue;
+    if (!splits || totalDistanceMeters === null) return null;
     const isMetersEvent = distanceUnit === DistanceUnit.Meters;
     if (isMetersEvent) {
-      if (totalMeters >= 1000) {
+      if (totalDistanceMeters >= 1000) {
         if (override === null) return { setTo: "K", label: "K" };
         if (override === "K") return { setTo: null, label: "laps" };
         return null;
       }
-      if (totalMeters > 400 && totalMeters <= 800) {
+      if (totalDistanceMeters > 400 && totalDistanceMeters <= 800) {
         if (override === null) return { setTo: "100m", label: "100m" };
         if (override === "100m") return { setTo: null, label: "laps" };
         return null;
@@ -135,7 +60,7 @@ export function useSplitsOverride({
       return { setTo: "K", label: "K" };
     }
     return null;
-  }, [splits, override, distanceAll, distanceUnit]);
+  }, [splits, override, totalDistanceMeters, distanceUnit]);
 
   const setOverrideStable = useCallback(
     (next: SplitsOverrideTarget) => setOverride(next),

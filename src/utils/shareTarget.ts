@@ -1,5 +1,6 @@
 import { DistanceUnit } from "pace-calculator";
 import { CalculatorStore } from "@/state/useCalculatorStore";
+import { CalculatorInputSubset } from "@/types/calculatorInput";
 import { DistanceMode } from "@/types/distance";
 import { sanitizeDistanceField, sanitizeTime } from "@/utils/input";
 
@@ -93,7 +94,7 @@ type ShareUrlOptions = {
 };
 
 export const buildShareUrl = (
-  state: CalculatorStore,
+  state: CalculatorInputSubset,
   location: Location,
   options: ShareUrlOptions = {},
 ): string => {

@@ -32,7 +32,6 @@ beforeEach(() => {
     splitsUnit: null,
     summaryViewOpen: false,
     summaryArrivedFromShare: false,
-    showSplitsBeforeSummary: null,
     computeMode: ComputeMode.Pace,
     theme: "light",
     event: DEFAULT_EVENT_ID,
