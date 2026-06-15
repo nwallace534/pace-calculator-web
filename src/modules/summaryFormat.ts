@@ -1,9 +1,10 @@
 import { DistanceUnit, getDistanceInAllUnits } from "pace-calculator";
-import { DistanceMode } from "@/types/distance";
+import { isCustomEvent } from "@/types/distance";
 import {
-  DistanceUnitShortLabel,
-  formatDistanceValue,
+  DistanceUnitStandardShortLabel,
   formatDistanceValueTwoDp,
+  formatDistanceWithShortUnit,
+  getDistanceUnitLabel,
 } from "@/utils/distances";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
 
@@ -14,31 +15,6 @@ export const getSplitsUnitKey = (
   if (unit === DistanceUnit.Meters) return "meters";
   if (unit === DistanceUnit.Kilometers) return "kilometers";
   return null;
-};
-
-type EventLabelParams = {
-  event: string;
-  distanceWhole: string;
-  distanceFractional: string;
-  distanceUnit: DistanceUnit;
-  eventLabel: string;
-};
-
-// Custom / CustomTrack have no catalog label so use the entered distance.
-export const getEventLabelText = ({
-  event,
-  distanceWhole,
-  distanceFractional,
-  distanceUnit,
-  eventLabel,
-}: EventLabelParams): string => {
-  const customLabel = getCustomDistanceLabel({
-    event,
-    distanceWhole,
-    distanceFractional,
-    distanceUnit,
-  });
-  return customLabel ?? eventLabel;
 };
 
 type CustomDistanceLabelParams = {
@@ -55,12 +31,10 @@ export const getCustomDistanceLabel = ({
   distanceFractional,
   distanceUnit,
 }: CustomDistanceLabelParams): string | null => {
-  if (event !== DistanceMode.Custom && event !== DistanceMode.CustomTrack) {
-    return null;
-  }
+  if (!isCustomEvent(event)) return null;
   const value =
     getNumericValue(distanceWhole) + getDecimalValue(distanceFractional);
-  return `${formatDistanceValue(value)}${DistanceUnitShortLabel[distanceUnit]}`;
+  return formatDistanceWithShortUnit(value, distanceUnit);
 };
 
 type DistanceLineParams = {
@@ -82,11 +56,11 @@ export const buildDistanceLine = ({
   });
   const inMiles = `${formatDistanceValueTwoDp(
     distanceAllUnits.inMiles.distanceValue,
-  )} miles`;
+  )} ${getDistanceUnitLabel(DistanceUnit.Miles)}`;
   if (distanceUnit === DistanceUnit.Miles) {
     const inKm = `${formatDistanceValueTwoDp(
       distanceAllUnits.inKilometers.distanceValue,
-    )} km`;
+    )} ${DistanceUnitStandardShortLabel[DistanceUnit.Kilometers]}`;
     return `${inMiles} = ${inKm}`;
   }
   return inMiles;

@@ -6,7 +6,7 @@ import DistanceValueInput from "@/components/DistanceValueInput";
 
 import { Events, EventTags } from "@/utils/events";
 import { DistanceUnitOptions } from "@/utils/distances";
-import { DistanceMode } from "@/types/distance";
+import { DistanceMode, isCustomEvent } from "@/types/distance";
 import { DistanceUnit } from "pace-calculator";
 import { useTranslation } from "react-i18next";
 import useEventGuide from "@/hooks/useEventGuide";
@@ -115,8 +115,7 @@ function Distance() {
             </option>
           </optgroup>
         </select>
-        {(event === DistanceMode.Custom ||
-          event === DistanceMode.CustomTrack) && (
+        {isCustomEvent(event) && (
           <div className="d-flex justify-content-center mt-2">
             <div className="d-flex align-items-center">
               <DistanceValueInput

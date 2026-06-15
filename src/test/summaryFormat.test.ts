@@ -3,11 +3,9 @@
 
 import { describe, expect, it } from "vitest";
 import { DistanceUnit } from "pace-calculator";
-import { DistanceMode } from "@/types/distance";
 import {
   buildDistanceLine,
   formatSplitLabel,
-  getEventLabelText,
   getSplitsUnitKey,
 } from "@/modules/summaryFormat";
 
@@ -20,90 +18,6 @@ describe("getSplitsUnitKey", () => {
 
   it("returns null for undefined (no splits → no unit suffix)", () => {
     expect(getSplitsUnitKey(undefined)).toBeNull();
-  });
-});
-
-describe("getEventLabelText", () => {
-  it("returns the catalog label for built-in events (the entered distance is irrelevant)", () => {
-    expect(
-      getEventLabelText({
-        event: "fiveK",
-        distanceWhole: "5",
-        distanceFractional: "0",
-        distanceUnit: DistanceUnit.Kilometers,
-        eventLabel: "5K",
-      }),
-    ).toBe("5K");
-
-    expect(
-      getEventLabelText({
-        event: "marathon",
-        distanceWhole: "26",
-        distanceFractional: "2",
-        distanceUnit: DistanceUnit.Miles,
-        eventLabel: "Marathon",
-      }),
-    ).toBe("Marathon");
-  });
-
-  it("derives the label from the entered distance for Custom (road) events", () => {
-    // Whole km, no fractional.
-    expect(
-      getEventLabelText({
-        event: DistanceMode.Custom,
-        distanceWhole: "7",
-        distanceFractional: "0",
-        distanceUnit: DistanceUnit.Kilometers,
-        eventLabel: "ignored",
-      }),
-    ).toBe("7K");
-
-    // Fractional km (".5" fractional → 7.5).
-    expect(
-      getEventLabelText({
-        event: DistanceMode.Custom,
-        distanceWhole: "7",
-        distanceFractional: "5",
-        distanceUnit: DistanceUnit.Kilometers,
-        eventLabel: "ignored",
-      }),
-    ).toBe("7.5K");
-
-    // Miles short-label includes a leading space ("10 mile") so it reads
-    // naturally beside a number.
-    expect(
-      getEventLabelText({
-        event: DistanceMode.Custom,
-        distanceWhole: "10",
-        distanceFractional: "0",
-        distanceUnit: DistanceUnit.Miles,
-        eventLabel: "ignored",
-      }),
-    ).toBe("10 mile");
-  });
-
-  it("derives the label from the entered distance for CustomTrack events", () => {
-    // 500m.
-    expect(
-      getEventLabelText({
-        event: DistanceMode.CustomTrack,
-        distanceWhole: "500",
-        distanceFractional: "0",
-        distanceUnit: DistanceUnit.Meters,
-        eventLabel: "ignored",
-      }),
-    ).toBe("500m");
-
-    // 1500m.
-    expect(
-      getEventLabelText({
-        event: DistanceMode.CustomTrack,
-        distanceWhole: "1500",
-        distanceFractional: "0",
-        distanceUnit: DistanceUnit.Meters,
-        eventLabel: "ignored",
-      }),
-    ).toBe("1500m");
   });
 });
 

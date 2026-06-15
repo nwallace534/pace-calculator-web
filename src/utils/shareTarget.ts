@@ -1,7 +1,7 @@
 import { DistanceUnit } from "pace-calculator";
 import { CalculatorStore } from "@/state/useCalculatorStore";
 import { CalculatorInputSubset } from "@/types/calculatorInput";
-import { DistanceMode } from "@/types/distance";
+import { isCustomEvent } from "@/types/distance";
 import { sanitizeDistanceField, sanitizeTime } from "@/utils/input";
 
 export type SharedTarget = {
@@ -20,9 +20,6 @@ export type SharedTarget = {
 };
 
 const VALID_DISTANCE_UNITS = new Set<string>(Object.values(DistanceUnit));
-
-const isCustomEvent = (event: string): boolean =>
-  event === DistanceMode.Custom || event === DistanceMode.CustomTrack;
 
 const hasTimeParam = (params: URLSearchParams): boolean =>
   ["h", "m", "s", "cs"].some((key) => params.has(key));

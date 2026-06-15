@@ -1,4 +1,4 @@
-import { DistanceMode } from "@/types/distance";
+import { DistanceMode, isCustomEvent } from "@/types/distance";
 import { Distance, DistanceUnit, getDistanceInAllUnits } from "pace-calculator";
 import { getDecimalValue, getNumericValue, sanitizeTime } from "./input";
 import { CalculatorTime, timeStringsToMs } from "./time";
@@ -252,17 +252,16 @@ export const getFastestRecordPace = (
   eventId: string,
   customDistanceMeters: number,
 ): { secPerKm: number } | null => {
-  const secPerKm =
-    eventId === DistanceMode.Custom || eventId === DistanceMode.CustomTrack
-      ? getBracketedRecordPaceSecPerKm(customDistanceMeters)
-      : getEventWrPaceSecPerKm(eventId);
+  const secPerKm = isCustomEvent(eventId)
+    ? getBracketedRecordPaceSecPerKm(customDistanceMeters)
+    : getEventWrPaceSecPerKm(eventId);
   return secPerKm !== null ? { secPerKm } : null;
 };
 
 export const getDistanceDetailsFromEvent = (eventId: string) => {
   let changes = null;
 
-  if (eventId !== DistanceMode.Custom && eventId !== DistanceMode.CustomTrack) {
+  if (!isCustomEvent(eventId)) {
     const selectedEvent = Events.find((event) => event.id === eventId);
 
     if (selectedEvent) {

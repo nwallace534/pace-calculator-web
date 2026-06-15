@@ -6,6 +6,7 @@ import HowFarIn from "@/modules/HowFarIn";
 import SummaryCardButton from "@/modules/SummaryCardButton";
 import {
   formatDistanceValueTwoDp,
+  getDistanceUnitLabel,
   getDistanceUnitSingular,
 } from "@/utils/distances";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
@@ -77,7 +78,7 @@ function PaceSummary({ results }: { results: MultiPace }) {
     switch (distanceUnit) {
       case DistanceUnit.Miles:
         return t("distanceApproximation", {
-          from: `${enteredDistance} ${distanceUnit}`,
+          from: `${enteredDistance} ${getDistanceUnitLabel(DistanceUnit.Miles)}`,
           to: `${formatDistanceValueTwoDp(
             allDistances.inKilometers.distanceValue,
           )}${getDistanceUnitSingular(DistanceUnit.Kilometers)}`,
@@ -86,9 +87,9 @@ function PaceSummary({ results }: { results: MultiPace }) {
       case DistanceUnit.Kilometers:
         return t("distanceApproximation", {
           from: `${enteredDistance}${getDistanceUnitSingular(distanceUnit)}`,
-          to: `${formatDistanceValueTwoDp(allDistances.inMiles.distanceValue)} ${
-            DistanceUnit.Miles
-          }`,
+          to: `${formatDistanceValueTwoDp(
+            allDistances.inMiles.distanceValue,
+          )} ${getDistanceUnitLabel(DistanceUnit.Miles)}`,
         });
       default:
         return "";
