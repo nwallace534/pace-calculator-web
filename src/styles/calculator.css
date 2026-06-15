@@ -3,13 +3,13 @@
 :root {
   --accent: #009688;
   --accent-fg: #ffffff;
-  /* Summary-card chrome (Close, Copy link, Screenshot mode label). */
-  --summary-chrome-color: #495057;
+  /* Summary-card controls (Close, Copy link, Screenshot mode label). */
+  --summary-controls-color: #495057;
 }
 [data-bs-theme="dark"] {
   --accent: #d2fe3d;
   --accent-fg: #111111;
-  --summary-chrome-color: var(--bs-emphasis-color);
+  --summary-controls-color: var(--bs-emphasis-color);
 }
 
 .btn-accent {
@@ -281,4 +281,162 @@
   color: var(--bs-body-color);
   font-size: 0.8rem;
   -webkit-overflow-scrolling: touch;
+}
+
+/* ===== Summary card =====
+   Class names share the `summary-` prefix so the design system for the
+   shareable card is grouped + scoped. Dynamic values (fade opacity,
+   column count, conditional font-size) stay inline in the components. */
+
+.summary-view {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+}
+
+.summary-card {
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-body-color);
+  max-width: 28rem;
+  max-height: 62.5rem;
+  overflow: hidden;
+  /* Body scale for everything inside the card; per-element classes override. */
+  font-size: 0.9rem;
+}
+
+.summary-card-title {
+  color: var(--accent);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.summary-card-details-line {
+  font-size: 0.9rem;
+  line-height: 1.3;
+  margin-top: 0.25rem;
+  color: var(--bs-body-color);
+}
+
+.summary-section-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.summary-section-value {
+  font-family: var(--bs-font-monospace);
+  font-weight: 200;
+  color: var(--accent);
+}
+
+/* Predictions + intervals share an identical list layout. */
+.summary-list {
+  column-count: 2;
+  column-width: 9rem;
+  column-gap: 0.5rem;
+}
+
+.summary-list-row {
+  display: flex;
+  gap: 0.4rem;
+  break-inside: avoid;
+  white-space: nowrap;
+}
+
+.summary-list-label {
+  min-width: 4em;
+}
+
+/* Splits list — different column rules + slightly wider row gap. The dynamic
+   column-count and font-size live in SummarySplits as deliberate inline
+   exceptions (driven by row count). */
+.summary-splits-list {
+  column-width: 6rem;
+  column-gap: 1rem;
+  line-height: 1.3;
+}
+
+.summary-splits-row {
+  display: flex;
+  gap: 0.5rem;
+  break-inside: avoid;
+  white-space: nowrap;
+}
+
+.summary-controls-button {
+  color: var(--summary-controls-color);
+  border-color: var(--summary-controls-color);
+}
+
+.summary-controls-anchor-left,
+.summary-controls-anchor-right {
+  position: absolute;
+  top: 0.75rem;
+  z-index: 10;
+}
+.summary-controls-anchor-left {
+  left: 0.75rem;
+}
+.summary-controls-anchor-right {
+  right: 0.75rem;
+}
+
+.summary-screenshot-toast {
+  position: absolute;
+  top: 0.95rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
+  color: var(--summary-controls-color);
+}
+
+.summary-from-share-hint {
+  max-width: 28rem;
+}
+
+.summary-branding {
+  flex-shrink: 0;
+  line-height: 1.1;
+  text-align: center;
+}
+.summary-branding-text {
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-size: 0.65rem;
+  line-height: 1;
+  margin-top: 0.3rem;
+}
+
+.summary-vertical-divider {
+  align-self: stretch;
+  width: 1px;
+  background-color: currentColor;
+  opacity: 0.25;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.summary-track-summary-line {
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.summary-copy-toast {
+  bottom: 1.5rem;
+  z-index: 1080;
+  max-width: min(28rem, 90vw);
+}
+.summary-copy-toast-card {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border: 1px solid var(--bs-border-color);
+}
+.summary-copy-toast-url {
+  margin-top: 0.15rem;
 }

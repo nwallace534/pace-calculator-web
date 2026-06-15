@@ -6,19 +6,18 @@ import { formatSplitLabel } from "@/modules/summaryFormat";
 import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
 import type { NextSplitsAction } from "@/hooks/useSplitsOverride";
 import type { SplitsOverrideTarget } from "@/hooks/useSplitsOverride";
-import { PencilIcon } from "./icons";
-import { sectionTitleStyle, valueStyle } from "./styles";
+import PencilIcon from "@/assets/icons/pencil.svg?react";
 
 export function SummarySplits({
   splits,
   splitsHeadingUnit,
-  chromeVisible,
+  controlsVisible,
   nextAction,
   onOverride,
 }: {
   splits: SplitsResult;
   splitsHeadingUnit: string;
-  chromeVisible: boolean;
+  controlsVisible: boolean;
   nextAction: NextSplitsAction;
   onOverride: (target: SplitsOverrideTarget) => void;
 }) {
@@ -31,10 +30,10 @@ export function SummarySplits({
         className="d-flex align-items-center mb-1 gap-3"
         style={{ minHeight: "1.75rem" }}
       >
-        <div style={sectionTitleStyle}>
+        <div className="summary-section-title">
           {t("summary.splitsHeading", { unit: splitsHeadingUnit })}
         </div>
-        {chromeVisible && nextAction !== null && (
+        {controlsVisible && nextAction !== null && (
           <button
             type="button"
             onClick={(e) => {
@@ -45,37 +44,30 @@ export function SummarySplits({
             data-testid="summary-splits-override-toggle"
           >
             <span>{t("result.splitsInUnit", { unit: nextAction.label })}</span>
-            <PencilIcon size={14} />
+            <PencilIcon width={14} height={14} />
           </button>
         )}
       </div>
       <div
+        className="summary-splits-list"
         data-testid="summary-splits"
         style={{
           // Stay single-column for sparse goals; only break out once it pays off.
           columnCount: splits.rows.length > 5 ? 3 : 1,
-          columnWidth: "6rem",
-          columnGap: "1rem",
           // Shrink only at marathon-scale row counts.
           fontSize: splits.rows.length > 20 ? "0.8rem" : "0.9rem",
-          lineHeight: 1.3,
         }}
       >
         {splits.rows.map((split) => (
           <div
             key={split.splitNumber}
             data-testid="summary-split-row"
-            className="d-flex"
-            style={{
-              gap: "0.5rem",
-              breakInside: "avoid",
-              whiteSpace: "nowrap",
-            }}
+            className="summary-splits-row"
           >
             <span className="text-muted">
               {formatSplitLabel(splits.unit, split.distance, split.splitNumber)}
             </span>
-            <span style={valueStyle}>
+            <span className="summary-section-value">
               {formatTime({
                 time: split.time,
                 alwaysShowHours: splits.unit !== DistanceUnit.Meters,
@@ -88,8 +80,7 @@ export function SummarySplits({
       {splits.trackSummary && (
         <TrackSummaryLine
           trackSummary={splits.trackSummary}
-          className="text-muted mt-1"
-          style={{ fontSize: "0.75rem", lineHeight: 1.3 }}
+          className="text-muted mt-1 summary-track-summary-line"
           data-testid="summary-track-summary"
         />
       )}

@@ -2,16 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // pinOpen / fadeNow let a modal interaction (e.g. title edit) override the
 // auto-hide timer.
-export type AutoHideChrome = {
+export type AutoHideControls = {
   visible: boolean;
   reveal: () => void;
   pinOpen: () => void;
   fadeNow: () => void;
 };
 
-export function useAutoHideChrome({
+export function useAutoHideControls({
   hideDelayMs = 3000,
-}: { hideDelayMs?: number } = {}): AutoHideChrome {
+}: { hideDelayMs?: number } = {}): AutoHideControls {
   const [visible, setVisible] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -22,7 +22,7 @@ export function useAutoHideChrome({
 
   useEffect(() => {
     // rAF so the opacity transition fires from a hidden start; without it
-    // the chrome would flash visible on first paint.
+    // the controls would flash visible on first paint.
     const rafId = requestAnimationFrame(() => {
       setVisible(true);
       scheduleHide(hideDelayMs);

@@ -16,13 +16,13 @@ import {
   getEventLabelText,
   getSplitsUnitKey,
 } from "@/modules/summaryFormat";
-import { useAutoHideChrome } from "@/hooks/useAutoHideChrome";
+import { useAutoHideControls } from "@/hooks/useAutoHideControls";
 import { useCardCloseAnimation } from "@/hooks/useCardCloseAnimation";
 import { TITLE_MAX_LENGTH, useEditableTitle } from "@/hooks/useEditableTitle";
 import { useSplitsOverride } from "@/hooks/useSplitsOverride";
 import { CloseButton, SectionSpacer } from "@/modules/summaryView/icons";
 import { CopyToast } from "@/modules/summaryView/CopyToast";
-import { SummaryChrome } from "@/modules/summaryView/SummaryChrome";
+import { SummaryControls } from "@/modules/summaryView/SummaryControls";
 import { SummaryHeader } from "@/modules/summaryView/SummaryHeader";
 import { SummaryPaces } from "@/modules/summaryView/SummaryPaces";
 import { SummaryPredictions } from "@/modules/summaryView/SummaryPredictions";
@@ -77,7 +77,7 @@ function SummaryView() {
     }
   };
 
-  const chrome = useAutoHideChrome({ hideDelayMs: 3000 });
+  const controls = useAutoHideControls({ hideDelayMs: 3000 });
   const title = useEditableTitle({ maxLength: TITLE_MAX_LENGTH });
   const close = useCardCloseAnimation(closeSummaryView);
   const splitsControl = useSplitsOverride({
@@ -94,22 +94,22 @@ function SummaryView() {
   // Reveal during editing would let the hide timer race the save.
   const handleRevealControls = () => {
     if (title.editing) return;
-    chrome.reveal();
+    controls.reveal();
   };
 
   const handleStartEdit = () => {
     title.startEdit();
-    chrome.pinOpen();
+    controls.pinOpen();
   };
 
   const handleFinishEdit = () => {
     title.finishEdit();
-    chrome.fadeNow();
+    controls.fadeNow();
   };
 
   const controlsFadeStyle: CSSProperties = {
-    opacity: chrome.visible ? 1 : 0,
-    pointerEvents: chrome.visible ? "auto" : "none",
+    opacity: controls.visible ? 1 : 0,
+    pointerEvents: controls.visible ? "auto" : "none",
     transition: "opacity 500ms ease",
   };
 
@@ -176,14 +176,7 @@ function SummaryView() {
 
   return (
     <div
-      className="px-3"
-      style={{
-        position: "relative",
-        minHeight: "100vh",
-        width: "100%",
-        paddingTop: "3rem",
-        paddingBottom: "1rem",
-      }}
+      className="px-3 summary-view"
       data-testid="summary-view"
       onClick={() => {
         // Bubbled clicks commit the edit; the input + check button stopPropagation so this only fires for taps outside.
@@ -195,7 +188,7 @@ function SummaryView() {
       }}
       onMouseMove={handleRevealControls}
     >
-      <SummaryChrome
+      <SummaryControls
         fadeStyle={controlsFadeStyle}
         arrivedFromShare={arrivedFromShare}
         onCopy={handleCopy}
@@ -203,23 +196,15 @@ function SummaryView() {
       />
 
       <div
-        className={`card rounded-3 border-0 p-3 mx-auto position-relative d-flex flex-column ${
+        className={`card rounded-3 border-0 p-3 mx-auto position-relative d-flex flex-column summary-card ${
           close.closing ? "summary-card-flip-out" : "summary-card-flip-in"
         }`}
         onAnimationEnd={close.handleAnimationEnd}
-        style={{
-          backgroundColor: "var(--bs-secondary-bg)",
-          color: "var(--bs-body-color)",
-          // Width cap = Pixel 9 Pro XL portrait; height is a ceiling so sparse goals shrink and marathon overflow-clips.
-          maxWidth: "28rem",
-          maxHeight: "62.5rem",
-          overflow: "hidden",
-        }}
         data-testid="summary-card"
       >
         <SummaryHeader
           title={title}
-          chromeVisible={chrome.visible}
+          controlsVisible={controls.visible}
           eventLabel={eventLabel}
           friendlyGoalTime={friendlyGoalTime}
           distanceLine={distanceLine}
@@ -258,7 +243,7 @@ function SummaryView() {
             <SummarySplits
               splits={splits}
               splitsHeadingUnit={splitsHeadingUnit}
-              chromeVisible={chrome.visible}
+              controlsVisible={controls.visible}
               nextAction={nextAction}
               onOverride={splitsControl.setOverride}
             />

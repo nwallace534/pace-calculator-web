@@ -21,27 +21,12 @@ export function CopyToast({
     <div
       role="status"
       aria-live="polite"
-      className="position-fixed start-50 translate-middle-x"
-      style={{
-        bottom: "1.5rem",
-        zIndex: 1080,
-        maxWidth: "min(28rem, 90vw)",
-      }}
+      className="position-fixed start-50 translate-middle-x summary-copy-toast"
     >
-      <div
-        className="shadow rounded-3 px-3 py-2"
-        style={{
-          backgroundColor: "var(--bs-body-bg)",
-          color: "var(--bs-body-color)",
-          border: "1px solid var(--bs-border-color)",
-        }}
-      >
+      <div className="shadow rounded-3 px-3 py-2 summary-copy-toast-card">
         <div className="fw-bold text-smallish">✓ {message}</div>
         {url && (
-          <div
-            className="text-muted text-small font-monospace text-truncate"
-            style={{ marginTop: "0.15rem" }}
-          >
+          <div className="text-muted text-small font-monospace text-truncate summary-copy-toast-url">
             {url}
           </div>
         )}

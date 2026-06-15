@@ -3,7 +3,6 @@ import {
   formatFriendlyTimeExact,
   type IntervalRow,
 } from "@/modules/summaryRows";
-import { sectionTitleStyle, valueStyle } from "./styles";
 
 export function SummaryIntervals({
   rows,
@@ -16,32 +15,19 @@ export function SummaryIntervals({
 
   return (
     <>
-      <div className="mb-1" style={sectionTitleStyle}>
+      <div className="mb-1 summary-section-title">
         {t("summary.intervalsHeading")}
       </div>
-      <div
-        data-testid="summary-intervals"
-        style={{
-          columnCount: 2,
-          columnWidth: "9rem",
-          columnGap: "0.5rem",
-          fontSize: "0.9rem",
-        }}
-      >
+      <div className="summary-list" data-testid="summary-intervals">
         {rows.map((row) => (
           <div
             key={row.label}
             data-testid="summary-interval-row"
-            className="d-flex"
-            style={{
-              gap: "0.4rem",
-              breakInside: "avoid",
-              whiteSpace: "nowrap",
-            }}
+            className="summary-list-row"
           >
             {/* Fixed label box so times align; sized for the widest label ("3000m" / "1/2 Mar"). */}
-            <span style={{ minWidth: "4em" }}>{row.label}</span>
-            <span style={valueStyle}>
+            <span className="summary-list-label">{row.label}</span>
+            <span className="summary-section-value">
               {formatFriendlyTimeExact(row.time, showHundredths)}
             </span>
           </div>

@@ -3,7 +3,6 @@ import {
   formatFriendlyTimeExact,
   type SummaryPredictionRow,
 } from "@/modules/summaryRows";
-import { sectionTitleStyle, valueStyle } from "./styles";
 
 // "Half Marathon" is too wide for this column; the adjacent time disambiguates "1/2 Mar".
 const SHORT_EVENT_LABELS: Record<string, string> = {
@@ -22,36 +21,22 @@ export function SummaryPredictions({
   return (
     <>
       <div
-        className="mb-1"
-        style={sectionTitleStyle}
+        className="mb-1 summary-section-title"
         data-testid="summary-predictions-heading"
       >
         {t("calculator:summary.predictionsHeading")}
       </div>
-      <div
-        data-testid="summary-predictions"
-        style={{
-          columnCount: 2,
-          columnWidth: "9rem",
-          columnGap: "0.5rem",
-          fontSize: "0.9rem",
-        }}
-      >
+      <div className="summary-list" data-testid="summary-predictions">
         {rows.map((row) => (
           <div
             key={row.id}
             data-testid="summary-prediction-row"
-            className="d-flex"
-            style={{
-              gap: "0.4rem",
-              breakInside: "avoid",
-              whiteSpace: "nowrap",
-            }}
+            className="summary-list-row"
           >
-            <span style={{ minWidth: "4em" }}>
+            <span className="summary-list-label">
               {SHORT_EVENT_LABELS[row.id] ?? t(`events:event.${row.id}.label`)}
             </span>
-            <span style={valueStyle}>
+            <span className="summary-section-value">
               {formatFriendlyTimeExact(row.time, showHundredths)}
             </span>
           </div>

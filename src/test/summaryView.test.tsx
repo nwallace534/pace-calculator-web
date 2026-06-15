@@ -1,7 +1,7 @@
 // Smoke-only browser coverage (see test-layering-with-screenshots memory):
 // per-event variety lives in the screenshot script and the summaryRows /
 // trackLandmarks unit suites. These tests only prove the component wires up
-// for the behaviours that can't be unit-tested cleanly — open/close, chrome
+// for the behaviours that can't be unit-tested cleanly — open/close, controls
 // autohide, title editing, the splits-override toggle — and run one of each
 // event type (track / middle distance / most popular) so we'd catch a wiring
 // regression that breaks only one path.
@@ -17,7 +17,7 @@ const openSummary = async () => {
   return screen.getByTestId("summary-card");
 };
 
-describe("Summary view — entry and chrome", () => {
+describe("Summary view — entry and controls", () => {
   it("opens, hides the navbar, and renders the card's main sections", async () => {
     render(<App />);
 
@@ -51,7 +51,7 @@ describe("Summary view — entry and chrome", () => {
     expect(screen.queryByTestId("summary-card")).toBeNull();
   });
 
-  it("fades the chrome controls out after the 3-second autohide timeout", async () => {
+  it("fades the controls out after the 3-second autohide timeout", async () => {
     render(<App />);
     await openSummary();
 

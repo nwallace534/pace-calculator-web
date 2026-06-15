@@ -1,25 +1,6 @@
 import { useTranslation } from "react-i18next";
 import useCalculatorStore from "@/state/useCalculatorStore";
-
-function CardIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="M3 10h18" />
-    </svg>
-  );
-}
+import CardIcon from "@/assets/icons/card.svg?react";
 
 function SummaryCardButton() {
   const { t } = useTranslation("calculator");
