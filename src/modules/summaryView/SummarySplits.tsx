@@ -5,7 +5,7 @@ import { formatTime } from "@/utils/formatTime";
 import { formatSplitLabel } from "@/modules/summaryFormat";
 import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
 import type { NextSplitsAction } from "@/hooks/useSplitsOverride";
-import type { SplitsOverrideTarget } from "@/hooks/useSplitsOverride";
+import type { SplitsOverrideOption } from "@/utils/splitsOverride";
 import PencilIcon from "@/assets/icons/pencil.svg?react";
 
 export function SummarySplits({
@@ -19,7 +19,7 @@ export function SummarySplits({
   splitsHeadingUnit: string;
   controlsVisible: boolean;
   nextAction: NextSplitsAction;
-  onOverride: (target: SplitsOverrideTarget) => void;
+  onOverride: (option: SplitsOverrideOption) => void;
 }) {
   const { t } = useTranslation("calculator");
 
@@ -38,12 +38,12 @@ export function SummarySplits({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onOverride(nextAction.setTo);
+              onOverride(nextAction);
             }}
             className="btn btn-link btn-sm p-0 text-muted text-smallish d-inline-flex align-items-center gap-1"
             data-testid="summary-splits-override-toggle"
           >
-            <span>{t("result.splitsInUnit", { unit: nextAction.label })}</span>
+            <span>{t(nextAction.i18nKey)}</span>
             <PencilIcon width={14} height={14} />
           </button>
         )}

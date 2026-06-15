@@ -1,6 +1,7 @@
 import useCalculatorStore from "@/state/useCalculatorStore";
-import { DistanceUnitOptions, DistanceUnitShortLabel } from "@/utils/distances";
+import { DistanceUnitShortLabel } from "@/utils/distances";
 import { SplitsResult } from "@/utils/calculator";
+import { SplitsOverrideOptions } from "@/utils/splitsOverride";
 import { formatTime } from "@/utils/formatTime";
 import { useTranslation } from "react-i18next";
 import { DistanceUnit } from "pace-calculator";
@@ -16,13 +17,10 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
 
   const isMeters = splits.unit === DistanceUnit.Meters;
 
-  const nextUnit =
+  const nextOption =
     splits.unit === DistanceUnit.Kilometers
-      ? DistanceUnit.Miles
-      : DistanceUnit.Kilometers;
-  const nextUnitLabel = DistanceUnitOptions.find(
-    (option) => option.value === nextUnit,
-  )?.label;
+      ? SplitsOverrideOptions.miles
+      : SplitsOverrideOptions.K;
 
   const distanceUnitLabel = DistanceUnitShortLabel[splits.unit];
 
@@ -40,7 +38,7 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
             className="btn btn-link btn-sm p-0 text-muted text-smallish"
             onClick={toggleSplitsUnit}
           >
-            {t("result.splitsInUnit", { unit: nextUnitLabel })}
+            {t(nextOption.i18nKey)}
           </button>
         </div>
       )}

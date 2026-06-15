@@ -2,31 +2,27 @@ import { useState } from "react";
 import { DistanceUnit } from "pace-calculator";
 import type { SplitsResult } from "@/utils/calculator";
 import useCalculatorStore from "@/state/useCalculatorStore";
+import {
+  SplitsOverrideOption,
+  SplitsOverrideOptions,
+} from "@/utils/splitsOverride";
 
-export type SplitsOverrideTarget = "K" | "miles" | "100m" | null;
-
-export type NextSplitsAction = {
-  setTo: SplitsOverrideTarget;
-  label: string;
-} | null;
+export type NextSplitsAction = SplitsOverrideOption | null;
 
 export type SplitsOverride = {
-  /** Override if set, otherwise the store-computed splits. */
+  /** Effective splits — pulled by the active option's pickSplits selector. */
   splits: SplitsResult | null;
-  setOverride: (next: SplitsOverrideTarget) => void;
+  setOverride: (next: SplitsOverrideOption) => void;
   nextAction: NextSplitsAction;
 };
 
 // Local to the card — closing discards the choice so nothing leaks into the store.
 export function useSplitsOverride(): SplitsOverride {
-  const [override, setOverride] = useState<SplitsOverrideTarget>(null);
+  const [override, setOverride] = useState<SplitsOverrideOption>(
+    SplitsOverrideOptions.laps,
+  );
 
-  const splits = useCalculatorStore((s) => {
-    if (override === "K") return s.splitsByKilometers;
-    if (override === "miles") return s.splitsByMiles;
-    if (override === "100m") return s.splitsBy100m;
-    return s.splits;
-  });
+  const splits = useCalculatorStore(override.pickSplits);
   const totalDistanceMeters = useCalculatorStore((s) => s.totalDistanceMeters);
   const distanceUnit = useCalculatorStore((s) => s.distanceUnit);
 
@@ -49,29 +45,30 @@ function pickNextAction({
   distanceUnit,
 }: {
   splits: SplitsResult | null;
-  override: SplitsOverrideTarget;
+  override: SplitsOverrideOption;
   totalDistanceMeters: number | null;
   distanceUnit: DistanceUnit;
 }): NextSplitsAction {
   if (!splits || totalDistanceMeters === null) return null;
   if (distanceUnit === DistanceUnit.Meters) {
     if (totalDistanceMeters >= 1000) {
-      if (override === null) return { setTo: "K", label: "K" };
-      if (override === "K") return { setTo: null, label: "laps" };
+      if (override === SplitsOverrideOptions.laps)
+        return SplitsOverrideOptions.K;
+      if (override === SplitsOverrideOptions.K)
+        return SplitsOverrideOptions.laps;
       return null;
     }
     if (totalDistanceMeters > 400 && totalDistanceMeters <= 800) {
-      if (override === null) return { setTo: "100m", label: "100m" };
-      if (override === "100m") return { setTo: null, label: "laps" };
+      if (override === SplitsOverrideOptions.laps)
+        return SplitsOverrideOptions.hundredMeters;
+      if (override === SplitsOverrideOptions.hundredMeters)
+        return SplitsOverrideOptions.laps;
       return null;
     }
     return null;
   }
-  if (splits.unit === DistanceUnit.Kilometers) {
-    return { setTo: "miles", label: "miles" };
-  }
-  if (splits.unit === DistanceUnit.Miles) {
-    return { setTo: "K", label: "K" };
-  }
+  if (splits.unit === DistanceUnit.Kilometers)
+    return SplitsOverrideOptions.miles;
+  if (splits.unit === DistanceUnit.Miles) return SplitsOverrideOptions.K;
   return null;
 }
