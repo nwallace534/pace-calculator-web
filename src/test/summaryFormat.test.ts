@@ -3,23 +3,7 @@
 
 import { describe, expect, it } from "vitest";
 import { DistanceUnit } from "pace-calculator";
-import {
-  buildDistanceLine,
-  formatSplitLabel,
-  getSplitsUnitKey,
-} from "@/modules/summaryFormat";
-
-describe("getSplitsUnitKey", () => {
-  it("maps each DistanceUnit to its translation-key suffix", () => {
-    expect(getSplitsUnitKey(DistanceUnit.Miles)).toBe("miles");
-    expect(getSplitsUnitKey(DistanceUnit.Meters)).toBe("meters");
-    expect(getSplitsUnitKey(DistanceUnit.Kilometers)).toBe("kilometers");
-  });
-
-  it("returns null for undefined (no splits → no unit suffix)", () => {
-    expect(getSplitsUnitKey(undefined)).toBeNull();
-  });
-});
+import { buildDistanceLine, formatSplitLabel } from "@/modules/summaryFormat";
 
 describe("buildDistanceLine", () => {
   it("renders 'X mi = Y km' (both at 2dp) for miles-unit events", () => {

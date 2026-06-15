@@ -8,15 +8,6 @@ import {
 } from "@/utils/distances";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
 
-export const getSplitsUnitKey = (
-  unit: DistanceUnit | undefined,
-): "miles" | "meters" | "kilometers" | null => {
-  if (unit === DistanceUnit.Miles) return "miles";
-  if (unit === DistanceUnit.Meters) return "meters";
-  if (unit === DistanceUnit.Kilometers) return "kilometers";
-  return null;
-};
-
 type CustomDistanceLabelParams = {
   event: string;
   distanceWhole: string;

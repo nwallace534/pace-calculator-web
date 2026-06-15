@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DistanceUnit } from "pace-calculator";
 import useCalculatorStore from "@/state/useCalculatorStore";
-import { getSplitsUnitKey } from "@/modules/summaryFormat";
 import { buildShareUrl } from "@/utils/shareTarget";
 import { useAutoHideControls } from "@/hooks/useAutoHideControls";
 import { useCardCloseAnimation } from "@/hooks/useCardCloseAnimation";
@@ -16,6 +16,12 @@ import { SummaryPaces } from "@/modules/summaryView/SummaryPaces";
 import { SummaryPredictions } from "@/modules/summaryView/SummaryPredictions";
 import { SummaryIntervals } from "@/modules/summaryView/SummaryIntervals";
 import { SummarySplits } from "@/modules/summaryView/SummarySplits";
+
+const SPLITS_HEADING_UNIT_KEY: Record<DistanceUnit, string> = {
+  [DistanceUnit.Miles]: "calculator:unit.miles",
+  [DistanceUnit.Kilometers]: "calculator:unit.kilometersShort",
+  [DistanceUnit.Meters]: "calculator:unit.meters",
+};
 
 function SummaryView() {
   const { t } = useTranslation(["calculator", "events"]);
@@ -98,10 +104,10 @@ function SummaryView() {
   const splits = splitsControl.splits;
   const nextAction = splitsControl.nextAction;
 
-  // Unit-key reflects the effective splits (override or store), not the store value.
-  const splitsUnitKey = getSplitsUnitKey(splits?.unit);
-  const splitsHeadingUnit = splitsUnitKey
-    ? t(`calculator:summary.splitsUnit.${splitsUnitKey}`)
+  // Heading uses the effective splits unit (override or store), not the store value.
+  // Km abbreviates because "kilometers" would crowd the heading; miles/meters stay long.
+  const splitsHeadingUnit = splits?.unit
+    ? t(SPLITS_HEADING_UNIT_KEY[splits.unit])
     : "";
 
   return (

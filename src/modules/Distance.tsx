@@ -128,7 +128,7 @@ function Distance() {
                 {event === DistanceMode.CustomTrack ? (
                   // Track mode is meters-only — render as static text so it
                   // doesn't look like a disabled-but-interactive dropdown.
-                  <span className="fs-5">meters</span>
+                  <span className="fs-5">{t("calculator:unit.meters")}</span>
                 ) : (
                   <div className="distance-unit">
                     <select

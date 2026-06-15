@@ -64,12 +64,7 @@
       "saveTitle": "Save title",
       "predictionsHeading": "Predicted race times",
       "intervalsHeading": "Times at goal pace",
-      "splitsHeading": "Splits in {{unit}}",
-      "splitsUnit": {
-        "miles": "miles",
-        "kilometers": "km",
-        "meters": "meters"
-      }
+      "splitsHeading": "Splits in {{unit}}"
     },
     "timesForPace": {
       "columnPrediction": "Prediction",
@@ -128,8 +123,10 @@
       "mph": "mph",
       "kilometersShort": "km",
       "kilometersShortRunning": "K",
+      "miles": "miles",
       "mileSingular": "mile",
       "milesShort": "mi",
+      "meters": "meters",
       "metersShort": "m"
     }
   },
