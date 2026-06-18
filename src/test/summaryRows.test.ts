@@ -1,5 +1,5 @@
 // Unit-test exception (per testing-approach memory): summaryRows.ts is a pure
-// helper module. Exercising its tier/threshold branches per-event through the
+// helper module. Exercising its reference-selection branches per-event through the
 // browser would be slow and offers no signal the screenshot script doesn't
 // already cover.
 
@@ -78,26 +78,13 @@ describe("formatFriendlyTimeExact", () => {
   });
 });
 
-describe("buildSummaryPredictionRows — tier matrix", () => {
-  it("returns nothing in the middle range (3K < goal < 10K, including a 5K)", () => {
-    // 5K @ 25:00 — middle range floor.
+describe("buildSummaryPredictionRows — summary references", () => {
+  it("returns nothing below the first configured event", () => {
     expect(
       buildSummaryPredictionRows({
-        ...distanceParams("5", DistanceUnit.Kilometers),
+        ...distanceParams("50", DistanceUnit.Meters),
         timeHours: "0",
-        timeMinutes: "25",
-        timeSeconds: "0",
-        timeHundredths: "0",
-        showHundredths: false,
-      }),
-    ).toEqual([]);
-
-    // 4K @ 18:00 — Custom road in the middle.
-    expect(
-      buildSummaryPredictionRows({
-        ...distanceParams("4", DistanceUnit.Kilometers),
-        timeHours: "0",
-        timeMinutes: "18",
+        timeMinutes: "0",
         timeSeconds: "0",
         timeHundredths: "0",
         showHundredths: false,
@@ -105,7 +92,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     ).toEqual([]);
   });
 
-  it("returns nothing for 800m (short tier, but the only ≥800m TimesForPace event below 800m is itself)", () => {
+  it("returns nothing when the resolved event has no prediction references", () => {
     expect(
       buildSummaryPredictionRows({
         ...distanceParams("800", DistanceUnit.Meters),
@@ -118,7 +105,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     ).toEqual([]);
   });
 
-  it("short tier — 1500m goal predicts 800m", () => {
+  it("1500m goal predicts 800m", () => {
     const rows = buildSummaryPredictionRows({
       ...distanceParams("1500", DistanceUnit.Meters),
       timeHours: "0",
@@ -130,7 +117,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     expect(rows.map((r) => r.id)).toEqual(["eightHundredMeters"]);
   });
 
-  it("short tier — 3000m goal predicts 800m and 1500m, ascending", () => {
+  it("3000m goal predicts 800m and 1500m", () => {
     const rows = buildSummaryPredictionRows({
       ...distanceParams("3", DistanceUnit.Kilometers),
       timeHours: "0",
@@ -145,7 +132,34 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     ]);
   });
 
-  it("long tier — 10K goal predicts the 5K only", () => {
+  it("custom 4K uses the nearest lower configured event references", () => {
+    const rows = buildSummaryPredictionRows({
+      ...distanceParams("4", DistanceUnit.Kilometers),
+      timeHours: "0",
+      timeMinutes: "18",
+      timeSeconds: "0",
+      timeHundredths: "0",
+      showHundredths: false,
+    });
+    expect(rows.map((r) => r.id)).toEqual([
+      "eightHundredMeters",
+      "fifteenHundredMeters",
+    ]);
+  });
+
+  it("exact 5K uses the 5K references", () => {
+    const rows = buildSummaryPredictionRows({
+      ...distanceParams("5", DistanceUnit.Kilometers),
+      timeHours: "0",
+      timeMinutes: "25",
+      timeSeconds: "0",
+      timeHundredths: "0",
+      showHundredths: false,
+    });
+    expect(rows).toEqual([]);
+  });
+
+  it("10K goal predicts the 5K only", () => {
     const rows = buildSummaryPredictionRows({
       ...distanceParams("10", DistanceUnit.Kilometers),
       timeHours: "0",
@@ -157,9 +171,9 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     expect(rows.map((r) => r.id)).toEqual(["fiveK"]);
   });
 
-  it("long tier — half marathon goal predicts the 5K and 10K", () => {
+  it("half marathon goal predicts the 5K and 10K", () => {
     const rows = buildSummaryPredictionRows({
-      ...distanceParams("13", DistanceUnit.Miles, "1"),
+      ...distanceParams("13", DistanceUnit.Miles, "109"),
       timeHours: "1",
       timeMinutes: "45",
       timeSeconds: "0",
@@ -169,9 +183,9 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     expect(rows.map((r) => r.id)).toEqual(["fiveK", "tenK"]);
   });
 
-  it("long tier — marathon goal predicts 5K, 10K, half marathon (ascending, never itself)", () => {
+  it("marathon goal predicts 5K, 10K, half marathon, never itself", () => {
     const rows = buildSummaryPredictionRows({
-      ...distanceParams("26", DistanceUnit.Miles, "2"),
+      ...distanceParams("26", DistanceUnit.Miles, "218"),
       timeHours: "3",
       timeMinutes: "30",
       timeSeconds: "0",
@@ -182,7 +196,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     expect(rows.some((r) => r.id === "marathon")).toBe(false);
   });
 
-  it("long tier — longer-than-marathon goals include the marathon prediction target", () => {
+  it("longer-than-marathon goals include the marathon prediction target", () => {
     const rows = buildSummaryPredictionRows({
       ...distanceParams("50", DistanceUnit.Kilometers),
       timeHours: "4",
@@ -202,7 +216,7 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
   it("returns nothing when the goal time is empty (predictRaceTime → null → filtered out)", () => {
     expect(
       buildSummaryPredictionRows({
-        ...distanceParams("26", DistanceUnit.Miles, "2"),
+        ...distanceParams("26", DistanceUnit.Miles, "218"),
         ...TIME_EMPTY,
       }),
     ).toEqual([]);
@@ -253,7 +267,17 @@ describe("buildIntervalRows", () => {
     ).toEqual([]);
   });
 
-  it("returns nothing for goals at or under 400m (splits already show 100m/200m landmarks)", () => {
+  it("returns nothing below the first configured event", () => {
+    expect(
+      buildIntervalRows({
+        paceResults: PACE_6_PER_KM,
+        ...distanceParams("50", DistanceUnit.Meters),
+        showHundredths: false,
+      }),
+    ).toEqual([]);
+  });
+
+  it("returns nothing when the resolved event has no interval references", () => {
     expect(
       buildIntervalRows({
         paceResults: PACE_6_PER_KM,
@@ -270,8 +294,7 @@ describe("buildIntervalRows", () => {
     ).toEqual([]);
   });
 
-  it("keeps the sprint references (100m, 200m) for sub-5K goals — they're meaningful at middle-distance pace", () => {
-    // 1km / 1mi are excluded from the ladder (race-distance entries only).
+  it("uses the selected distance's configured interval references", () => {
     const rows = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("1500", DistanceUnit.Meters),
@@ -283,10 +306,12 @@ describe("buildIntervalRows", () => {
       "fourHundredMeters",
       "eightHundredMeters",
     ]);
+  });
 
+  it("custom 4K uses the nearest lower configured event interval references", () => {
     const threeK = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
-      ...distanceParams("3", DistanceUnit.Kilometers),
+      ...distanceParams("4", DistanceUnit.Kilometers),
       showHundredths: false,
     });
     expect(threeK.map((r) => r.id)).toEqual([
@@ -297,7 +322,7 @@ describe("buildIntervalRows", () => {
     ]);
   });
 
-  it("drops the sprint references for endurance goals (≥ 5K) — 400m is the natural floor there", () => {
+  it("exact 5K uses the 5K interval references", () => {
     const fiveK = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("5", DistanceUnit.Kilometers),
@@ -308,14 +333,12 @@ describe("buildIntervalRows", () => {
       "eightHundredMeters",
       "threeThousandMeters",
     ]);
-    expect(fiveK.some((r) => r.id === "oneHundredMeters")).toBe(false);
-    expect(fiveK.some((r) => r.id === "twoHundredMeters")).toBe(false);
   });
 
-  it("lights up the full ladder (minus sprints, 1km, 1mi) for a marathon goal", () => {
+  it("uses the marathon interval references for a marathon goal", () => {
     const rows = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
-      ...distanceParams("26", DistanceUnit.Miles, "2"),
+      ...distanceParams("26", DistanceUnit.Miles, "218"),
       showHundredths: false,
     });
     expect(rows.map((r) => r.id)).toEqual([

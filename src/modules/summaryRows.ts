@@ -4,24 +4,13 @@ import {
   MultiPace,
   Time,
 } from "pace-calculator";
-import { Events, EventTags } from "@/utils/events-data";
+import { Events, type Event } from "@/utils/events-data";
 import { eventDistancesInMeters } from "@/utils/events";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
 import { predictRaceTime } from "@/utils/predictions";
 import { DISTANCE_MATCH_TOLERANCE_METERS } from "@/utils/distances";
 import { msToTime, timeToMs } from "@/utils/time";
 
-// Middle range (3K < goal < 10K) gets no predictions — Riegel across that gap is too lossy to be useful.
-const LONG_TIER_INPUT_METERS = 10_000;
-const LONG_TIER_FLOOR_METERS = 5_000;
-const SHORT_TIER_INPUT_METERS = 3_000;
-const SHORT_TIER_FLOOR_METERS = 800;
-
-const getPredictionFloorMeters = (inputMeters: number): number | null => {
-  if (inputMeters >= LONG_TIER_INPUT_METERS) return LONG_TIER_FLOOR_METERS;
-  if (inputMeters <= SHORT_TIER_INPUT_METERS) return SHORT_TIER_FLOOR_METERS;
-  return null;
-};
 export type SummaryPredictionRow = {
   id: string;
   timeText: string;
@@ -99,6 +88,23 @@ const getInputMeters = (params: {
   }).inMeters.distanceValue;
 };
 
+const getSummaryReferenceEvent = (inputMeters: number): Event | null => {
+  return (
+    Events.map((event) => ({
+      event,
+      meters: eventDistancesInMeters[event.id] ?? 0,
+    }))
+      .filter(
+        (event) =>
+          event.meters <= inputMeters + DISTANCE_MATCH_TOLERANCE_METERS,
+      )
+      .sort((a, b) => b.meters - a.meters)[0]?.event ?? null
+  );
+};
+
+const getReferenceMeters = (id: string): number =>
+  eventDistancesInMeters[id] ?? 0;
+
 export const buildSummaryPredictionRows = ({
   distanceWhole,
   distanceFractional,
@@ -122,20 +128,15 @@ export const buildSummaryPredictionRows = ({
     distanceUnit,
   });
 
-  const floor = getPredictionFloorMeters(inputMeters);
-  if (floor === null) return [];
+  const referenceEvent = getSummaryReferenceEvent(inputMeters);
+  if (!referenceEvent) return [];
 
-  return Events.filter((e) => e.eventTags.includes(EventTags.SummaryPrediction))
+  return referenceEvent.summaryReferences.predictions
     .map((e) => ({
-      id: e.id,
-      meters: eventDistancesInMeters[e.id] ?? 0,
+      id: e,
+      meters: getReferenceMeters(e),
     }))
-    .filter(
-      (e) =>
-        e.meters >= floor &&
-        e.meters < inputMeters - DISTANCE_MATCH_TOLERANCE_METERS,
-    )
-    .sort((a, b) => a.meters - b.meters)
+    .filter((e) => e.meters < inputMeters - DISTANCE_MATCH_TOLERANCE_METERS)
     .map((e): SummaryPredictionRow | null => {
       const prediction = predictRaceTime({
         inputTime,
@@ -175,27 +176,17 @@ export const buildIntervalRows = ({
   });
   if (inputMeters <= 0) return [];
 
-  // Sub-400m goals would just duplicate the splits below.
-  if (inputMeters <= 400) return [];
-
   const msPerMeter = timeToMs(paceResults.perKilometer) / 1000;
 
-  // Sprint references (100m / 200m) carry no useful pacing at endurance distances.
-  const ENDURANCE_GOAL_THRESHOLD_METERS = 5000;
-  const ENDURANCE_INTERVAL_FLOOR_METERS = 400;
-  const isEnduranceGoal = inputMeters >= ENDURANCE_GOAL_THRESHOLD_METERS;
+  const referenceEvent = getSummaryReferenceEvent(inputMeters);
+  if (!referenceEvent) return [];
 
-  return Events.filter((e) => e.eventTags.includes(EventTags.SummaryInterval))
+  return referenceEvent.summaryReferences.intervals
     .map((e) => ({
-      id: e.id,
-      meters: eventDistancesInMeters[e.id] ?? 0,
+      id: e,
+      meters: getReferenceMeters(e),
     }))
-    .filter(
-      (i) =>
-        i.meters < inputMeters - DISTANCE_MATCH_TOLERANCE_METERS &&
-        (!isEnduranceGoal || i.meters >= ENDURANCE_INTERVAL_FLOOR_METERS),
-    )
-    .sort((a, b) => a.meters - b.meters)
+    .filter((i) => i.meters < inputMeters - DISTANCE_MATCH_TOLERANCE_METERS)
     .map((i) => ({
       id: i.id,
       timeText: formatFriendlyTimeExact(

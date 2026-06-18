@@ -9,8 +9,6 @@ export enum EventTags {
   // table. The mile is untagged — selectable as an event but omitted from
   // that list because the per-mile pace row already restates it.
   TimesForPace = "TimesForPace",
-  SummaryInterval = "SummaryInterval",
-  SummaryPrediction = "SummaryPrediction",
 }
 
 export type TimeExample = {
@@ -27,12 +25,18 @@ export type EventGuide = {
   timeExamples: TimeExample[];
 };
 
+export type SummaryReferences = {
+  intervals: string[];
+  predictions: string[];
+};
+
 export type Event = {
   id: string;
   distanceValue: string;
   distanceDecimal: string;
   distanceUnit: DistanceUnit;
   eventTags: EventTags[];
+  summaryReferences: SummaryReferences;
   eventGuide?: EventGuide;
   showHours?: boolean;
   /** Defaults to true. False for sprints (100m, 200m). */
@@ -48,11 +52,11 @@ export type Event = {
 export const Events: Event[] = [
   {
     id: "oneHundredMeters",
-    eventTags: [
-      EventTags.Sprints,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-    ],
+    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [],
+      predictions: [],
+    },
     distanceValue: "100",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -108,11 +112,11 @@ export const Events: Event[] = [
   },
   {
     id: "twoHundredMeters",
-    eventTags: [
-      EventTags.Sprints,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-    ],
+    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [],
+      predictions: [],
+    },
     distanceValue: "200",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -168,11 +172,11 @@ export const Events: Event[] = [
   },
   {
     id: "fourHundredMeters",
-    eventTags: [
-      EventTags.Sprints,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-    ],
+    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [],
+      predictions: [],
+    },
     distanceValue: "400",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -227,12 +231,11 @@ export const Events: Event[] = [
   },
   {
     id: "eightHundredMeters",
-    eventTags: [
-      EventTags.MiddleDistance,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-      EventTags.SummaryPrediction,
-    ],
+    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: ["oneHundredMeters", "twoHundredMeters", "fourHundredMeters"],
+      predictions: [],
+    },
     distanceValue: "800",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -287,11 +290,16 @@ export const Events: Event[] = [
   },
   {
     id: "fifteenHundredMeters",
-    eventTags: [
-      EventTags.MiddleDistance,
-      EventTags.TimesForPace,
-      EventTags.SummaryPrediction,
-    ],
+    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [
+        "oneHundredMeters",
+        "twoHundredMeters",
+        "fourHundredMeters",
+        "eightHundredMeters",
+      ],
+      predictions: ["eightHundredMeters"],
+    },
     distanceValue: "1500",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -356,6 +364,15 @@ export const Events: Event[] = [
   {
     id: "mile",
     eventTags: [EventTags.MiddleDistance],
+    summaryReferences: {
+      intervals: [
+        "oneHundredMeters",
+        "twoHundredMeters",
+        "fourHundredMeters",
+        "eightHundredMeters",
+      ],
+      predictions: ["eightHundredMeters", "fifteenHundredMeters"],
+    },
     distanceValue: "1",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Miles,
@@ -428,11 +445,16 @@ export const Events: Event[] = [
   },
   {
     id: "threeThousandMeters",
-    eventTags: [
-      EventTags.MiddleDistance,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-    ],
+    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [
+        "oneHundredMeters",
+        "twoHundredMeters",
+        "fourHundredMeters",
+        "eightHundredMeters",
+      ],
+      predictions: ["eightHundredMeters", "fifteenHundredMeters"],
+    },
     distanceValue: "3",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -495,12 +517,15 @@ export const Events: Event[] = [
   },
   {
     id: "fiveK",
-    eventTags: [
-      EventTags.Standard,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-      EventTags.SummaryPrediction,
-    ],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [
+        "fourHundredMeters",
+        "eightHundredMeters",
+        "threeThousandMeters",
+      ],
+      predictions: [],
+    },
     distanceValue: "5",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -571,12 +596,16 @@ export const Events: Event[] = [
   },
   {
     id: "tenK",
-    eventTags: [
-      EventTags.Standard,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-      EventTags.SummaryPrediction,
-    ],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [
+        "fourHundredMeters",
+        "eightHundredMeters",
+        "threeThousandMeters",
+        "fiveK",
+      ],
+      predictions: ["fiveK"],
+    },
     distanceValue: "10",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -639,12 +668,17 @@ export const Events: Event[] = [
   },
   {
     id: "halfMarathon",
-    eventTags: [
-      EventTags.Standard,
-      EventTags.TimesForPace,
-      EventTags.SummaryInterval,
-      EventTags.SummaryPrediction,
-    ],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [
+        "fourHundredMeters",
+        "eightHundredMeters",
+        "threeThousandMeters",
+        "fiveK",
+        "tenK",
+      ],
+      predictions: ["fiveK", "tenK"],
+    },
     distanceValue: "13",
     distanceDecimal: "109",
     distanceUnit: DistanceUnit.Miles,
@@ -707,11 +741,18 @@ export const Events: Event[] = [
   },
   {
     id: "marathon",
-    eventTags: [
-      EventTags.Standard,
-      EventTags.TimesForPace,
-      EventTags.SummaryPrediction,
-    ],
+    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    summaryReferences: {
+      intervals: [
+        "fourHundredMeters",
+        "eightHundredMeters",
+        "threeThousandMeters",
+        "fiveK",
+        "tenK",
+        "halfMarathon",
+      ],
+      predictions: ["fiveK", "tenK", "halfMarathon", "marathon"],
+    },
     distanceValue: "26",
     distanceDecimal: "218",
     distanceUnit: DistanceUnit.Miles,
