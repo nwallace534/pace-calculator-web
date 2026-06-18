@@ -1,27 +1,19 @@
-import useCalculatorStore from "@/state/useCalculatorStore";
 import { DistanceUnitShortLabel } from "@/utils/distances";
-import { SplitsResult } from "@/utils/calculator";
-import { SplitsOverrideOptions } from "@/utils/splitsOverride";
 import { formatTime } from "@/utils/formatTime";
 import { useTranslation } from "react-i18next";
 import { DistanceUnit } from "pace-calculator";
 import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
+import { SplitsViewPicker } from "@/components/SplitsViewPicker";
+import { useSplitsOverride } from "@/hooks/useSplitsOverride";
 
-function PaceSplits({ splits }: { splits: SplitsResult | null }) {
+function PaceSplits() {
   const { t } = useTranslation("calculator");
-  const toggleSplitsUnit = useCalculatorStore(
-    (state) => state.toggleSplitsUnit,
-  );
+  const splitsControl = useSplitsOverride();
+  const splits = splitsControl.splits;
 
   if (!splits) return null;
 
   const isMeters = splits.unit === DistanceUnit.Meters;
-
-  const nextOption =
-    splits.unit === DistanceUnit.Kilometers
-      ? SplitsOverrideOptions.miles
-      : SplitsOverrideOptions.K;
-
   const distanceUnitLabel = DistanceUnitShortLabel[splits.unit];
 
   // Whole splits render bare; the tail split (e.g. 10K in miles → 6.21) keeps
@@ -31,17 +23,13 @@ function PaceSplits({ splits }: { splits: SplitsResult | null }) {
 
   return (
     <>
-      {!isMeters && (
-        <div className="d-flex justify-content-end">
-          <button
-            type="button"
-            className="btn btn-link btn-sm p-0 text-muted text-smallish"
-            onClick={toggleSplitsUnit}
-          >
-            {t(nextOption.i18nKey)}
-          </button>
-        </div>
-      )}
+      <div className="d-flex justify-content-end">
+        <SplitsViewPicker
+          selected={splitsControl.selected}
+          options={splitsControl.options}
+          onSelect={splitsControl.onSelect}
+        />
+      </div>
       <table className="align-middle w-100">
         <thead>
           <tr>

@@ -19,6 +19,7 @@ beforeEach(() => {
   window.localStorage?.removeItem("theme");
   window.localStorage?.removeItem("pace-calculator:saved-distances");
   window.localStorage?.removeItem("pace-calculator:saved-durations");
+  window.localStorage?.removeItem("pace-calculator:splits-preferences");
 
   // The Zustand store is a module-level singleton; without a full wipe, panel
   // toggles, per-event time memory, the splits-unit override and Custom
@@ -51,6 +52,7 @@ beforeEach(() => {
     paceHundredths: "",
     savedDistances: [],
     savedDurations: [],
+    splitsPreferences: {},
   });
   // Re-bootstrap the default event so distance/time/calculations repaint —
   // same path the store uses on first load.

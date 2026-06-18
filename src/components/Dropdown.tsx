@@ -29,8 +29,21 @@ export default function Dropdown({
           placement,
           modifiers: [
             { name: "offset", options: { offset } },
-            { name: "preventOverflow", options: { boundary: "viewport" } },
-            { name: "flip", options: { fallbackPlacements: ["top-start"] } },
+            // "viewport" isn't valid in Popper v2 — default clippingParents
+            // is what we want.
+            { name: "preventOverflow", options: { padding: 8 } },
+            // Cover every corner so the menu can flip rather than render off-screen.
+            {
+              name: "flip",
+              options: {
+                fallbackPlacements: [
+                  "bottom-start",
+                  "bottom-end",
+                  "top-start",
+                  "top-end",
+                ],
+              },
+            },
           ],
         },
       );

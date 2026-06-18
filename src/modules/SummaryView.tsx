@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DistanceUnit } from "pace-calculator";
 import useCalculatorStore from "@/state/useCalculatorStore";
 import { buildShareUrl } from "@/utils/shareTarget";
 import { useAutoHideControls } from "@/hooks/useAutoHideControls";
@@ -16,12 +15,6 @@ import { SummaryPaces } from "@/modules/summaryView/SummaryPaces";
 import { SummaryPredictions } from "@/modules/summaryView/SummaryPredictions";
 import { SummaryIntervals } from "@/modules/summaryView/SummaryIntervals";
 import { SummarySplits } from "@/modules/summaryView/SummarySplits";
-
-const SPLITS_HEADING_UNIT_KEY: Record<DistanceUnit, string> = {
-  [DistanceUnit.Miles]: "calculator:unit.miles",
-  [DistanceUnit.Kilometers]: "calculator:unit.kilometersShort",
-  [DistanceUnit.Meters]: "calculator:unit.meters",
-};
 
 function SummaryView() {
   const { t } = useTranslation(["calculator", "events"]);
@@ -102,13 +95,6 @@ function SummaryView() {
     t(`events:event.${event}.label`, { defaultValue: "" });
 
   const splits = splitsControl.splits;
-  const nextAction = splitsControl.nextAction;
-
-  // Heading uses the effective splits unit (override or store), not the store value.
-  // Km abbreviates because "kilometers" would crowd the heading; miles/meters stay long.
-  const splitsHeadingUnit = splits?.unit
-    ? t(SPLITS_HEADING_UNIT_KEY[splits.unit])
-    : "";
 
   return (
     <div
@@ -172,10 +158,10 @@ function SummaryView() {
             <SectionSpacer />
             <SummarySplits
               splits={splits}
-              splitsHeadingUnit={splitsHeadingUnit}
               controlsVisible={controls.visible}
-              nextAction={nextAction}
-              onOverride={splitsControl.setOverride}
+              selected={splitsControl.selected}
+              pickerOptions={splitsControl.options}
+              onSelect={splitsControl.onSelect}
             />
           </>
         )}

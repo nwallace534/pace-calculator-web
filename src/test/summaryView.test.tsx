@@ -98,7 +98,7 @@ describe("Summary view — title editing", () => {
 });
 
 describe("Summary view — per event type", () => {
-  it("track sprint (100m) opens cleanly and hides the splits-override toggle", async () => {
+  it("track sprint (100m) opens cleanly and hides the splits-view picker", async () => {
     render(<App />);
     await selectEvent("oneHundredMeters");
 
@@ -109,13 +109,11 @@ describe("Summary view — per event type", () => {
       .querySelectorAll('[data-testid="summary-split-row"]');
     expect(rows.length).toBeGreaterThanOrEqual(1);
 
-    // Sub-400m has nothing meaningful to toggle to, so the override hides.
-    expect(
-      within(card).queryByTestId("summary-splits-override-toggle"),
-    ).toBeNull();
+    // Sub-400m only has the 100m option enabled, so the picker hides.
+    expect(within(card).queryByTestId("splits-view-picker-toggle")).toBeNull();
   });
 
-  it("middle distance (800m) splits-override flips lap landmarks to 100m intervals", async () => {
+  it("middle distance (800m) picker flips lap landmarks to 100m intervals", async () => {
     render(<App />);
     await selectEvent("eightHundredMeters");
 
@@ -128,10 +126,13 @@ describe("Summary view — per event type", () => {
     ).toHaveLength(2);
 
     await userEvent.click(
-      within(card).getByTestId("summary-splits-override-toggle"),
+      within(card).getByTestId("splits-view-picker-toggle"),
+    );
+    await userEvent.click(
+      within(card).getByTestId("splits-view-option-hundredMeters"),
     );
 
-    // After toggle: 8 × 100m rows.
+    // After switch: 8 × 100m rows.
     await waitFor(() => {
       expect(
         splits().querySelectorAll('[data-testid="summary-split-row"]'),
@@ -139,19 +140,27 @@ describe("Summary view — per event type", () => {
     });
   });
 
-  it("most popular event (5K) splits-override flips km to miles", async () => {
+  it("most popular event (5K) picker flips km to miles", async () => {
     render(<App />);
     // 5K is the default event — no selectEvent call needed.
 
     const card = await openSummary();
-    expect(within(card).getByText(/Splits in km/i)).toBeInTheDocument();
+    // Bold heading shows the selected unit; the "Modify splits" trigger
+    // sits beside it. Assert on the heading by testid (the menu items also
+    // contain the unit-label text).
+    expect(
+      within(card).getByTestId("summary-splits-heading"),
+    ).toHaveTextContent(/Splits in Kilometers/);
 
     await userEvent.click(
-      within(card).getByTestId("summary-splits-override-toggle"),
+      within(card).getByTestId("splits-view-picker-toggle"),
     );
+    await userEvent.click(within(card).getByTestId("splits-view-option-miles"));
 
     await waitFor(() => {
-      expect(within(card).getByText(/Splits in miles/i)).toBeInTheDocument();
+      expect(
+        within(card).getByTestId("summary-splits-heading"),
+      ).toHaveTextContent(/Splits in Miles/);
     });
   });
 });

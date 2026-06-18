@@ -255,11 +255,10 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
         showHundredths,
       });
 
-      // Override variants for the splits-unit toggle (K / miles / 100m); the
-      // card picks one based on its local override state, no recompute needed.
+      // Picker variants share the event's showHundredths so sprint precision survives the switch.
       splitsByKilometers = {
         unit: DistanceUnit.Kilometers,
-        showHundredths: false,
+        showHundredths,
         trackSummary: null,
         rows: calculateSplits({
           time,
@@ -269,7 +268,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
       };
       splitsByMiles = {
         unit: DistanceUnit.Miles,
-        showHundredths: false,
+        showHundredths,
         trackSummary: null,
         rows: calculateSplits({
           time,
@@ -279,7 +278,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
       };
       splitsBy100m = {
         unit: DistanceUnit.Meters,
-        showHundredths: false,
+        showHundredths,
         trackSummary: null,
         rows: calculateSplits({
           time,

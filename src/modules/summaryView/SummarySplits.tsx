@@ -4,48 +4,58 @@ import type { SplitsResult } from "@/utils/calculator";
 import { formatTime } from "@/utils/formatTime";
 import { formatSplitLabel } from "@/modules/summaryFormat";
 import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
-import type { NextSplitsAction } from "@/hooks/useSplitsOverride";
+import { SplitsViewPicker } from "@/components/SplitsViewPicker";
 import type { SplitsOverrideOption } from "@/utils/splitsOverride";
+import type { SplitsViewOption } from "@/hooks/useSplitsOverride";
 import PencilIcon from "@/assets/icons/pencil.svg?react";
 
 export function SummarySplits({
   splits,
-  splitsHeadingUnit,
   controlsVisible,
-  nextAction,
-  onOverride,
+  selected,
+  pickerOptions,
+  onSelect,
 }: {
   splits: SplitsResult;
-  splitsHeadingUnit: string;
   controlsVisible: boolean;
-  nextAction: NextSplitsAction;
-  onOverride: (option: SplitsOverrideOption) => void;
+  selected: SplitsOverrideOption;
+  pickerOptions: SplitsViewOption[];
+  onSelect: (option: SplitsOverrideOption) => void;
 }) {
   const { t } = useTranslation("calculator");
 
+  const enabledOptionCount = pickerOptions.filter((o) => o.enabled).length;
+  const showModify = controlsVisible && enabledOptionCount > 1;
+
   return (
     <>
-      {/* minHeight reserves space for the toggle so showing/hiding it doesn't reflow the grid. */}
+      {/* minHeight reserves space so the modify link showing/hiding doesn't reflow. */}
       <div
         className="d-flex align-items-center mb-1 gap-3"
         style={{ minHeight: "1.75rem" }}
       >
-        <div className="summary-section-title">
-          {t("summary.splitsHeading", { unit: splitsHeadingUnit })}
+        <div
+          className="summary-section-title"
+          data-testid="summary-splits-heading"
+        >
+          {t(selected.i18nKey)}
         </div>
-        {controlsVisible && nextAction !== null && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOverride(nextAction);
-            }}
-            className="btn btn-link btn-sm p-0 text-muted text-smallish d-inline-flex align-items-center gap-1"
-            data-testid="summary-splits-override-toggle"
+        {showModify && (
+          <SplitsViewPicker
+            selected={selected}
+            options={pickerOptions}
+            onSelect={onSelect}
+            placement="bottom-start"
           >
-            <span>{t(nextAction.i18nKey)}</span>
-            <PencilIcon width={14} height={14} />
-          </button>
+            <button
+              type="button"
+              className="btn btn-link btn-sm p-0 text-muted text-smallish d-inline-flex align-items-center gap-1"
+              data-testid="splits-view-picker-toggle"
+            >
+              <span>{t("summary.modifySplits")}</span>
+              <PencilIcon width={14} height={14} />
+            </button>
+          </SplitsViewPicker>
         )}
       </div>
       <div

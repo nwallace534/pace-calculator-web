@@ -18,7 +18,6 @@ function PaceResult() {
   const { t } = useTranslation("calculator");
   const paceResults = useCalculatorStore((state) => state.paceResults);
   const timesForPace = useCalculatorStore((state) => state.timesForPace);
-  const splits = useCalculatorStore((state) => state.splits);
   const showSplits = useCalculatorStore((state) => state.showSplits);
   const setShowSplits = useCalculatorStore((state) => state.setShowSplits);
   const showTimesForPace = useCalculatorStore(
@@ -49,7 +48,7 @@ function PaceResult() {
         isExpanded={showSplits}
         handleToggle={setShowSplits}
       >
-        <PaceSplits splits={splits} />
+        <PaceSplits />
       </ExpandableCard>
 
       <HowFarIn paceResults={paceResults} />

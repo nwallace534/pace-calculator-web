@@ -44,10 +44,20 @@
       "timesForPace": "Times & predictions",
       "howFarIn": "Distance covered",
       "splits": "Splits",
-      "splitsInK": "Show in K",
-      "splitsInMiles": "Show in miles",
-      "splitsInHundredMeters": "Show in 100m",
-      "splitsInLaps": "Show in laps",
+      "splitsView": {
+        "laps": "Splits in Laps",
+        "hundredMeters": "Splits in 100m",
+        "K": "Splits in Kilometers",
+        "miles": "Splits in Miles"
+      },
+      "splitsDisabled": {
+        "lapsSprint": "Laps aren't meaningful for sprints",
+        "lapsLong": "Laps unavailable for distances over 5K",
+        "lapsRoad": "Laps only apply to track-style events",
+        "hundredMeters": "100m splits unavailable for distances over 800m",
+        "K": "K splits unavailable for distances under 1K",
+        "miles": "Mile splits unavailable for distances under 1 mile"
+      },
       "trackSummary": "First {{opening}}m in {{openingTime}} · {{lap}}m laps in {{lapTime}}",
       "trackSummaryLapsOnly": "{{lap}}m laps in {{lapTime}}",
       "eventGuideTitle": "Popular goals",
@@ -67,7 +77,7 @@
       "saveTitle": "Save title",
       "predictionsHeading": "Predicted race times",
       "intervalsHeading": "Times at goal pace",
-      "splitsHeading": "Splits in {{unit}}"
+      "modifySplits": "Modify splits"
     },
     "timesForPace": {
       "columnPrediction": "Prediction",
@@ -126,7 +136,6 @@
       "mph": "mph",
       "kilometersShort": "km",
       "kilometersShortRunning": "K",
-      "miles": "miles",
       "mileSingular": "mile",
       "milesShort": "mi",
       "meters": "meters",
