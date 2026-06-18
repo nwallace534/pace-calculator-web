@@ -329,6 +329,7 @@
       },
       "halfMarathon": {
         "label": "Half Marathon",
+        "shortLabel": "1/2 Mar",
         "guide": {
           "description": "<strong>13.1 miles</strong> — a popular endurance challenge in its own right. <strong>Under 2 hours</strong> is a common goal while the world's best approach <strong>1 hour</strong>."
         },

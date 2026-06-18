@@ -1,11 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { type SummaryPredictionRow } from "@/modules/summaryRows";
 
-// "Half Marathon" is too wide for this column; the adjacent time disambiguates "1/2 Mar".
-const SHORT_EVENT_LABELS: Record<string, string> = {
-  halfMarathon: "1/2 Mar",
-};
-
 export function SummaryPredictions({ rows }: { rows: SummaryPredictionRow[] }) {
   const { t } = useTranslation(["calculator", "events"]);
 
@@ -25,7 +20,9 @@ export function SummaryPredictions({ rows }: { rows: SummaryPredictionRow[] }) {
             className="summary-list-row"
           >
             <span className="summary-list-label">
-              {SHORT_EVENT_LABELS[row.id] ?? t(`events:event.${row.id}.label`)}
+              {t(`events:event.${row.id}.shortLabel`, {
+                defaultValue: t(`events:event.${row.id}.label`),
+              })}
             </span>
             <span className="summary-section-value">{row.timeText}</span>
           </div>

@@ -9,6 +9,8 @@ export enum EventTags {
   // table. The mile is untagged — selectable as an event but omitted from
   // that list because the per-mile pace row already restates it.
   TimesForPace = "TimesForPace",
+  SummaryInterval = "SummaryInterval",
+  SummaryPrediction = "SummaryPrediction",
 }
 
 export type TimeExample = {
@@ -46,7 +48,11 @@ export type Event = {
 export const Events: Event[] = [
   {
     id: "oneHundredMeters",
-    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.Sprints,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+    ],
     distanceValue: "100",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -102,7 +108,11 @@ export const Events: Event[] = [
   },
   {
     id: "twoHundredMeters",
-    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.Sprints,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+    ],
     distanceValue: "200",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -158,7 +168,11 @@ export const Events: Event[] = [
   },
   {
     id: "fourHundredMeters",
-    eventTags: [EventTags.Sprints, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.Sprints,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+    ],
     distanceValue: "400",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -213,7 +227,12 @@ export const Events: Event[] = [
   },
   {
     id: "eightHundredMeters",
-    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.MiddleDistance,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+      EventTags.SummaryPrediction,
+    ],
     distanceValue: "800",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -268,7 +287,11 @@ export const Events: Event[] = [
   },
   {
     id: "fifteenHundredMeters",
-    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.MiddleDistance,
+      EventTags.TimesForPace,
+      EventTags.SummaryPrediction,
+    ],
     distanceValue: "1500",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Meters,
@@ -405,7 +428,11 @@ export const Events: Event[] = [
   },
   {
     id: "threeThousandMeters",
-    eventTags: [EventTags.MiddleDistance, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.MiddleDistance,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+    ],
     distanceValue: "3",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -468,7 +495,12 @@ export const Events: Event[] = [
   },
   {
     id: "fiveK",
-    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.Standard,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+      EventTags.SummaryPrediction,
+    ],
     distanceValue: "5",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -539,7 +571,12 @@ export const Events: Event[] = [
   },
   {
     id: "tenK",
-    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.Standard,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+      EventTags.SummaryPrediction,
+    ],
     distanceValue: "10",
     distanceDecimal: "0",
     distanceUnit: DistanceUnit.Kilometers,
@@ -602,7 +639,12 @@ export const Events: Event[] = [
   },
   {
     id: "halfMarathon",
-    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.Standard,
+      EventTags.TimesForPace,
+      EventTags.SummaryInterval,
+      EventTags.SummaryPrediction,
+    ],
     distanceValue: "13",
     distanceDecimal: "109",
     distanceUnit: DistanceUnit.Miles,
@@ -665,7 +707,11 @@ export const Events: Event[] = [
   },
   {
     id: "marathon",
-    eventTags: [EventTags.Standard, EventTags.TimesForPace],
+    eventTags: [
+      EventTags.Standard,
+      EventTags.TimesForPace,
+      EventTags.SummaryPrediction,
+    ],
     distanceValue: "26",
     distanceDecimal: "218",
     distanceUnit: DistanceUnit.Miles,

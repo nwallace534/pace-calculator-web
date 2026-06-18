@@ -182,6 +182,23 @@ describe("buildSummaryPredictionRows — tier matrix", () => {
     expect(rows.some((r) => r.id === "marathon")).toBe(false);
   });
 
+  it("long tier — longer-than-marathon goals include the marathon prediction target", () => {
+    const rows = buildSummaryPredictionRows({
+      ...distanceParams("50", DistanceUnit.Kilometers),
+      timeHours: "4",
+      timeMinutes: "30",
+      timeSeconds: "0",
+      timeHundredths: "0",
+      showHundredths: false,
+    });
+    expect(rows.map((r) => r.id)).toEqual([
+      "fiveK",
+      "tenK",
+      "halfMarathon",
+      "marathon",
+    ]);
+  });
+
   it("returns nothing when the goal time is empty (predictRaceTime → null → filtered out)", () => {
     expect(
       buildSummaryPredictionRows({
@@ -260,18 +277,23 @@ describe("buildIntervalRows", () => {
       ...distanceParams("1500", DistanceUnit.Meters),
       showHundredths: false,
     });
-    expect(rows.map((r) => r.label)).toEqual(["100m", "200m", "400m", "800m"]);
+    expect(rows.map((r) => r.id)).toEqual([
+      "oneHundredMeters",
+      "twoHundredMeters",
+      "fourHundredMeters",
+      "eightHundredMeters",
+    ]);
 
     const threeK = buildIntervalRows({
       paceResults: PACE_6_PER_KM,
       ...distanceParams("3", DistanceUnit.Kilometers),
       showHundredths: false,
     });
-    expect(threeK.map((r) => r.label)).toEqual([
-      "100m",
-      "200m",
-      "400m",
-      "800m",
+    expect(threeK.map((r) => r.id)).toEqual([
+      "oneHundredMeters",
+      "twoHundredMeters",
+      "fourHundredMeters",
+      "eightHundredMeters",
     ]);
   });
 
@@ -281,9 +303,13 @@ describe("buildIntervalRows", () => {
       ...distanceParams("5", DistanceUnit.Kilometers),
       showHundredths: false,
     });
-    expect(fiveK.map((r) => r.label)).toEqual(["400m", "800m", "3000m"]);
-    expect(fiveK.some((r) => r.label === "100m")).toBe(false);
-    expect(fiveK.some((r) => r.label === "200m")).toBe(false);
+    expect(fiveK.map((r) => r.id)).toEqual([
+      "fourHundredMeters",
+      "eightHundredMeters",
+      "threeThousandMeters",
+    ]);
+    expect(fiveK.some((r) => r.id === "oneHundredMeters")).toBe(false);
+    expect(fiveK.some((r) => r.id === "twoHundredMeters")).toBe(false);
   });
 
   it("lights up the full ladder (minus sprints, 1km, 1mi) for a marathon goal", () => {
@@ -292,13 +318,13 @@ describe("buildIntervalRows", () => {
       ...distanceParams("26", DistanceUnit.Miles, "2"),
       showHundredths: false,
     });
-    expect(rows.map((r) => r.label)).toEqual([
-      "400m",
-      "800m",
-      "3000m",
-      "5K",
-      "10K",
-      "1/2 Mar",
+    expect(rows.map((r) => r.id)).toEqual([
+      "fourHundredMeters",
+      "eightHundredMeters",
+      "threeThousandMeters",
+      "fiveK",
+      "tenK",
+      "halfMarathon",
     ]);
   });
 
@@ -309,10 +335,10 @@ describe("buildIntervalRows", () => {
       ...distanceParams("5", DistanceUnit.Kilometers),
       showHundredths: false,
     });
-    const fourHundred = rows.find((r) => r.label === "400m")!;
+    const fourHundred = rows.find((r) => r.id === "fourHundredMeters")!;
     expect(fourHundred.timeText).toBe("2m 24s");
     // 3000m × 360 = 1,080,000 ms = 18:00.
-    const threeK = rows.find((r) => r.label === "3000m")!;
+    const threeK = rows.find((r) => r.id === "threeThousandMeters")!;
     expect(threeK.timeText).toBe("18m 00s");
   });
 });

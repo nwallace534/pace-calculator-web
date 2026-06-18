@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { type IntervalRow } from "@/modules/summaryRows";
 
 export function SummaryIntervals({ rows }: { rows: IntervalRow[] }) {
-  const { t } = useTranslation("calculator");
+  const { t } = useTranslation(["calculator", "events"]);
 
   return (
     <>
@@ -12,12 +12,15 @@ export function SummaryIntervals({ rows }: { rows: IntervalRow[] }) {
       <div className="summary-list" data-testid="summary-intervals">
         {rows.map((row) => (
           <div
-            key={row.label}
+            key={row.id}
             data-testid="summary-interval-row"
             className="summary-list-row"
           >
-            {/* Fixed label box so times align; sized for the widest label ("3000m" / "1/2 Mar"). */}
-            <span className="summary-list-label">{row.label}</span>
+            <span className="summary-list-label">
+              {t(`events:event.${row.id}.shortLabel`, {
+                defaultValue: t(`events:event.${row.id}.label`),
+              })}
+            </span>
             <span className="summary-section-value">{row.timeText}</span>
           </div>
         ))}
