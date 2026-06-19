@@ -8,3 +8,14 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* Project accent (teal light / lime dark), matching .btn-accent. */
+.custom-dropdown .dropdown-item.active {
+  background-color: var(--accent);
+  color: var(--accent-fg);
+}
+
+/* Stronger fade so disabled options visibly recede vs enabled. */
+.custom-dropdown .dropdown-item.disabled {
+  opacity: 0.5;
+}

@@ -24,6 +24,15 @@ import {
   CalculatorInputSubset,
   DistanceInputSubset,
 } from "@/types/calculatorInput";
+import {
+  buildDistanceLine,
+  buildIntervalRows,
+  buildSummaryPredictionRows,
+  formatFriendlyTimeExact,
+  getCustomDistanceLabel,
+  type IntervalRow,
+  type SummaryPredictionRow,
+} from "@/modules/summaryView/summaryData";
 
 export enum ComputeMode {
   Distance = "Distance",
@@ -31,15 +40,14 @@ export enum ComputeMode {
   Pace = "Pace",
 }
 
-// Everything the splits view needs, pre-resolved so the component can render
-// without re-deriving event/unit/precision rules.
 export type SplitsResult = {
   unit: DistanceUnit;
   showHundredths: boolean;
   rows: CalculateSplitsOutput;
   trackSummary: {
-    opening: number;
-    openingTime: Time;
+    /** Null for pure-laps (e.g. the mile); the renderer drops the "First Xm in Y · " prefix. */
+    opening: number | null;
+    openingTime: Time | null;
     lap: number;
     lapTime: Time;
   } | null;
@@ -49,6 +57,15 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
   let paceResults: MultiPace | null = null;
   let splits: SplitsResult | null = null;
   let timesForPace: Record<string, Time> | null = null;
+  let friendlyGoalTime: string | null = null;
+  let distanceLine: string | null = null;
+  let customDistanceLabel: string | null = null;
+  let predictionRows: SummaryPredictionRow[] = [];
+  let intervalRows: IntervalRow[] = [];
+  let splitsByKilometers: SplitsResult | null = null;
+  let splitsByMiles: SplitsResult | null = null;
+  let splitsBy100m: SplitsResult | null = null;
+  let totalDistanceMeters: number | null = null;
 
   if (state.computeMode === ComputeMode.Pace) {
     const {
@@ -81,19 +98,20 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
         time,
       });
 
-      if (state.showSplits) {
-        const distanceInAllUnits = getDistanceInAllUnits(distance);
-        const totalMeters = distanceInAllUnits.inMeters.distanceValue;
+      const distanceInAllUnits = getDistanceInAllUnits(distance);
+      const totalMeters = distanceInAllUnits.inMeters.distanceValue;
+      totalDistanceMeters = totalMeters;
+
+      {
         const trackLandmarks = getEventLandmarks(state.event, totalMeters);
 
-        const splitsUnit = trackLandmarks
+        const primarySplitUnit = trackLandmarks
           ? DistanceUnit.Meters
-          : (state.splitsUnit ?? distanceUnit);
+          : distanceUnit;
 
         let rows: CalculateSplitsOutput;
         if (trackLandmarks) {
-          // Library only handles uniform intervals — scale each materialised
-          // landmark by proportion of the total instead.
+          // pace-calculator only handles uniform intervals, so scale each landmark by proportion of the total.
           const totalMs = timeToMs(time);
           rows = trackLandmarks.map((landmark, i) => ({
             splitNumber: i + 1,
@@ -101,11 +119,9 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
             time: msToTime((totalMs * landmark) / totalMeters),
           }));
         } else {
-          // Road branch: splitsUnit is always Km or Miles here. Custom (road)
-          // forbids Meters in its distance dropdown, and every meter-distance
-          // event routes through trackLandmarks above.
+          // primarySplitUnit is Km or Miles here — meter events route through trackLandmarks above.
           const splitsDistance =
-            splitsUnit === DistanceUnit.Miles
+            primarySplitUnit === DistanceUnit.Miles
               ? distanceInAllUnits.inMiles
               : distanceInAllUnits.inKilometers;
 
@@ -118,30 +134,42 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
 
         const showHundredths = getVisibleTimeFields(state.event).showHundredths;
 
-        // Surface "first X in Y, then Z-meter laps in W" when there's a
-        // non-uniform opener (first landmark shorter than subsequent ones).
-        // Uniform-lap events (800m, sprints) leave trackSummary null.
+        // Three shapes: opener + laps (1500m), laps-only with trailing partial (mile), or null (clean uniform / sub-400m).
         const trackSummary =
-          trackLandmarks && rows.length >= 2
+          trackLandmarks && rows.length >= 2 && totalMeters >= 400
             ? (() => {
                 const opening = trackLandmarks[0];
                 const lap = trackLandmarks[1] - trackLandmarks[0];
-                if (opening === lap) return null;
+                const lastGap =
+                  trackLandmarks[trackLandmarks.length - 1] -
+                  trackLandmarks[trackLandmarks.length - 2];
+                const hasOpener = opening !== lap;
+                const hasTrailing = lastGap !== lap;
+                if (!hasOpener && !hasTrailing) return null;
+                const lapTime = msToTime(
+                  timeToMs(rows[1].time) - timeToMs(rows[0].time),
+                );
+                if (!hasOpener) {
+                  return {
+                    opening: null,
+                    openingTime: null,
+                    lap,
+                    lapTime,
+                  };
+                }
                 return {
                   opening,
                   openingTime: rows[0].time,
                   lap,
-                  lapTime: msToTime(
-                    timeToMs(rows[1].time) - timeToMs(rows[0].time),
-                  ),
+                  lapTime,
                 };
               })()
             : null;
 
-        splits = { unit: splitsUnit, showHundredths, rows, trackSummary };
+        splits = { unit: primarySplitUnit, showHundredths, rows, trackSummary };
       }
 
-      if (state.showTimesForPace) {
+      {
         const kPace = {
           minutes: paceResults.perKilometer.minutes,
           seconds: paceResults.perKilometer.seconds,
@@ -193,6 +221,69 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
           ),
         );
       }
+
+      const showHundredths = getVisibleTimeFields(state.event).showHundredths;
+      friendlyGoalTime = formatFriendlyTimeExact(time, showHundredths);
+      distanceLine = buildDistanceLine({
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+      });
+      customDistanceLabel = getCustomDistanceLabel({
+        event: state.event,
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+      });
+      predictionRows = buildSummaryPredictionRows({
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+        timeHours: state.timeHours,
+        timeMinutes: state.timeMinutes,
+        timeSeconds: state.timeSeconds,
+        timeHundredths: state.timeHundredths,
+        showHundredths,
+      });
+      intervalRows = buildIntervalRows({
+        paceResults,
+        distanceWhole: state.distanceWhole,
+        distanceFractional: state.distanceFractional,
+        distanceUnit: state.distanceUnit,
+        showHundredths,
+      });
+
+      // Picker variants share the event's showHundredths so sprint precision survives the switch.
+      splitsByKilometers = {
+        unit: DistanceUnit.Kilometers,
+        showHundredths,
+        trackSummary: null,
+        rows: calculateSplits({
+          time,
+          distance: distanceInAllUnits.inKilometers,
+          splitInterval: 1,
+        }),
+      };
+      splitsByMiles = {
+        unit: DistanceUnit.Miles,
+        showHundredths,
+        trackSummary: null,
+        rows: calculateSplits({
+          time,
+          distance: distanceInAllUnits.inMiles,
+          splitInterval: 1,
+        }),
+      };
+      splitsBy100m = {
+        unit: DistanceUnit.Meters,
+        showHundredths,
+        trackSummary: null,
+        rows: calculateSplits({
+          time,
+          distance: distanceInAllUnits.inMeters,
+          splitInterval: 100,
+        }),
+      };
     }
   }
 
@@ -200,6 +291,15 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
     paceResults,
     timesForPace,
     splits,
+    friendlyGoalTime,
+    distanceLine,
+    customDistanceLabel,
+    predictionRows,
+    intervalRows,
+    splitsByKilometers,
+    splitsByMiles,
+    splitsBy100m,
+    totalDistanceMeters,
   };
 };
 

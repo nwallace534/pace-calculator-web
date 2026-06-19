@@ -10,6 +10,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest",
+    "screenshot:cards": "node scripts/screenshot-cards.mjs",
     "reload": "npm install --force",
     "prepare": "husky"
   },

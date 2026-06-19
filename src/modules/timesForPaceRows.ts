@@ -1,10 +1,9 @@
 import { DistanceUnit, getDistanceInAllUnits, Time } from "pace-calculator";
-import { DistanceMode } from "@/types/distance";
+import { isCustomEvent } from "@/types/distance";
 import { SavedDistance } from "@/state/savedDistancesSlice";
 import {
   DISTANCE_MATCH_TOLERANCE_METERS,
-  DistanceUnitShortLabel,
-  formatDistanceValue,
+  formatDistanceWithShortUnit,
 } from "@/utils/distances";
 import {
   eventDistancesInMeters,
@@ -42,7 +41,7 @@ const getSavedDistanceLabel = (
 ): string | null => {
   const saved = savedDistances.find((s) => `saved:${s.id}` === id);
   if (!saved) return null;
-  return `${formatDistanceValue(saved.distanceValue)}${DistanceUnitShortLabel[saved.distanceUnit]}`;
+  return formatDistanceWithShortUnit(saved.distanceValue, saved.distanceUnit);
 };
 
 const getMatchedSavedId = (
@@ -94,10 +93,7 @@ export const buildTimesForPaceRows = ({
   let customMeters = 0;
   let highlightId: string = event;
 
-  const isCustomMode =
-    event === DistanceMode.Custom || event === DistanceMode.CustomTrack;
-
-  if (isCustomMode) {
+  if (isCustomEvent(event)) {
     const matchedEventId = Object.entries(eventDistancesInMeters).find(
       ([, meters]) =>
         Math.abs(meters - inputMeters) < DISTANCE_MATCH_TOLERANCE_METERS,
@@ -115,7 +111,7 @@ export const buildTimesForPaceRows = ({
       customMeters = inputMeters;
       customRow = {
         id: event,
-        label: `${formatDistanceValue(inputDistanceValue)}${DistanceUnitShortLabel[distanceUnit]}`,
+        label: formatDistanceWithShortUnit(inputDistanceValue, distanceUnit),
         time: inputTime,
         prediction: predictRaceTime({
           inputTime,

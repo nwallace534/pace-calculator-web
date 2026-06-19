@@ -10,16 +10,10 @@
     "pacerlyClassic": "Visit Pacerly Classic"
   },
   "calculator": {
-    "distanceApproximation": "{{from}} is approximately {{to}}",
+    "distanceApproximation": "{{from}} = {{to}}",
     "share": {
-      "button": "Share",
-      "popoverTitle": "Share this pace",
-      "popoverText": "Shareable link to this pace",
-      "urlLabel": "Share URL",
-      "copyLink": "Copy",
-      "copied": "Copied — ready to paste",
-      "copyFailed": "Copy failed",
-      "close": "Close"
+      "toastCopied": "Link copied",
+      "copyFailed": "Couldn't copy link"
     },
     "runDuration": "Run duration",
     "holdHint": "Tip: press and hold to change faster",
@@ -50,11 +44,40 @@
       "timesForPace": "Times & predictions",
       "howFarIn": "Distance covered",
       "splits": "Splits",
-      "splitsInUnit": "Show in {{unit}}",
+      "splitsView": {
+        "laps": "Splits in Laps",
+        "hundredMeters": "Splits in 100m",
+        "K": "Splits in Kilometers",
+        "miles": "Splits in Miles"
+      },
+      "splitsDisabled": {
+        "lapsSprint": "Laps aren't meaningful for sprints",
+        "lapsLong": "Laps unavailable for distances over 5K",
+        "lapsRoad": "Laps only apply to track-style events",
+        "hundredMeters": "100m splits unavailable for distances over 800m",
+        "K": "K splits unavailable for distances under 1K",
+        "miles": "Mile splits unavailable for distances under 1 mile"
+      },
       "trackSummary": "First {{opening}}m in {{openingTime}} · {{lap}}m laps in {{lapTime}}",
-      "eventGuideTitle": "{{event}} goals",
+      "trackSummaryLapsOnly": "{{lap}}m laps in {{lapTime}}",
+      "eventGuideTitle": "Popular goals",
       "columnDistance": "Distance",
-      "columnTime": "Time"
+      "columnTime": "Time",
+      "summary": {
+        "openButton": "Open card"
+      }
+    },
+    "summary": {
+      "close": "Close",
+      "copyLink": "Copy link",
+      "screenshotModeToast": "Screenshot mode",
+      "fromShareHint": "Close the card to use the calculator with this goal.",
+      "goalHeading": "Goal Summary",
+      "editTitle": "Edit title",
+      "saveTitle": "Save title",
+      "predictionsHeading": "Predicted race times",
+      "intervalsHeading": "Times at goal pace",
+      "modifySplits": "Modify splits"
     },
     "timesForPace": {
       "columnPrediction": "Prediction",
@@ -115,6 +138,7 @@
       "kilometersShortRunning": "K",
       "mileSingular": "mile",
       "milesShort": "mi",
+      "meters": "meters",
       "metersShort": "m"
     }
   },
@@ -305,6 +329,7 @@
       },
       "halfMarathon": {
         "label": "Half Marathon",
+        "shortLabel": "1/2 Mar",
         "guide": {
           "description": "<strong>13.1 miles</strong> — a popular endurance challenge in its own right. <strong>Under 2 hours</strong> is a common goal while the world's best approach <strong>1 hour</strong>."
         },

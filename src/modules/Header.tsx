@@ -6,15 +6,23 @@ function Header() {
   const { t } = useTranslation("theme");
   const toggleTheme = useCalculatorStore((state) => state.toggleTheme);
   const theme = useCalculatorStore((state) => state.theme);
-  const logoSrc =
-    theme === "dark"
-      ? "/pacerly-full-logo-dark.svg"
-      : "/pacerly-full-logo-light.svg";
+  const logoSrc = "/pacerly-logo.svg";
 
   return (
     <nav className="navbar fixed-top border-bottom bg-body-tertiary py-1 small text-boldish d-flex justify-content-between align-items-center px-3">
-      <div>
-        <img src={logoSrc} width="126" height="24" alt={t("logoAlt")} />
+      <div className="d-flex align-items-center gap-2">
+        <img src={logoSrc} width="28" height="28" alt={t("logoAlt")} />
+        <span
+          style={{
+            fontFamily: "'Noto Sans', sans-serif",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            fontSize: "1.05rem",
+            lineHeight: 1,
+          }}
+        >
+          PACERLY
+        </span>
       </div>
 
       <div className="d-flex align-items-center">

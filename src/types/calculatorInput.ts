@@ -13,7 +13,6 @@ export interface CalculatorInputSubset {
   showSplits: boolean;
   showTimesForPace: boolean;
   computeMode: ComputeMode;
-  splitsUnit: DistanceUnit | null;
   event: string;
   savedDistances: SavedDistance[];
 }

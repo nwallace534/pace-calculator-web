@@ -1,6 +1,7 @@
 import { DistanceUnit } from "pace-calculator";
 import { CalculatorStore } from "@/state/useCalculatorStore";
-import { DistanceMode } from "@/types/distance";
+import { CalculatorInputSubset } from "@/types/calculatorInput";
+import { isCustomEvent } from "@/types/distance";
 import { sanitizeDistanceField, sanitizeTime } from "@/utils/input";
 
 export type SharedTarget = {
@@ -12,12 +13,13 @@ export type SharedTarget = {
   distanceWhole?: string;
   distanceFractional?: string;
   distanceUnit?: DistanceUnit;
+  /** Auto-opens the summary view after the link loads. */
+  view?: "summary";
+  /** Triggers the from-share orientation hint on the card. */
+  fromShare?: boolean;
 };
 
 const VALID_DISTANCE_UNITS = new Set<string>(Object.values(DistanceUnit));
-
-const isCustomEvent = (event: string): boolean =>
-  event === DistanceMode.Custom || event === DistanceMode.CustomTrack;
 
 const hasTimeParam = (params: URLSearchParams): boolean =>
   ["h", "m", "s", "cs"].some((key) => params.has(key));
@@ -48,6 +50,9 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
   const event = params.get("event");
   if (!event || !hasTimeParam(params)) return null;
 
+  const view = params.get("view") === "summary" ? "summary" : undefined;
+  const fromShare = params.get("from") === "share";
+
   const target: SharedTarget = {
     event,
     ...sanitizeTime({
@@ -56,6 +61,8 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
       timeSeconds: getParam(params, "s"),
       timeHundredths: getParam(params, "cs"),
     }),
+    view,
+    fromShare,
   };
 
   if (!isCustomEvent(event)) return target;
@@ -77,9 +84,16 @@ export const parseSharedTarget = (search: string): SharedTarget | null => {
   };
 };
 
+type ShareUrlOptions = {
+  view?: "summary";
+  /** Stamps `from=share` so the recipient gets the orientation hint. */
+  fromShare?: boolean;
+};
+
 export const buildShareUrl = (
-  state: CalculatorStore,
+  state: CalculatorInputSubset,
   location: Location,
+  options: ShareUrlOptions = {},
 ): string => {
   const params = new URLSearchParams();
   params.set("event", state.event);
@@ -93,6 +107,9 @@ export const buildShareUrl = (
     params.set("df", state.distanceFractional || "0");
     params.set("unit", state.distanceUnit);
   }
+
+  if (options.view) params.set("view", options.view);
+  if (options.fromShare) params.set("from", "share");
 
   return `${location.origin}${location.pathname}?${params.toString()}`;
 };
@@ -119,4 +136,9 @@ export const applySharedTarget = (
     target.timeSeconds,
     target.timeHundredths,
   );
+
+  if (target.view === "summary") {
+    if (target.fromShare) store.openSummaryViewFromShare();
+    else store.openSummaryView();
+  }
 };

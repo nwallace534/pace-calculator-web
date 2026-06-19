@@ -1,5 +1,19 @@
 import { Time } from "pace-calculator";
 
+import { timeToMs } from "./time";
+
+// Under 90s reads clearer as "78 seconds" than as MM:SS.
+export const formatNaturalDuration = (
+  time: Time,
+  secondsLabel: string,
+): string => {
+  const totalSeconds = Math.floor(timeToMs(time) / 1000);
+  if (totalSeconds < 90) {
+    return `${totalSeconds} ${secondsLabel}`;
+  }
+  return formatTime({ time });
+};
+
 export function formatTime({
   time,
   alwaysShowHours = false,

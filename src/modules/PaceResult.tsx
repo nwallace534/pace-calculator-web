@@ -3,9 +3,10 @@ import useCalculatorStore from "@/state/useCalculatorStore";
 import TimesForPace from "@/modules/TimesForPace";
 import PaceSplits from "@/modules/PaceSplits";
 import HowFarIn from "@/modules/HowFarIn";
-import ShareTargetButton from "@/modules/ShareTargetButton";
+import SummaryCardButton from "@/modules/SummaryCardButton";
 import {
-  formatDistanceValue,
+  formatDistanceValueTwoDp,
+  getDistanceUnitLabel,
   getDistanceUnitSingular,
 } from "@/utils/distances";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
@@ -17,7 +18,6 @@ function PaceResult() {
   const { t } = useTranslation("calculator");
   const paceResults = useCalculatorStore((state) => state.paceResults);
   const timesForPace = useCalculatorStore((state) => state.timesForPace);
-  const splits = useCalculatorStore((state) => state.splits);
   const showSplits = useCalculatorStore((state) => state.showSplits);
   const setShowSplits = useCalculatorStore((state) => state.setShowSplits);
   const showTimesForPace = useCalculatorStore(
@@ -48,7 +48,7 @@ function PaceResult() {
         isExpanded={showSplits}
         handleToggle={setShowSplits}
       >
-        <PaceSplits splits={splits} />
+        <PaceSplits />
       </ExpandableCard>
 
       <HowFarIn paceResults={paceResults} />
@@ -66,20 +66,19 @@ function PaceSummary({ results }: { results: MultiPace }) {
 
   const allDistances = useCalculatorStore((state) => state.allDistances);
 
-  const displayText = (() => {
+  // Both sides at 2dp so the conversion can't silently lose accuracy.
+  const distanceInBothUnits = (() => {
     if (!allDistances) return "";
 
-    // Round the entered distance the same way as the converted one, so both
-    // sides of the approximation show at most one decimal place.
-    const enteredDistance = formatDistanceValue(
+    const enteredDistance = formatDistanceValueTwoDp(
       getNumericValue(distance) + getDecimalValue(distanceDecimal),
     );
 
     switch (distanceUnit) {
       case DistanceUnit.Miles:
         return t("distanceApproximation", {
-          from: `${enteredDistance} ${distanceUnit}`,
-          to: `${formatDistanceValue(
+          from: `${enteredDistance} ${getDistanceUnitLabel(DistanceUnit.Miles)}`,
+          to: `${formatDistanceValueTwoDp(
             allDistances.inKilometers.distanceValue,
           )}${getDistanceUnitSingular(DistanceUnit.Kilometers)}`,
         });
@@ -87,9 +86,9 @@ function PaceSummary({ results }: { results: MultiPace }) {
       case DistanceUnit.Kilometers:
         return t("distanceApproximation", {
           from: `${enteredDistance}${getDistanceUnitSingular(distanceUnit)}`,
-          to: `${formatDistanceValue(allDistances.inMiles.distanceValue)} ${
-            DistanceUnit.Miles
-          }`,
+          to: `${formatDistanceValueTwoDp(
+            allDistances.inMiles.distanceValue,
+          )} ${getDistanceUnitLabel(DistanceUnit.Miles)}`,
         });
       default:
         return "";
@@ -140,9 +139,9 @@ function PaceSummary({ results }: { results: MultiPace }) {
 
       <div className="d-flex justify-content-between align-items-center mt-2 gap-2">
         <div className="text-muted text-smallish">
-          {allDistances ? displayText : null}
+          {allDistances ? distanceInBothUnits : null}
         </div>
-        <ShareTargetButton />
+        <SummaryCardButton />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { DistanceMode } from "@/types/distance";
+import { DistanceMode, isCustomEvent } from "@/types/distance";
 import { Distance, DistanceUnit, getDistanceInAllUnits } from "pace-calculator";
 import { getDecimalValue, getNumericValue, sanitizeTime } from "./input";
 import { CalculatorTime, timeStringsToMs } from "./time";
@@ -103,13 +103,14 @@ export const getStepMs = (eventId: string): number => {
   return event?.stepMs ?? 1000;
 };
 
-// opening = total % interval (a partial first lap when total isn't a clean
-// multiple), then full intervals up to total. The pace-calculator library
-// only handles uniform intervals, so these landmarks are scaled by proportion
-// in calculator.ts.
+// Sub-100m leftovers flip to the trailing layout so the mile (1609.344m → 9.344m) reads as 4×400m + trailing, not as a 9m opener.
 const generateLandmarks = (total: number, interval: number): number[] => {
-  const landmarks: number[] = [];
   const opening = total % interval;
+  if (opening > 0 && opening < 100) {
+    return generateLandmarksTrailing(total, interval);
+  }
+
+  const landmarks: number[] = [];
   if (opening > 0) landmarks.push(opening);
   for (let m = opening + interval; m <= total; m += interval) {
     landmarks.push(m);
@@ -120,9 +121,22 @@ const generateLandmarks = (total: number, interval: number): number[] => {
   return landmarks;
 };
 
-// Track-style cumulative landmarks for events that pace by laps rather than
-// road km/miles. Returns null for road events (5K+) — calculator.ts falls
-// through to its km/mile splits path for those.
+// Sub-400m distances want the first split at a natural marker, not at a leftover 50m/75m opener.
+const generateLandmarksTrailing = (
+  total: number,
+  interval: number,
+): number[] => {
+  const landmarks: number[] = [];
+  for (let m = interval; m <= total; m += interval) {
+    landmarks.push(m);
+  }
+  if (landmarks.length === 0 || landmarks[landmarks.length - 1] !== total) {
+    landmarks.push(total);
+  }
+  return landmarks;
+};
+
+// Null for road events; calculator.ts falls through to its km/mile splits path.
 export const getEventLandmarks = (
   eventId: string,
   totalMeters: number,
@@ -132,18 +146,16 @@ export const getEventLandmarks = (
   const event = Events.find((e) => e.id === eventId);
   const tags = event?.eventTags ?? [];
 
-  // Sprints (100m / 200m / 400m) pace in 100m segments.
   if (tags.includes(EventTags.Sprints)) {
     return generateLandmarks(totalMeters, 100);
   }
-  // Middle-distance (800m / 1500m / mile / 3000m) paces in 400m laps.
   if (tags.includes(EventTags.MiddleDistance)) {
     return generateLandmarks(totalMeters, 400);
   }
-  // Custom Track is meters-only and always pace-by-laps: 400m above the
-  // threshold, 100m intervals below to keep splits useful at short distances.
   if (eventId === DistanceMode.CustomTrack) {
-    return generateLandmarks(totalMeters, totalMeters >= 400 ? 400 : 100);
+    // Sub-400m falls back to 100m intervals via the trailing variant.
+    if (totalMeters >= 400) return generateLandmarks(totalMeters, 400);
+    return generateLandmarksTrailing(totalMeters, 100);
   }
 
   return null;
@@ -240,17 +252,16 @@ export const getFastestRecordPace = (
   eventId: string,
   customDistanceMeters: number,
 ): { secPerKm: number } | null => {
-  const secPerKm =
-    eventId === DistanceMode.Custom || eventId === DistanceMode.CustomTrack
-      ? getBracketedRecordPaceSecPerKm(customDistanceMeters)
-      : getEventWrPaceSecPerKm(eventId);
+  const secPerKm = isCustomEvent(eventId)
+    ? getBracketedRecordPaceSecPerKm(customDistanceMeters)
+    : getEventWrPaceSecPerKm(eventId);
   return secPerKm !== null ? { secPerKm } : null;
 };
 
 export const getDistanceDetailsFromEvent = (eventId: string) => {
   let changes = null;
 
-  if (eventId !== DistanceMode.Custom && eventId !== DistanceMode.CustomTrack) {
+  if (!isCustomEvent(eventId)) {
     const selectedEvent = Events.find((event) => event.id === eventId);
 
     if (selectedEvent) {

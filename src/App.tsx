@@ -3,6 +3,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import Calculator from "./modules/Calculator";
 import Footer from "./modules/Footer";
 import Header from "./modules/Header";
+import SummaryView from "./modules/SummaryView";
 import useCalculatorStore from "./state/useCalculatorStore";
 import { applySharedTarget, parseSharedTarget } from "./utils/shareTarget";
 
@@ -18,14 +19,22 @@ function SharedTargetLoader() {
 }
 
 function App() {
+  const summaryViewOpen = useCalculatorStore((s) => s.summaryViewOpen);
+
   return (
     <ThemeProvider>
       <SharedTargetLoader />
-      <Header />
-      <div className="mt-5">
-        <Calculator />
-      </div>
-      <Footer />
+      {summaryViewOpen ? (
+        <SummaryView />
+      ) : (
+        <>
+          <Header />
+          <div className="mt-5">
+            <Calculator />
+          </div>
+          <Footer />
+        </>
+      )}
     </ThemeProvider>
   );
 }

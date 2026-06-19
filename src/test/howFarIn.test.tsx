@@ -3,11 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import { userEvent } from "vitest/browser";
 import App from "@/App";
 import useCalculatorStore from "@/state/useCalculatorStore";
-import {
-  SAVED_DURATION_CAP,
-  SAVED_DURATION_STORAGE_KEY,
-  SAVED_DURATION_STORAGE_VERSION,
-} from "@/state/savedDurationsSlice";
+import { SAVED_DURATION_CAP } from "@/state/savedDurationsSlice";
 import { howFarInCard, selectEvent } from "./helpers";
 
 const openHowFarIn = async () => {
@@ -69,7 +65,7 @@ describe("How far in — default rows and units", () => {
 });
 
 describe("How far in — custom durations", () => {
-  it("adds, persists, and removes a custom duration", async () => {
+  it("adds and removes a custom duration without persisting it", async () => {
     const card = await openHowFarIn();
     await openCustomDurationForm();
 
@@ -85,12 +81,8 @@ describe("How far in — custom durations", () => {
     expect(row).toHaveTextContent("3.7K");
     expect(within(row).getByText("Custom")).toBeInTheDocument();
 
-    const raw = window.localStorage.getItem(SAVED_DURATION_STORAGE_KEY);
-    expect(raw).not.toBeNull();
-    const parsed = JSON.parse(raw!);
-    expect(parsed.version).toBe(SAVED_DURATION_STORAGE_VERSION);
-    expect(parsed.savedDurations).toHaveLength(1);
-    expect(parsed.savedDurations[0].seconds).toBe(22 * 60);
+    expect(useCalculatorStore.getState().savedDurations).toHaveLength(1);
+    expect(window.localStorage.length).toBe(0);
 
     await userEvent.click(
       within(row).getByRole("button", { name: /remove custom duration/i }),

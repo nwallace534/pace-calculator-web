@@ -12,6 +12,7 @@
 /coverage
 .vitest-attachments/
 __screenshots__/
+/screenshots
 
 # production
 /dist

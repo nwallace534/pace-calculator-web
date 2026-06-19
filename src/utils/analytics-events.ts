@@ -8,7 +8,6 @@ export const AnalyticsEvent = {
   ThemeToggled: "theme_toggled",
   SplitsOpened: "splits_opened",
   TimesForPaceOpened: "times_for_pace_opened",
-  SplitsUnitToggled: "splits_unit_toggled",
   DistanceUnitChanged: "distance_unit_changed",
   TimeFieldEdited: "time_field_edited",
   DistanceFieldEdited: "distance_field_edited",
@@ -18,6 +17,7 @@ export const AnalyticsEvent = {
   CalculationCompleted: "calculation_completed",
   SavedDistanceAdded: "saved_distance_added",
   SavedDistanceRemoved: "saved_distance_removed",
+  SummaryViewOpened: "summary_view_opened",
 } as const;
 
 export type AnalyticsEventName =

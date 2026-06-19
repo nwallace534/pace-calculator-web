@@ -14,7 +14,6 @@ export const extractCalculatorInput = (
   showSplits: state.showSplits,
   showTimesForPace: state.showTimesForPace,
   computeMode: state.computeMode,
-  splitsUnit: state.splitsUnit,
   event: state.event,
   savedDistances: state.savedDistances,
 });

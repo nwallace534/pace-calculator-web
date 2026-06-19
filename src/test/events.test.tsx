@@ -32,8 +32,14 @@ describe("5K (default event)", () => {
     expect(within(splitRows[1]).getByText("1K")).toBeInTheDocument();
     expect(within(splitRows[5]).getByText("00:30:00")).toBeInTheDocument();
 
-    // Toggle splits to miles. 5km ≈ 3.11mi → 4 splits (1, 2, 3, partial).
-    await userEvent.click(within(splitsCard()).getByText(/show in miles/i));
+    // Open the splits-view picker and select miles. 5km ≈ 3.11mi → 4 splits
+    // (1, 2, 3, partial).
+    await userEvent.click(
+      within(splitsCard()).getByTestId("splits-view-picker-toggle"),
+    );
+    await userEvent.click(
+      within(splitsCard()).getByTestId("splits-view-option-miles"),
+    );
     splitRows = within(splitsCard()).getAllByRole("row");
     expect(splitRows).toHaveLength(1 + 4);
     expect(within(splitRows[1]).getByText("1 mile")).toBeInTheDocument();
@@ -60,6 +66,32 @@ describe("5K (default event)", () => {
     splitRows = within(splitsCard()).getAllByRole("row");
     expect(splitRows).toHaveLength(1 + 4);
     expect(splitRows[1].textContent).toMatch(/1 mile/);
+  });
+
+  it("remembers normal split view selections per event for the browser session", async () => {
+    render(<App />);
+
+    await selectEvent("marathon");
+    await userEvent.click(screen.getByText("Splits"));
+    let splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1 mile/);
+
+    await userEvent.click(
+      within(splitsCard()).getByTestId("splits-view-picker-toggle"),
+    );
+    await userEvent.click(
+      within(splitsCard()).getByTestId("splits-view-option-K"),
+    );
+    splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1K/);
+
+    await selectEvent("halfMarathon");
+    splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1 mile/);
+
+    await selectEvent("marathon");
+    splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1K/);
   });
 
   it("Splits and Times & predictions start collapsed and toggle on click", async () => {
