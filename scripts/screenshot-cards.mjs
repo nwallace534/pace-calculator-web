@@ -8,7 +8,10 @@
 //   2. In another:      `npm run screenshot:cards`
 //      (override the dev URL with `BASE_URL=…` if you've moved the port)
 //
-// Output: ./screenshots/cards/<viewport-name>/<event-id>.png
+// Output:
+//   ./docs/pacerly-start-light.jpg
+//   ./docs/pacerly-start-dark.jpg
+//   ./screenshots/cards/<viewport-name>/<event-id>.png
 //
 // Add or trim EVENT_GOALS / VIEWPORTS to widen or narrow the sweep.
 
@@ -22,6 +25,7 @@ const ROOT = dirname(__dirname);
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:5273";
 const OUT_DIR = `${ROOT}/screenshots/cards`;
+const DOCS_DIR = `${ROOT}/docs`;
 
 // Portrait phone presets: small / medium / large. Large matches the card's
 // own max (Pixel 9 Pro XL CSS dimensions), so it should fill the viewport.
@@ -48,6 +52,16 @@ const EVENT_GOALS = [
   { id: "marathon", h: 4, m: 0, s: 0, cs: 0 },
 ];
 
+const HOMEPAGE_VIEWPORT = VIEWPORTS.find(
+  (viewport) => viewport.name === "large",
+);
+const HOMEPAGE_SCREENSHOT_HEIGHT = 1500;
+const HOMEPAGE_JPEG_QUALITY = 82;
+const HOMEPAGE_SHOTS = [
+  { theme: "light", path: `${DOCS_DIR}/pacerly-start-light.jpg` },
+  { theme: "dark", path: `${DOCS_DIR}/pacerly-start-dark.jpg` },
+];
+
 const buildUrl = ({ id, h, m, s, cs }) => {
   const p = new URLSearchParams({ event: id, view: "summary" });
   if (h) p.set("h", String(h));
@@ -57,6 +71,36 @@ const buildUrl = ({ id, h, m, s, cs }) => {
   return `${BASE_URL}/?${p.toString()}`;
 };
 
+const captureHomepageShot = async (browser, { theme, path }) => {
+  const context = await browser.newContext({
+    viewport: {
+      width: HOMEPAGE_VIEWPORT.width,
+      height: HOMEPAGE_SCREENSHOT_HEIGHT / 2,
+    },
+    deviceScaleFactor: 2,
+  });
+  await context.addInitScript((themeValue) => {
+    window.localStorage.setItem("theme", themeValue);
+  }, theme);
+
+  const page = await context.newPage();
+  try {
+    await page.goto(BASE_URL, { waitUntil: "networkidle" });
+    await page.waitForSelector('img[alt="Pacerly logo"]', {
+      timeout: 5000,
+    });
+    await page.screenshot({
+      path,
+      type: "jpeg",
+      quality: HOMEPAGE_JPEG_QUALITY,
+    });
+    console.log(`  ✓ ${path.replace(`${ROOT}/`, "")}`);
+  } finally {
+    await page.close();
+    await context.close();
+  }
+};
+
 async function main() {
   console.log(`base url:  ${BASE_URL}`);
   console.log(`out dir:   ${OUT_DIR}`);
@@ -64,11 +108,20 @@ async function main() {
   // Wipe previous run so stale event ids don't linger if the catalog shrinks.
   await rm(OUT_DIR, { recursive: true, force: true });
   await mkdir(OUT_DIR, { recursive: true });
+  await mkdir(DOCS_DIR, { recursive: true });
 
   const browser = await chromium.launch();
   let count = 0;
 
   try {
+    console.log(
+      `\nhomepage docs (${HOMEPAGE_VIEWPORT.width * 2}×${HOMEPAGE_SCREENSHOT_HEIGHT})`,
+    );
+    for (const shot of HOMEPAGE_SHOTS) {
+      await captureHomepageShot(browser, shot);
+      count++;
+    }
+
     for (const viewport of VIEWPORTS) {
       const dir = `${OUT_DIR}/${viewport.name}`;
       await mkdir(dir, { recursive: true });
@@ -105,7 +158,9 @@ async function main() {
     await browser.close();
   }
 
-  console.log(`\n${count} screenshots → ${OUT_DIR}`);
+  console.log(`\n${count} screenshots written`);
+  console.log(`cards → ${OUT_DIR}`);
+  console.log(`docs  → ${DOCS_DIR}`);
 }
 
 main().catch((err) => {

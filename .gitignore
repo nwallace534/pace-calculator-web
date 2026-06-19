@@ -35,6 +35,3 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-
-# pre-wipe blob recovery (2026-06-13). Local-only; not for commit.
-recovered/
