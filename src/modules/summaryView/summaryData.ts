@@ -4,16 +4,88 @@ import {
   MultiPace,
   Time,
 } from "pace-calculator";
+import { isCustomEvent } from "@/types/distance";
+import {
+  DISTANCE_MATCH_TOLERANCE_METERS,
+  DistanceUnitStandardShortLabel,
+  formatDistanceValueTwoDp,
+  formatDistanceWithShortUnit,
+  getDistanceUnitLabel,
+} from "@/utils/distances";
 import { Events, type Event } from "@/utils/events-data";
 import { eventDistancesInMeters } from "@/utils/events";
 import { getDecimalValue, getNumericValue } from "@/utils/input";
 import { predictRaceTime } from "@/utils/predictions";
-import { DISTANCE_MATCH_TOLERANCE_METERS } from "@/utils/distances";
 import { msToTime, timeToMs } from "@/utils/time";
 
 export type SummaryPredictionRow = {
   id: string;
   timeText: string;
+};
+
+export type IntervalRow = {
+  id: string;
+  timeText: string;
+};
+
+type CustomDistanceLabelParams = {
+  event: string;
+  distanceWhole: string;
+  distanceFractional: string;
+  distanceUnit: DistanceUnit;
+};
+
+// Returns null for built-in events so callers can fall back to the i18n label.
+export const getCustomDistanceLabel = ({
+  event,
+  distanceWhole,
+  distanceFractional,
+  distanceUnit,
+}: CustomDistanceLabelParams): string | null => {
+  if (!isCustomEvent(event)) return null;
+  const value =
+    getNumericValue(distanceWhole) + getDecimalValue(distanceFractional);
+  return formatDistanceWithShortUnit(value, distanceUnit);
+};
+
+type DistanceLineParams = {
+  distanceWhole: string;
+  distanceFractional: string;
+  distanceUnit: DistanceUnit;
+};
+
+// Miles events render both sides because the headline carries no unit suffix.
+export const buildDistanceLine = ({
+  distanceWhole,
+  distanceFractional,
+  distanceUnit,
+}: DistanceLineParams): string => {
+  const distanceAllUnits = getDistanceInAllUnits({
+    distanceValue:
+      getNumericValue(distanceWhole) + getDecimalValue(distanceFractional),
+    distanceUnit,
+  });
+  const inMiles = `${formatDistanceValueTwoDp(
+    distanceAllUnits.inMiles.distanceValue,
+  )} ${getDistanceUnitLabel(DistanceUnit.Miles)}`;
+  if (distanceUnit === DistanceUnit.Miles) {
+    const inKm = `${formatDistanceValueTwoDp(
+      distanceAllUnits.inKilometers.distanceValue,
+    )} ${DistanceUnitStandardShortLabel[DistanceUnit.Kilometers]}`;
+    return `${inMiles} = ${inKm}`;
+  }
+  return inMiles;
+};
+
+// Track events label by cumulative meter landmark (the number carries pacing meaning); road events use the split index.
+export const formatSplitLabel = (
+  unit: DistanceUnit | undefined,
+  distance: number,
+  splitNumber: number,
+): string => {
+  if (unit === DistanceUnit.Meters) return `${distance}`;
+  if (Number.isInteger(distance)) return `${splitNumber}`;
+  return distance.toFixed(2);
 };
 
 // No rounding — these are exact arrival points, so a 9.988s rounded to "10s" would misstate the goal pace.
@@ -56,11 +128,6 @@ const friendlyFromParts = (
     return `${m}m ${secondsString(true)}`;
   }
   return secondsString(false);
-};
-
-export type IntervalRow = {
-  id: string;
-  timeText: string;
 };
 
 type BuildSummaryPredictionRowsParams = {

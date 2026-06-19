@@ -1,9 +1,12 @@
-// Unit-test exception (per testing-approach memory): summaryFormat.ts is a
+// Unit-test exception (per testing-approach memory): summaryData.ts is a
 // pure helper module with no DOM, store, or i18n surface.
 
 import { describe, expect, it } from "vitest";
 import { DistanceUnit } from "pace-calculator";
-import { buildDistanceLine, formatSplitLabel } from "@/modules/summaryFormat";
+import {
+  buildDistanceLine,
+  formatSplitLabel,
+} from "@/modules/summaryView/summaryData";
 
 describe("buildDistanceLine", () => {
   it("renders 'X mi = Y km' (both at 2dp) for miles-unit events", () => {

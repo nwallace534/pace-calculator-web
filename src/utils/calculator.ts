@@ -25,16 +25,14 @@ import {
   DistanceInputSubset,
 } from "@/types/calculatorInput";
 import {
+  buildDistanceLine,
   buildIntervalRows,
   buildSummaryPredictionRows,
   formatFriendlyTimeExact,
+  getCustomDistanceLabel,
   type IntervalRow,
   type SummaryPredictionRow,
-} from "@/modules/summaryRows";
-import {
-  buildDistanceLine,
-  getCustomDistanceLabel,
-} from "@/modules/summaryFormat";
+} from "@/modules/summaryView/summaryData";
 
 export enum ComputeMode {
   Distance = "Distance",

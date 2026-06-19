@@ -2,7 +2,7 @@ import { DistanceUnit } from "pace-calculator";
 import { useTranslation } from "react-i18next";
 import type { SplitsResult } from "@/utils/calculator";
 import { formatTime } from "@/utils/formatTime";
-import { formatSplitLabel } from "@/modules/summaryFormat";
+import { formatSplitLabel } from "@/modules/summaryView/summaryData";
 import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
 import { SplitsViewPicker } from "@/components/SplitsViewPicker";
 import type { SplitsViewOption } from "@/utils/splitsView";

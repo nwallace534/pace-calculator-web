@@ -1,7 +1,10 @@
 import { StateCreator } from "zustand";
 import { MultiPace, Time } from "pace-calculator";
 import { SplitsResult } from "@/utils/calculator";
-import type { IntervalRow, SummaryPredictionRow } from "@/modules/summaryRows";
+import type {
+  IntervalRow,
+  SummaryPredictionRow,
+} from "@/modules/summaryView/summaryData";
 
 export interface PaceResultsSlice {
   paceResults: MultiPace | null;

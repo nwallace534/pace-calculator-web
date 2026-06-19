@@ -1,5 +1,5 @@
 // Smoke-only browser coverage (see test-layering-with-screenshots memory):
-// per-event variety lives in the screenshot script and the summaryRows /
+// per-event variety lives in the screenshot script and the summaryData /
 // trackLandmarks unit suites. These tests only prove the component wires up
 // for the behaviours that can't be unit-tested cleanly — open/close, controls
 // autohide, title editing, the splits-view picker — and run one of each

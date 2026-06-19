@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { type SummaryPredictionRow } from "@/modules/summaryRows";
+import { type SummaryPredictionRow } from "@/modules/summaryView/summaryData";
 
 export function SummaryPredictions({ rows }: { rows: SummaryPredictionRow[] }) {
   const { t } = useTranslation(["calculator", "events"]);

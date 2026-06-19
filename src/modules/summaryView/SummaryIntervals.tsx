@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { type IntervalRow } from "@/modules/summaryRows";
+import { type IntervalRow } from "@/modules/summaryView/summaryData";
 
 export function SummaryIntervals({ rows }: { rows: IntervalRow[] }) {
   const { t } = useTranslation(["calculator", "events"]);

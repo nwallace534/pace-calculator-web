@@ -96,7 +96,7 @@ export function Tooltip({
   // Auto-dismiss fallback — touch devices have no hover-out so a forgotten
   // tooltip would otherwise linger forever.
   useEffect(() => {
-    if (!show) return;
+    if (!show || HOVER_CAPABLE) return;
     const id = window.setTimeout(() => setShow(false), 3000);
     return () => clearTimeout(id);
   }, [show]);

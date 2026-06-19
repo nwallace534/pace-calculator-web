@@ -1,6 +1,6 @@
-// Unit-test exception (per testing-approach memory): summaryRows.ts is a pure
-// helper module. Exercising its reference-selection branches per-event through the
-// browser would be slow and offers no signal the screenshot script doesn't
+// Unit-test exception (per testing-approach memory): summaryData.ts is a pure
+// helper module. Exercising its reference-selection branches per-event through
+// the browser would be slow and offers no signal the screenshot script doesn't
 // already cover.
 
 import { describe, expect, it } from "vitest";
@@ -9,7 +9,7 @@ import {
   buildIntervalRows,
   buildSummaryPredictionRows,
   formatFriendlyTimeExact,
-} from "@/modules/summaryRows";
+} from "@/modules/summaryView/summaryData";
 
 const time = (hours: number, minutes: number, seconds: number, ms = 0) => ({
   hours,
