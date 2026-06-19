@@ -4,12 +4,7 @@ import { userEvent } from "vitest/browser";
 import { DistanceUnit } from "pace-calculator";
 import App from "@/App";
 import useCalculatorStore from "@/state/useCalculatorStore";
-import {
-  SAVED_DISTANCE_CAP,
-  STORAGE_KEY,
-  STORAGE_VERSION,
-  loadSavedDistances,
-} from "@/state/savedDistancesSlice";
+import { SAVED_DISTANCE_CAP } from "@/state/savedDistancesSlice";
 import { selectEvent, timesForPaceCard } from "./helpers";
 
 const seedSavedDistance = (
@@ -318,46 +313,14 @@ describe("Saved custom distances — add form", () => {
   });
 });
 
-describe("Saved custom distances — persistence", () => {
-  it("persists added distances to localStorage in the documented envelope", async () => {
+describe("Saved custom distances — session storage", () => {
+  it("does not persist added distances to localStorage", async () => {
     render(<App />);
     await userEvent.click(screen.getByText("Times & predictions"));
 
     seedSavedDistance(8, DistanceUnit.Kilometers);
 
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    expect(raw).not.toBeNull();
-    const parsed = JSON.parse(raw!);
-    expect(parsed.version).toBe(STORAGE_VERSION);
-    expect(parsed.savedDistances).toHaveLength(1);
-    expect(parsed.savedDistances[0]).toMatchObject({
-      distanceValue: 8,
-      distanceUnit: DistanceUnit.Kilometers,
-    });
-  });
-
-  it("hydrates the slice from localStorage on next load", async () => {
-    // Pre-seed localStorage as if the user already had a saved distance.
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        version: STORAGE_VERSION,
-        savedDistances: [
-          {
-            id: "fixture-id",
-            distanceValue: 12,
-            distanceUnit: DistanceUnit.Miles,
-          },
-        ],
-      }),
-    );
-
-    // loadSavedDistances simulates the slice's init path on a fresh page load.
-    const hydrated = loadSavedDistances();
-    expect(hydrated).toHaveLength(1);
-    expect(hydrated[0]).toMatchObject({
-      distanceValue: 12,
-      distanceUnit: DistanceUnit.Miles,
-    });
+    expect(useCalculatorStore.getState().savedDistances).toHaveLength(1);
+    expect(window.localStorage.length).toBe(0);
   });
 });

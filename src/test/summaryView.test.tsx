@@ -2,7 +2,7 @@
 // per-event variety lives in the screenshot script and the summaryRows /
 // trackLandmarks unit suites. These tests only prove the component wires up
 // for the behaviours that can't be unit-tested cleanly — open/close, controls
-// autohide, title editing, the splits-override toggle — and run one of each
+// autohide, title editing, the splits-view picker — and run one of each
 // event type (track / middle distance / most popular) so we'd catch a wiring
 // regression that breaks only one path.
 
@@ -162,5 +162,24 @@ describe("Summary view — per event type", () => {
         within(card).getByTestId("summary-splits-heading"),
       ).toHaveTextContent(/Splits in Miles/);
     });
+  });
+
+  it("summary split selection does not leak back to the normal splits panel", async () => {
+    render(<App />);
+
+    const card = await openSummary();
+    await userEvent.click(
+      within(card).getByTestId("splits-view-picker-toggle"),
+    );
+    await userEvent.click(within(card).getByTestId("splits-view-option-miles"));
+
+    await userEvent.click(screen.getByTestId("summary-close"));
+    expect(await screen.findByAltText("Pacerly logo")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByText("Splits"));
+    const splitRows = within(screen.getByTestId("card-splits")).getAllByRole(
+      "row",
+    );
+    expect(within(splitRows[1]).getByText("1K")).toBeInTheDocument();
   });
 });

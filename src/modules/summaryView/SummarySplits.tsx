@@ -5,8 +5,8 @@ import { formatTime } from "@/utils/formatTime";
 import { formatSplitLabel } from "@/modules/summaryFormat";
 import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
 import { SplitsViewPicker } from "@/components/SplitsViewPicker";
-import type { SplitsOverrideOption } from "@/utils/splitsOverride";
-import type { SplitsViewOption } from "@/hooks/useSplitsOverride";
+import type { SplitsViewOption } from "@/utils/splitsView";
+import type { SplitsPickerOption } from "@/hooks/useSplitsViewSelection";
 import PencilIcon from "@/assets/icons/pencil.svg?react";
 
 export function SummarySplits({
@@ -18,9 +18,9 @@ export function SummarySplits({
 }: {
   splits: SplitsResult;
   controlsVisible: boolean;
-  selected: SplitsOverrideOption;
-  pickerOptions: SplitsViewOption[];
-  onSelect: (option: SplitsOverrideOption) => void;
+  selected: SplitsViewOption;
+  pickerOptions: SplitsPickerOption[];
+  onSelect: (option: SplitsViewOption) => void;
 }) {
   const { t } = useTranslation("calculator");
 

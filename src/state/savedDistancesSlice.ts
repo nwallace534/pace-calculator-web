@@ -8,11 +8,8 @@ import { extractCalculatorInput } from "@/utils/extractCalculatorInput";
 import { track } from "@/utils/analytics";
 import { AnalyticsEvent } from "@/utils/analytics-events";
 
-export const STORAGE_KEY = "pace-calculator:saved-distances";
-export const STORAGE_VERSION = 1;
 export const SAVED_DISTANCE_CAP = 5;
 const MAX_DISPLAY_VALUE = 100000;
-const MAX_METERS = 200_000_000;
 
 export type SavedDistance = {
   id: string;
@@ -85,82 +82,6 @@ const findSavedMatch = (
       DISTANCE_MATCH_TOLERANCE_METERS,
   );
 
-// Hydration validator — runs at slice init AND is exported for unit tests.
-// Per-item validation so one bad entry doesn't drop the whole list.
-export const loadSavedDistances = (): SavedDistance[] => {
-  let raw: string | null;
-  try {
-    raw = window.localStorage?.getItem(STORAGE_KEY) ?? null;
-  } catch {
-    return [];
-  }
-  if (!raw) return [];
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return [];
-  }
-
-  if (
-    !parsed ||
-    typeof parsed !== "object" ||
-    (parsed as { version: unknown }).version !== STORAGE_VERSION
-  ) {
-    return [];
-  }
-
-  const list = (parsed as { savedDistances: unknown }).savedDistances;
-  if (!Array.isArray(list)) return [];
-
-  const out: SavedDistance[] = [];
-  for (const item of list) {
-    if (out.length >= SAVED_DISTANCE_CAP) break;
-    if (!item || typeof item !== "object") continue;
-    const id = (item as { id: unknown }).id;
-    const distanceValue = (item as { distanceValue: unknown }).distanceValue;
-    const distanceUnit = (item as { distanceUnit: unknown }).distanceUnit;
-    if (typeof id !== "string" || id.length === 0) continue;
-    if (!isValidDisplayValue(distanceValue)) continue;
-    if (!isValidUnit(distanceUnit)) continue;
-    out.push({ id, distanceValue, distanceUnit });
-  }
-  return out;
-};
-
-const persistSavedDistances = (savedDistances: SavedDistance[]): void => {
-  try {
-    window.localStorage?.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ version: STORAGE_VERSION, savedDistances }),
-    );
-  } catch {
-    // localStorage may throw (private mode, quota). In-memory state still
-    // updates; the next save attempt will retry persistence.
-  }
-};
-
-// Single egress point for analytics payloads on these events. Returns null
-// if any check fails; the call site treats null as "skip tracking" rather
-// than emit a malformed event.
-export const buildSavedDistancePayload = (
-  input: AddSavedDistanceInput,
-): { unit: DistanceUnit; displayValue: number; meters: number } | null => {
-  if (!isValidUnit(input.distanceUnit)) return null;
-  const coerced = Number(input.distanceValue);
-  if (!isValidDisplayValue(coerced)) return null;
-  const metersRaw = toMeters(coerced, input.distanceUnit);
-  if (!Number.isFinite(metersRaw) || metersRaw <= 0 || metersRaw > MAX_METERS) {
-    return null;
-  }
-  return {
-    unit: input.distanceUnit,
-    displayValue: coerced,
-    meters: Math.round(metersRaw),
-  };
-};
-
 // Typed against the full CalculatorStore so set/get see the whole state — the
 // setters recompute timesForPace via getCalculationUpdate, which needs the
 // other slices' fields (distance, time, computeMode, etc.).
@@ -170,7 +91,7 @@ export const createSavedDistancesSlice: StateCreator<
   [],
   SavedDistancesSlice
 > = (set, get) => ({
-  savedDistances: loadSavedDistances(),
+  savedDistances: [],
   addSavedDistance: (input) => {
     if (!isValidUnit(input.distanceUnit))
       return { ok: false, reason: "invalid" };
@@ -199,7 +120,6 @@ export const createSavedDistancesSlice: StateCreator<
         distanceUnit: input.distanceUnit,
       },
     ];
-    persistSavedDistances(next);
 
     // Recompute timesForPace so the new row appears immediately. Mirrors the
     // pattern in distanceSlice setters.
@@ -209,16 +129,13 @@ export const createSavedDistancesSlice: StateCreator<
     });
     set({ savedDistances: next, ...calculationUpdate });
 
-    const payload = buildSavedDistancePayload(input);
-    if (payload) track(AnalyticsEvent.SavedDistanceAdded, payload);
+    track(AnalyticsEvent.SavedDistanceAdded);
     return { ok: true };
   },
   removeSavedDistance: (id) => {
     const current = get().savedDistances;
-    const target = current.find((s) => s.id === id);
-    if (!target) return;
+    if (!current.some((s) => s.id === id)) return;
     const next = current.filter((s) => s.id !== id);
-    persistSavedDistances(next);
 
     const calculationUpdate = getCalculationUpdate({
       ...extractCalculatorInput(get()),
@@ -226,10 +143,6 @@ export const createSavedDistancesSlice: StateCreator<
     });
     set({ savedDistances: next, ...calculationUpdate });
 
-    const payload = buildSavedDistancePayload({
-      distanceValue: target.distanceValue,
-      distanceUnit: target.distanceUnit,
-    });
-    if (payload) track(AnalyticsEvent.SavedDistanceRemoved, payload);
+    track(AnalyticsEvent.SavedDistanceRemoved);
   },
 });

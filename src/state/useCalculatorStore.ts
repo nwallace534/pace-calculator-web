@@ -17,10 +17,7 @@ import {
   createSavedDurationsSlice,
   SavedDurationsSlice,
 } from "./savedDurationsSlice";
-import {
-  createSplitsPreferencesSlice,
-  SplitsPreferencesSlice,
-} from "./splitsPreferencesSlice";
+import { createSplitsViewSlice, SplitsViewSlice } from "./splitsViewSlice";
 
 export type CalculatorStore = CalculatorSlice &
   DistanceSlice &
@@ -32,7 +29,7 @@ export type CalculatorStore = CalculatorSlice &
   SpinnerHintSlice &
   SavedDistancesSlice &
   SavedDurationsSlice &
-  SplitsPreferencesSlice;
+  SplitsViewSlice;
 
 const useCalculatorStore = create<CalculatorStore>()((...args) => ({
   ...createCalculatorSlice(...args),
@@ -44,7 +41,7 @@ const useCalculatorStore = create<CalculatorStore>()((...args) => ({
   ...createSpinnerHintSlice(...args),
   ...createSavedDistancesSlice(...args),
   ...createSavedDurationsSlice(...args),
-  ...createSplitsPreferencesSlice(...args),
+  ...createSplitsViewSlice(...args),
 }));
 
 // Resolve the default event for first load

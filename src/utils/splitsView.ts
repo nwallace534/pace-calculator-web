@@ -7,15 +7,15 @@ import type { PaceResultsSlice } from "@/state/paceResultsSlice";
 
 // "laps" means the event's default landmark layout — track laps for ≥400m,
 // 100m segments for sprints.
-export type SplitsOverrideOptionKey = "K" | "miles" | "hundredMeters" | "laps";
+export type SplitsViewOptionKey = "K" | "miles" | "hundredMeters" | "laps";
 
-export type SplitsOverrideOption = {
-  key: SplitsOverrideOptionKey;
+export type SplitsViewOption = {
+  key: SplitsViewOptionKey;
   pickSplits: (state: PaceResultsSlice) => SplitsResult | null;
   i18nKey: string;
 };
 
-export const SplitsOverrideOptions = {
+export const SplitsViewOptions = {
   laps: {
     key: "laps",
     pickSplits: (s: PaceResultsSlice) => s.splits,
@@ -36,14 +36,14 @@ export const SplitsOverrideOptions = {
     pickSplits: (s: PaceResultsSlice) => s.splitsByMiles,
     i18nKey: "calculator:result.splitsView.miles",
   },
-} as const satisfies Record<SplitsOverrideOptionKey, SplitsOverrideOption>;
+} as const satisfies Record<SplitsViewOptionKey, SplitsViewOption>;
 
 // Road units first since they're the common case.
-export const SPLITS_OVERRIDE_OPTION_ORDER: SplitsOverrideOption[] = [
-  SplitsOverrideOptions.K,
-  SplitsOverrideOptions.miles,
-  SplitsOverrideOptions.laps,
-  SplitsOverrideOptions.hundredMeters,
+export const SPLITS_VIEW_OPTION_ORDER: SplitsViewOption[] = [
+  SplitsViewOptions.K,
+  SplitsViewOptions.miles,
+  SplitsViewOptions.laps,
+  SplitsViewOptions.hundredMeters,
 ];
 
 const ONE_MILE_METERS = 1609.344;
@@ -51,7 +51,7 @@ const ONE_MILE_METERS = 1609.344;
 // primarySplitsUnit discriminates track-style from road events: Meters means
 // laps apply; K/Miles means "laps" would duplicate K/Miles splits.
 export const getSplitsOptionDisabledReasonKey = (
-  option: SplitsOverrideOption,
+  option: SplitsViewOption,
   totalDistanceMeters: number | null,
   primarySplitsUnit: DistanceUnit | undefined,
 ): string | null => {
@@ -85,12 +85,10 @@ export const getSplitsOptionDisabledReasonKey = (
 export const getDefaultSplitsOption = (
   totalDistanceMeters: number | null,
   primarySplitsUnit: DistanceUnit | undefined,
-): SplitsOverrideOption => {
-  if (totalDistanceMeters === null) return SplitsOverrideOptions.laps;
-  if (totalDistanceMeters <= 400) return SplitsOverrideOptions.hundredMeters;
-  if (primarySplitsUnit === DistanceUnit.Meters)
-    return SplitsOverrideOptions.laps;
-  if (primarySplitsUnit === DistanceUnit.Miles)
-    return SplitsOverrideOptions.miles;
-  return SplitsOverrideOptions.K;
+): SplitsViewOption => {
+  if (totalDistanceMeters === null) return SplitsViewOptions.laps;
+  if (totalDistanceMeters <= 400) return SplitsViewOptions.hundredMeters;
+  if (primarySplitsUnit === DistanceUnit.Meters) return SplitsViewOptions.laps;
+  if (primarySplitsUnit === DistanceUnit.Miles) return SplitsViewOptions.miles;
+  return SplitsViewOptions.K;
 };

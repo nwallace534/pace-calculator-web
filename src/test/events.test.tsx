@@ -68,6 +68,32 @@ describe("5K (default event)", () => {
     expect(splitRows[1].textContent).toMatch(/1 mile/);
   });
 
+  it("remembers normal split view selections per event for the browser session", async () => {
+    render(<App />);
+
+    await selectEvent("marathon");
+    await userEvent.click(screen.getByText("Splits"));
+    let splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1 mile/);
+
+    await userEvent.click(
+      within(splitsCard()).getByTestId("splits-view-picker-toggle"),
+    );
+    await userEvent.click(
+      within(splitsCard()).getByTestId("splits-view-option-K"),
+    );
+    splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1K/);
+
+    await selectEvent("halfMarathon");
+    splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1 mile/);
+
+    await selectEvent("marathon");
+    splitRows = within(splitsCard()).getAllByRole("row");
+    expect(splitRows[1].textContent).toMatch(/1K/);
+  });
+
   it("Splits and Times & predictions start collapsed and toggle on click", async () => {
     render(<App />);
 

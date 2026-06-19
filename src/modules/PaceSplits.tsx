@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next";
 import { DistanceUnit } from "pace-calculator";
 import { TrackSummaryLine } from "@/modules/TrackSummaryLine";
 import { SplitsViewPicker } from "@/components/SplitsViewPicker";
-import { useSplitsOverride } from "@/hooks/useSplitsOverride";
+import { useSplitsViewSelection } from "@/hooks/useSplitsViewSelection";
 
 function PaceSplits() {
   const { t } = useTranslation("calculator");
-  const splitsControl = useSplitsOverride();
+  const splitsControl = useSplitsViewSelection();
   const splits = splitsControl.splits;
 
   if (!splits) return null;

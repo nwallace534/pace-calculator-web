@@ -23,7 +23,6 @@ const baseInput = (
   showSplits: true,
   showTimesForPace: false,
   computeMode: ComputeMode.Pace,
-  splitsUnit: null,
   event: "fiveK",
   savedDistances: [],
   ...overrides,

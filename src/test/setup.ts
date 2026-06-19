@@ -17,12 +17,9 @@ beforeEach(() => {
   // Clear the per-test localStorage so a prior test's theme toggle (or any
   // other persisted preference) doesn't bleed into the next render.
   window.localStorage?.removeItem("theme");
-  window.localStorage?.removeItem("pace-calculator:saved-distances");
-  window.localStorage?.removeItem("pace-calculator:saved-durations");
-  window.localStorage?.removeItem("pace-calculator:splits-preferences");
 
   // The Zustand store is a module-level singleton; without a full wipe, panel
-  // toggles, per-event time memory, the splits-unit override and Custom
+  // toggles, per-event time memory, split view selections and Custom
   // distance slots all leak between tests. Wipe inline to give each test a
   // clean default-event slate.
   const store = useCalculatorStore;
@@ -30,7 +27,6 @@ beforeEach(() => {
     showSplits: false,
     showTimesForPace: false,
     timesForPaceTab: "times",
-    splitsUnit: null,
     summaryViewOpen: false,
     summaryArrivedFromShare: false,
     computeMode: ComputeMode.Pace,
@@ -52,7 +48,7 @@ beforeEach(() => {
     paceHundredths: "",
     savedDistances: [],
     savedDurations: [],
-    splitsPreferences: {},
+    splitsViewSelections: {},
   });
   // Re-bootstrap the default event so distance/time/calculations repaint —
   // same path the store uses on first load.

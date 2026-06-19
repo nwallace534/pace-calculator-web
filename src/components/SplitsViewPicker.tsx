@@ -3,14 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Placement } from "@popperjs/core";
 import Dropdown from "@/components/Dropdown";
 import { Tooltip } from "@/components/Tooltip";
-import type { SplitsOverrideOption } from "@/utils/splitsOverride";
-import type { SplitsViewOption } from "@/hooks/useSplitsOverride";
+import type { SplitsViewOption } from "@/utils/splitsView";
+import type { SplitsPickerOption } from "@/hooks/useSplitsViewSelection";
 import InfoIcon from "@/assets/icons/info.svg?react";
 
 type Props = {
-  selected: SplitsOverrideOption;
-  options: SplitsViewOption[];
-  onSelect: (option: SplitsOverrideOption) => void;
+  selected: SplitsViewOption;
+  options: SplitsPickerOption[];
+  onSelect: (option: SplitsViewOption) => void;
   /** bottom-end for right-anchored triggers, bottom-start for left-anchored. */
   placement?: Placement;
   /** Custom trigger element; defaults to the selected unit label with chevron. */

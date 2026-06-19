@@ -8,7 +8,6 @@ export const AnalyticsEvent = {
   ThemeToggled: "theme_toggled",
   SplitsOpened: "splits_opened",
   TimesForPaceOpened: "times_for_pace_opened",
-  SplitsUnitToggled: "splits_unit_toggled",
   DistanceUnitChanged: "distance_unit_changed",
   TimeFieldEdited: "time_field_edited",
   DistanceFieldEdited: "distance_field_edited",

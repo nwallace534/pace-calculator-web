@@ -107,9 +107,9 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
       {
         const trackLandmarks = getEventLandmarks(state.event, totalMeters);
 
-        const splitsUnit = trackLandmarks
+        const primarySplitUnit = trackLandmarks
           ? DistanceUnit.Meters
-          : (state.splitsUnit ?? distanceUnit);
+          : distanceUnit;
 
         let rows: CalculateSplitsOutput;
         if (trackLandmarks) {
@@ -121,9 +121,9 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
             time: msToTime((totalMs * landmark) / totalMeters),
           }));
         } else {
-          // splitsUnit is Km or Miles here — meter events route through trackLandmarks above.
+          // primarySplitUnit is Km or Miles here — meter events route through trackLandmarks above.
           const splitsDistance =
-            splitsUnit === DistanceUnit.Miles
+            primarySplitUnit === DistanceUnit.Miles
               ? distanceInAllUnits.inMiles
               : distanceInAllUnits.inKilometers;
 
@@ -168,7 +168,7 @@ export const getCalculationUpdate = (state: CalculatorInputSubset) => {
               })()
             : null;
 
-        splits = { unit: splitsUnit, showHundredths, rows, trackSummary };
+        splits = { unit: primarySplitUnit, showHundredths, rows, trackSummary };
       }
 
       {

@@ -6,7 +6,7 @@ import { buildShareUrl } from "@/utils/shareTarget";
 import { useAutoHideControls } from "@/hooks/useAutoHideControls";
 import { useCardCloseAnimation } from "@/hooks/useCardCloseAnimation";
 import { TITLE_MAX_LENGTH, useEditableTitle } from "@/hooks/useEditableTitle";
-import { useSplitsOverride } from "@/hooks/useSplitsOverride";
+import { useSummarySplitsViewSelection } from "@/hooks/useSplitsViewSelection";
 import { CloseButton, SectionSpacer } from "@/modules/summaryView/icons";
 import { CopyToast } from "@/modules/summaryView/CopyToast";
 import { SummaryControls } from "@/modules/summaryView/SummaryControls";
@@ -54,7 +54,7 @@ function SummaryView() {
   const controls = useAutoHideControls({ hideDelayMs: 3000 });
   const title = useEditableTitle({ maxLength: TITLE_MAX_LENGTH });
   const close = useCardCloseAnimation(closeSummaryView);
-  const splitsControl = useSplitsOverride();
+  const splitsControl = useSummarySplitsViewSelection();
 
   // Reveal during editing would let the hide timer race the save.
   const handleRevealControls = () => {

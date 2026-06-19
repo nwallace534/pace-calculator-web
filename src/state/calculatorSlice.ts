@@ -1,8 +1,7 @@
-import { ComputeMode, getCalculationUpdate } from "@/utils/calculator";
-import { DistanceUnit } from "pace-calculator";
+import { ComputeMode } from "@/utils/calculator";
 import { StateCreator } from "zustand";
 import { CalculatorStore } from "./useCalculatorStore";
-import { track, trackOnce } from "@/utils/analytics";
+import { trackOnce, track } from "@/utils/analytics";
 import { AnalyticsEvent } from "@/utils/analytics-events";
 
 const THEME_STORAGE_KEY = "theme";
@@ -31,9 +30,6 @@ export interface CalculatorSlice {
   setShowTimesForPace: (showTimesForPace: boolean) => void;
   timesForPaceTab: TimesForPaceTab;
   setTimesForPaceTab: (timesForPaceTab: TimesForPaceTab) => void;
-  /** Unit for the splits table; `null` follows the entered distance unit. */
-  splitsUnit: DistanceUnit | null;
-  toggleSplitsUnit: () => void;
   summaryViewOpen: boolean;
   /** True when opened via a share link; drives the orientation hint. */
   summaryArrivedFromShare: boolean;
@@ -53,7 +49,6 @@ export const createCalculatorSlice: StateCreator<
   showSplits: false,
   showTimesForPace: false,
   timesForPaceTab: "times",
-  splitsUnit: null,
   summaryViewOpen: false,
   summaryArrivedFromShare: false,
   openSummaryView: () => {
@@ -86,22 +81,6 @@ export const createCalculatorSlice: StateCreator<
 
   setTimesForPaceTab: (timesForPaceTab) => {
     set({ timesForPaceTab });
-  },
-
-  toggleSplitsUnit: () => {
-    const current = get().splitsUnit ?? get().distanceUnit;
-    const splitsUnit =
-      current === DistanceUnit.Kilometers
-        ? DistanceUnit.Miles
-        : DistanceUnit.Kilometers;
-
-    const calculationUpdate = getCalculationUpdate({
-      ...get(),
-      splitsUnit,
-    });
-
-    track(AnalyticsEvent.SplitsUnitToggled, { to: splitsUnit });
-    set({ splitsUnit, ...calculationUpdate });
   },
 
   toggleTheme: () => {

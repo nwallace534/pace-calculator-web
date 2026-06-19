@@ -1,4 +1,4 @@
-// Unit-test exception (per testing-approach memory): splitsOverride.ts is a
+// Unit-test exception (per testing-approach memory): splitsView.ts is a
 // pure helper module — the disabled-rules matrix and smart-default matrix
 // are exactly what unit tests catch cleanly. Browser coverage of every
 // distance/unit combination would be slow and offers no signal a small
@@ -7,66 +7,66 @@
 import { describe, expect, it } from "vitest";
 import { DistanceUnit } from "pace-calculator";
 import {
-  SplitsOverrideOptions,
+  SplitsViewOptions,
   getDefaultSplitsOption,
   getSplitsOptionDisabledReasonKey,
-} from "@/utils/splitsOverride";
+} from "@/utils/splitsView";
 
 describe("getDefaultSplitsOption", () => {
   it("returns hundredMeters for sprint distances (≤400m), regardless of primary unit", () => {
     expect(getDefaultSplitsOption(100, DistanceUnit.Meters)).toBe(
-      SplitsOverrideOptions.hundredMeters,
+      SplitsViewOptions.hundredMeters,
     );
     expect(getDefaultSplitsOption(400, DistanceUnit.Meters)).toBe(
-      SplitsOverrideOptions.hundredMeters,
+      SplitsViewOptions.hundredMeters,
     );
   });
 
   it("returns laps when the primary splits are in meters (track-style events) above 400m", () => {
     // 800m, 1500m, mile, 3000m, even custom-track 5000m if entered as meters.
     expect(getDefaultSplitsOption(800, DistanceUnit.Meters)).toBe(
-      SplitsOverrideOptions.laps,
+      SplitsViewOptions.laps,
     );
     expect(getDefaultSplitsOption(1500, DistanceUnit.Meters)).toBe(
-      SplitsOverrideOptions.laps,
+      SplitsViewOptions.laps,
     );
     expect(getDefaultSplitsOption(3000, DistanceUnit.Meters)).toBe(
-      SplitsOverrideOptions.laps,
+      SplitsViewOptions.laps,
     );
   });
 
   it("returns miles for road events entered in miles (marathon, half marathon)", () => {
     // Marathon: 42195m, primary unit Miles.
     expect(getDefaultSplitsOption(42195, DistanceUnit.Miles)).toBe(
-      SplitsOverrideOptions.miles,
+      SplitsViewOptions.miles,
     );
     // Half marathon: 21097m, primary unit Miles.
     expect(getDefaultSplitsOption(21097, DistanceUnit.Miles)).toBe(
-      SplitsOverrideOptions.miles,
+      SplitsViewOptions.miles,
     );
   });
 
   it("returns K for road events entered in km (5K, 10K)", () => {
     expect(getDefaultSplitsOption(5000, DistanceUnit.Kilometers)).toBe(
-      SplitsOverrideOptions.K,
+      SplitsViewOptions.K,
     );
     expect(getDefaultSplitsOption(10000, DistanceUnit.Kilometers)).toBe(
-      SplitsOverrideOptions.K,
+      SplitsViewOptions.K,
     );
   });
 
   it("falls back to laps when totalDistanceMeters is null (loading / no input yet)", () => {
     expect(getDefaultSplitsOption(null, DistanceUnit.Kilometers)).toBe(
-      SplitsOverrideOptions.laps,
+      SplitsViewOptions.laps,
     );
     expect(getDefaultSplitsOption(null, undefined)).toBe(
-      SplitsOverrideOptions.laps,
+      SplitsViewOptions.laps,
     );
   });
 });
 
 describe("getSplitsOptionDisabledReasonKey — laps", () => {
-  const laps = SplitsOverrideOptions.laps;
+  const laps = SplitsViewOptions.laps;
 
   it("is disabled for sprints (≤400m)", () => {
     expect(
@@ -109,7 +109,7 @@ describe("getSplitsOptionDisabledReasonKey — laps", () => {
 });
 
 describe("getSplitsOptionDisabledReasonKey — hundredMeters", () => {
-  const opt = SplitsOverrideOptions.hundredMeters;
+  const opt = SplitsViewOptions.hundredMeters;
 
   it("is enabled for distances up to 800m (the sprint + 800m range)", () => {
     expect(
@@ -131,7 +131,7 @@ describe("getSplitsOptionDisabledReasonKey — hundredMeters", () => {
 });
 
 describe("getSplitsOptionDisabledReasonKey — K", () => {
-  const opt = SplitsOverrideOptions.K;
+  const opt = SplitsViewOptions.K;
 
   it("is enabled at and above 1K", () => {
     expect(
@@ -153,7 +153,7 @@ describe("getSplitsOptionDisabledReasonKey — K", () => {
 });
 
 describe("getSplitsOptionDisabledReasonKey — miles", () => {
-  const opt = SplitsOverrideOptions.miles;
+  const opt = SplitsViewOptions.miles;
   const ONE_MILE = 1609.344;
 
   it("is enabled at and above 1 mile (1609.344m)", () => {
@@ -180,15 +180,11 @@ describe("getSplitsOptionDisabledReasonKey — null distance", () => {
     // Loading state — don't claim anything is disabled until we know the
     // distance. Callers default to the smart-default option anyway.
     expect(
-      getSplitsOptionDisabledReasonKey(
-        SplitsOverrideOptions.laps,
-        null,
-        undefined,
-      ),
+      getSplitsOptionDisabledReasonKey(SplitsViewOptions.laps, null, undefined),
     ).toBeNull();
     expect(
       getSplitsOptionDisabledReasonKey(
-        SplitsOverrideOptions.K,
+        SplitsViewOptions.K,
         null,
         DistanceUnit.Kilometers,
       ),
